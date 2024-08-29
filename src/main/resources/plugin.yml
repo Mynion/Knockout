@@ -1,0 +1,9 @@
+name: KnockoutPlugin
+version: '${project.version}'
+main: org.mynion.knockoutplugin.KnockoutPlugin
+api-version: '1.21'
+commands:
+  pick:
+    description: pick up a knocked out player
+  throw:
+    description: throw a knocked out player
