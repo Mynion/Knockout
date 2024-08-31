@@ -10,15 +10,15 @@ public class Npc {
     private final ServerPlayer deadBody;
     private final ArmorStand armorStand;
 
-    public Entity getVehicle() {
+    public Player getVehicle() {
         return vehicle;
     }
 
-    public void setVehicle(Entity vehicle) {
+    public void setVehicle(Player vehicle) {
         this.vehicle = vehicle;
     }
 
-    private Entity vehicle;
+    private Player vehicle;
 
     public Npc(Player player, ServerPlayer deadBody, ArmorStand armorStand) {
         this.player = player;

@@ -277,9 +277,19 @@ public class NpcManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                org.bukkit.entity.Entity currentVehicle = NpcManager.getNpc(knockedOutPlayer).getVehicle();
-                if (currentVehicle != null) {
-                    currentVehicle.addPassenger(knockedOutPlayer);
+                if (npcExists(knockedOutPlayer)) {
+                    Player currentVehicle = getNpc(knockedOutPlayer).getVehicle();
+                    if (currentVehicle != null) {
+                        if (currentVehicle.isOnline()) {
+                            currentVehicle.addPassenger(knockedOutPlayer);
+                        } else {
+                            knockedOutPlayer.leaveVehicle();
+                            getNpc(knockedOutPlayer).setVehicle(null);
+                            this.cancel();
+                        }
+                    } else {
+                        this.cancel();
+                    }
                 } else {
                     this.cancel();
                 }
