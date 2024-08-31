@@ -150,11 +150,15 @@ public class NpcManager {
         AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
         jumpAttribute.setBaseValue(0);
 
+        // Remove all potion effects
+        PotionEffectType[] potionEffects = PotionEffectType.values();
+        Arrays.asList(potionEffects).forEach(p::removePotionEffect);
+
+        // Add custom potion effects
         PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 999999999, 1, false, false);
         PotionEffect invisibility = new PotionEffect(PotionEffectType.INVISIBILITY, 999999999, 100, false, false);
         p.addPotionEffect(blindness);
         p.addPotionEffect(invisibility);
-        p.removePotionEffect(PotionEffectType.POISON);
 
         p.setHealth(2);
         p.setWalkSpeed(0);
