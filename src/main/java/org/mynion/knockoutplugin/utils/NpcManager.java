@@ -73,11 +73,13 @@ public class NpcManager {
         armorStand.setInvisible(true);
         armorStand.setGravity(false);
 
+        // Has to be done before creating NPC
+        applyKnockoutEffects(p);
+
         // Create npc
         Npc npc = new Npc(p, deadBodyPlayer, armorStand);
         NPCs.add(npc);
 
-        applyKnockoutEffects(p);
         setNoCollisions(npc);
         teleportBody(npc);
 
