@@ -28,6 +28,7 @@ public final class KnockoutPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new DropItemListener(), this);
         getServer().getPluginManager().registerEvents(new PotionEffectListener(), this);
         getServer().getPluginManager().registerEvents(new PickupItemListener(), this);
+        getServer().getPluginManager().registerEvents(new PickupArrowListener(), this);
         getCommand("pick").setExecutor(new PickCommand());
         getCommand("throw").setExecutor(new ThrowCommand());
     }

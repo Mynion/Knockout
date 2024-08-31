@@ -8,7 +8,7 @@ import org.mynion.knockoutplugin.utils.NpcManager;
 
 public class PickupItemListener implements Listener {
     @EventHandler
-    public void onPickUpItem(EntityPickupItemEvent e) {
+    public void onPickupItem(EntityPickupItemEvent e) {
         if (e.getEntity() instanceof Player p) {
             if (NpcManager.npcExists(p)) {
                 e.setCancelled(true);
