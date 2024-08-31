@@ -19,7 +19,10 @@ public class PickCommand implements CommandExecutor {
                 return false;
             }).findFirst().map(pl -> (Player) pl);
 
-            knockedOutPlayer.ifPresent(p::addPassenger);
+            knockedOutPlayer.ifPresent(ko -> {
+                p.addPassenger(ko);
+                NpcManager.getNpc(ko).setVehicle(p);
+            });
         }
         return true;
     }

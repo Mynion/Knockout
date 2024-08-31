@@ -13,14 +13,17 @@ public class ThrowCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player p) {
-            Optional<Entity> knockedOutPlayer = p.getPassengers().stream().filter(pass -> {
+            Optional<Player> knockedOutPlayer = p.getPassengers().stream().filter(pass -> {
                 if (pass instanceof Player pl) {
                     return NpcManager.npcExists(pl);
                 }
                 return false;
-            }).findFirst();
+            }).findFirst().map(pl -> (Player) pl);
 
-            knockedOutPlayer.ifPresent(p::removePassenger);
+            knockedOutPlayer.ifPresent(ko -> {
+                p.removePassenger(ko);
+                NpcManager.getNpc(ko).setVehicle(null);
+            });
         }
         return true;
     }
