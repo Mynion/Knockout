@@ -11,8 +11,7 @@ public class PlayerQuitListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent e) {
         Player p = e.getPlayer();
         if (NpcManager.npcExists(p)) {
-            NpcManager.resetKnockout(NpcManager.getNpc(p));
-            p.setHealth(0);
+            NpcManager.forceKill(p);
         }
     }
 }

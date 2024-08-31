@@ -12,6 +12,7 @@ public class PickCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player p) {
+            // Find knocked out player
             Optional<Player> knockedOutPlayer = p.getNearbyEntities(1, 1, 1).stream().filter(e -> {
                 if (e instanceof Player pl) {
                     return NpcManager.npcExists(pl);
@@ -19,9 +20,10 @@ public class PickCommand implements CommandExecutor {
                 return false;
             }).findFirst().map(pl -> (Player) pl);
 
+            // Pick up a knocked out player
             knockedOutPlayer.ifPresent(ko -> {
-                p.addPassenger(ko);
                 NpcManager.getNpc(ko).setVehicle(p);
+                NpcManager.trackVehicle(ko);
             });
         }
         return true;

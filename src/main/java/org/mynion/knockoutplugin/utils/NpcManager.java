@@ -84,6 +84,7 @@ public class NpcManager {
     }
 
     private static ServerPlayer createDeadBody(Player p) {
+
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
         MinecraftServer server = sp.getServer();
@@ -115,6 +116,7 @@ public class NpcManager {
         return deadBodyPlayer;
     }
 
+    // Resets knockout but does not kill the player
     public static void resetKnockout(Npc npc) {
 
         // Reset knockout effects
@@ -134,6 +136,7 @@ public class NpcManager {
 
     }
 
+    // Resets knockout and kills the player
     public static void forceKill(Player p) {
         resetKnockout(getNpc(p));
         p.setHealth(0);
@@ -226,6 +229,7 @@ public class NpcManager {
 
     }
 
+    // Teleporting body and hologram to the player while knocked out
     private static void teleportBody(Npc npc) {
 
         CraftEntity craftArmorStand = (CraftEntity) npc.getArmorStand();
@@ -233,7 +237,6 @@ public class NpcManager {
         ServerPlayer deadBody = npc.getDeadBody();
         Player p = npc.getPlayer();
 
-        // Teleport dead body to the player while knocked out
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -241,8 +244,8 @@ public class NpcManager {
                     ClientboundTeleportEntityPacket teleportBodyPacket = new ClientboundTeleportEntityPacket(deadBody);
                     broadcastPacket(teleportBodyPacket);
                     if (p.isInsideVehicle()) {
-                        deadBody.teleportTo(p.getLocation().getX(), p.getLocation().getY() + 0.5, p.getLocation().getZ());
-                        armorStand.teleportTo(p.getLocation().getX(), p.getLocation().getY() + 0.5, p.getLocation().getZ());
+                        deadBody.teleportTo(p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
+                        armorStand.teleportTo(p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
                     } else {
                         deadBody.teleportTo(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
                         armorStand.teleportTo(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
@@ -251,18 +254,33 @@ public class NpcManager {
                     this.cancel();
                 }
             }
-        }.runTaskTimer(KnockoutPlugin.getPlugin(), 0, 3);
+        }.runTaskTimer(KnockoutPlugin.getPlugin(), 0, 1);
     }
 
+    // Set no collisions for dead body
     private static void setNoCollisions(Npc npc) {
 
-        // Set no collisions for dead body
         PlayerTeam team = new PlayerTeam(new Scoreboard(), "deadBody");
         team.setCollisionRule(Team.CollisionRule.NEVER);
         team.getPlayers().add(npc.getDeadBody().displayName);
 
         broadcastPacket(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
 
+    }
+
+    // Tracking a knocked out player vehicle to prevent dismount
+    public static void trackVehicle(Player knockedOutPlayer) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                org.bukkit.entity.Entity currentVehicle = NpcManager.getNpc(knockedOutPlayer).getVehicle();
+                if (currentVehicle != null) {
+                    currentVehicle.addPassenger(knockedOutPlayer);
+                } else {
+                    this.cancel();
+                }
+            }
+        }.runTaskTimer(KnockoutPlugin.getPlugin(), 0, 2);
     }
 
     private static void broadcastPacket(Packet<?> packet) {

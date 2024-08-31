@@ -21,7 +21,7 @@ public final class KnockoutPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerInteractEntityListener(), this);
         getServer().getPluginManager().registerEvents(new EntityDamageListener(), this);
         getServer().getPluginManager().registerEvents(new RegainHealthListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerTargetListener(), this);
+        getServer().getPluginManager().registerEvents(new EntityTargetListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerMoveListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
