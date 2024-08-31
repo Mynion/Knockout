@@ -313,14 +313,17 @@ public class NpcManager {
     }
 
     public static Npc getNpc(Player player) {
-        return NPCs.stream().filter(npc -> npc.getPlayer().equals(player)).findFirst().get();
+        Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getPlayer().equals(player)).findFirst();
+        return matchingNpc.orElse(null);
     }
 
     public static Npc getNpc(ArmorStand armorStand) {
-        return NPCs.stream().filter(npc -> npc.getArmorStand().equals(armorStand)).findFirst().get();
+        Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getArmorStand().equals(armorStand)).findFirst();
+        return matchingNpc.orElse(null);
     }
 
     public static Npc getNpc(ServerPlayer deadBody) {
-        return NPCs.stream().filter(npc -> npc.getDeadBody().equals(deadBody)).findFirst().get();
+        Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getDeadBody().equals(deadBody)).findFirst();
+        return matchingNpc.orElse(null);
     }
 }
