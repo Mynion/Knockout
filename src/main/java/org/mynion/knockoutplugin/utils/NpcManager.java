@@ -173,6 +173,7 @@ public class NpcManager {
         p.leaveVehicle();
         p.getPassengers().forEach(p::removePassenger);
 
+        // Reset nearby mobs focus on a KO player
         List<org.bukkit.entity.Entity> nearbyMobs = p.getNearbyEntities(50, 50, 50);
         nearbyMobs.forEach(mob -> {
             if (mob instanceof Mob m) {
@@ -184,6 +185,7 @@ public class NpcManager {
             }
         });
 
+        // Hide KO player
         Bukkit.getServer().getOnlinePlayers().forEach(player -> player.hidePlayer(KnockoutPlugin.getPlugin(), p));
 
         startTimer(p);
@@ -204,8 +206,7 @@ public class NpcManager {
                 } else {
                     this.cancel();
                     if (NpcManager.npcExists(p)) {
-                        NpcManager.resetKnockout(NpcManager.getNpc(p));
-                        p.setHealth(0);
+                        forceKill(p);
                     }
                 }
             }
