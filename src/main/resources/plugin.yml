@@ -7,3 +7,5 @@ commands:
     description: pick up a knocked out player
   throw:
     description: throw a knocked out player
+  die:
+    description: die when you are knocked out

@@ -2,6 +2,7 @@ package org.mynion.knockoutplugin;
 
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.mynion.knockoutplugin.commands.DieCommand;
 import org.mynion.knockoutplugin.commands.PickCommand;
 import org.mynion.knockoutplugin.commands.ThrowCommand;
 import org.mynion.knockoutplugin.listeners.*;
@@ -34,6 +35,7 @@ public final class KnockoutPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ExpChangeListener(), this);
         getCommand("pick").setExecutor(new PickCommand());
         getCommand("throw").setExecutor(new ThrowCommand());
+        getCommand("die").setExecutor(new DieCommand());
     }
 
     @Override
