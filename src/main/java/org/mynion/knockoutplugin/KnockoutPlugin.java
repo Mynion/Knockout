@@ -33,6 +33,7 @@ public final class KnockoutPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new EditBookListener(), this);
         getServer().getPluginManager().registerEvents(new SwapHandItemsListener(), this);
         getServer().getPluginManager().registerEvents(new ExpChangeListener(), this);
+        getServer().getPluginManager().registerEvents(new CommandListener(), this);
         getCommand("pick").setExecutor(new PickCommand());
         getCommand("throw").setExecutor(new ThrowCommand());
         getCommand("die").setExecutor(new DieCommand());
