@@ -26,6 +26,7 @@ import net.minecraft.world.scores.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_21_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer;
 import org.bukkit.entity.ArmorStand;
@@ -300,7 +301,8 @@ public class NpcManager {
             }
         }.runTaskTimer(KnockoutPlugin.getPlugin(), 0, 2);
     }
-    public static void startReviving(Player revivingPlayer, Player knockedOutPlayer){
+
+    public static void startReviving(Player revivingPlayer, Player knockedOutPlayer) {
 
         int requiredLevels = 5;
         int playerStartingLevel = revivingPlayer.getLevel();
@@ -308,14 +310,16 @@ public class NpcManager {
         int timeInTicks = 10 * 20;
         int period = 1;
         float expDecrement = (float) requiredLevels / ((float) timeInTicks / period);
+        Location reviveLocation = revivingPlayer.getLocation();
 
         if (playerStartingLevel >= requiredLevels) {
             new BukkitRunnable() {
                 int timer = 0;
                 float usedLevels = 0;
+
                 @Override
                 public void run() {
-                    if (revivingPlayer.isSneaking()) {
+                    if (canBeRevivedBy(revivingPlayer, knockedOutPlayer, reviveLocation)) {
 
                         // Checks if the player has enough xp to be decremented
                         if (revivingPlayer.getExp() >= expDecrement) {
@@ -331,6 +335,7 @@ public class NpcManager {
                         // Update timer and send the title
                         timer += period;
                         revivingPlayer.sendTitle(ChatColor.GREEN + "Reviving...", (int) (((float) timer / (float) timeInTicks) * 100) + "%", 1, period, 1);
+                        knockedOutPlayer.sendTitle(ChatColor.GREEN + "You are being revived... ", (int) (((float) timer / (float) timeInTicks) * 100) + "%", 1, period, 1);
 
                         // Check if the player has used required levels
                         if (usedLevels >= requiredLevels) {
@@ -344,6 +349,7 @@ public class NpcManager {
                                 // Revive a KO player
                                 NpcManager.resetKnockout(NpcManager.getNpc(knockedOutPlayer));
                                 revivingPlayer.sendMessage("You revived " + knockedOutPlayer.getDisplayName());
+                                knockedOutPlayer.sendMessage("You have been revived by " + revivingPlayer.getDisplayName());
                                 this.cancel();
 
                             }
@@ -354,10 +360,14 @@ public class NpcManager {
                 }
             }.runTaskTimer(KnockoutPlugin.getPlugin(), 0, period);
         } else {
-            if (!revivingPlayer.isSneaking()) {
+            if (!revivingPlayer.isSneaking() && !knockedOutPlayer.isInsideVehicle()) {
                 revivingPlayer.sendMessage(ChatColor.RED + "You don't have enough levels ( " + ChatColor.RED + requiredLevels + ChatColor.RED + " ) to revive that player");
             }
         }
+    }
+
+    private static boolean canBeRevivedBy(Player revivingPlayer, Player knockedOutPlayer, Location reviveLocation) {
+        return !knockedOutPlayer.isInsideVehicle() && revivingPlayer.isSneaking() && reviveLocation.getBlock().equals(revivingPlayer.getLocation().getBlock());
     }
 
     private static void broadcastPacket(Packet<?> packet) {
