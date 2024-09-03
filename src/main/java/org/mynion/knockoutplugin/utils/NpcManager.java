@@ -166,6 +166,7 @@ public class NpcManager {
         p.setWalkSpeed(0);
         p.setFlySpeed(0);
         p.setFireTicks(0);
+        p.setNoDamageTicks(11);
         p.setFlying(false);
         p.setInvisible(true);
         p.setCollidable(false);
