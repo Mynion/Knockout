@@ -31,6 +31,7 @@ public class PlayerJoinListener implements Listener {
         ServerPlayer sp = cp.getHandle();
         ServerLevel level = sp.serverLevel();
 
+        // Perform actions for a new player
         NpcManager.getNPCs().forEach(npc -> {
 
             ServerPlayer deadBodyPlayer = npc.getDeadBody();
@@ -45,14 +46,14 @@ public class PlayerJoinListener implements Listener {
             sp.connection.send(addEntityPacket);
             sp.connection.send(setEntityDataPacket);
 
-            // Set no collisions for dead bodies and new player
+            // Set no collisions for dead bodies and a new player
             PlayerTeam team = new PlayerTeam(new Scoreboard(), "deadBody");
             team.setCollisionRule(Team.CollisionRule.NEVER);
             team.getPlayers().add(npc.getDeadBody().displayName);
 
             sp.connection.send(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
 
-            // Hide knocked out player for new player
+            // Hide knocked out players for a new player
             p.hidePlayer(KnockoutPlugin.getPlugin(), npc.getPlayer());
 
         });

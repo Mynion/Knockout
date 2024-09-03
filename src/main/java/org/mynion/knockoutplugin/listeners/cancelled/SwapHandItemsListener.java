@@ -1,13 +1,13 @@
-package org.mynion.knockoutplugin.listeners;
+package org.mynion.knockoutplugin.listeners.cancelled;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
-public class PlayerInteractListener implements Listener {
+public class SwapHandItemsListener implements Listener {
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent e) {
+    public void onSwapHandItems(PlayerSwapHandItemsEvent e) {
         if (NpcManager.npcExists(e.getPlayer())) {
             e.setCancelled(true);
         }

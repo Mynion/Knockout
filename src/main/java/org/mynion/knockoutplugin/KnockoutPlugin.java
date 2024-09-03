@@ -6,6 +6,7 @@ import org.mynion.knockoutplugin.commands.DieCommand;
 import org.mynion.knockoutplugin.commands.PickCommand;
 import org.mynion.knockoutplugin.commands.ThrowCommand;
 import org.mynion.knockoutplugin.listeners.*;
+import org.mynion.knockoutplugin.listeners.cancelled.*;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
 public final class KnockoutPlugin extends JavaPlugin {

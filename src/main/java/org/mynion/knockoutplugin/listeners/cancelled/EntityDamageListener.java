@@ -1,4 +1,4 @@
-package org.mynion.knockoutplugin.listeners;
+package org.mynion.knockoutplugin.listeners.cancelled;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

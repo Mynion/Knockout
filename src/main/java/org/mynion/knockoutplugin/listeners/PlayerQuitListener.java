@@ -10,8 +10,11 @@ public class PlayerQuitListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
         Player p = e.getPlayer();
+
+        // Kill the player if knocked out
         if (NpcManager.npcExists(p)) {
             NpcManager.forceKill(p);
         }
+
     }
 }
