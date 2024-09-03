@@ -299,6 +299,65 @@ public class NpcManager {
             }
         }.runTaskTimer(KnockoutPlugin.getPlugin(), 0, 2);
     }
+    public static void startReviving(Player revivingPlayer, Player knockedOutPlayer){
+
+        int requiredLevels = 5;
+        int playerStartingLevel = revivingPlayer.getLevel();
+        float playerStartingExp = revivingPlayer.getExp();
+        int timeInTicks = 10 * 20;
+        int period = 1;
+        float expDecrement = (float) requiredLevels / ((float) timeInTicks / period);
+
+        if (playerStartingLevel >= requiredLevels) {
+            new BukkitRunnable() {
+                int timer = 0;
+                float usedLevels = 0;
+                @Override
+                public void run() {
+                    if (revivingPlayer.isSneaking()) {
+
+                        // Checks if the player has enough xp to be decremented
+                        if (revivingPlayer.getExp() >= expDecrement) {
+                            // Decrement player xp
+                            revivingPlayer.setExp(revivingPlayer.getExp() - expDecrement);
+                        } else {
+                            // Reduce player level by 1 and set xp bar to maximum
+                            revivingPlayer.setLevel(revivingPlayer.getLevel() - 1);
+                            revivingPlayer.setExp(0.9999f);
+                            usedLevels = playerStartingLevel - revivingPlayer.getLevel();
+                        }
+
+                        // Update timer and send the title
+                        timer += period;
+                        revivingPlayer.sendTitle(ChatColor.GREEN + "Reviving...", (int) (((float) timer / (float) timeInTicks) * 100) + "%", 1, period, 1);
+
+                        // Check if the player has used required levels
+                        if (usedLevels >= requiredLevels) {
+                            if (revivingPlayer.getExp() < expDecrement) {
+                                revivingPlayer.setExp(0);
+                            }
+
+                            // Check if the player has used required xp on xp bar
+                            if (revivingPlayer.getExp() <= playerStartingExp) {
+
+                                // Revive a KO player
+                                NpcManager.resetKnockout(NpcManager.getNpc(knockedOutPlayer));
+                                revivingPlayer.sendMessage("You revived " + knockedOutPlayer.getDisplayName());
+                                this.cancel();
+
+                            }
+                        }
+                    } else {
+                        this.cancel();
+                    }
+                }
+            }.runTaskTimer(KnockoutPlugin.getPlugin(), 0, period);
+        } else {
+            if (!revivingPlayer.isSneaking()) {
+                revivingPlayer.sendMessage(ChatColor.RED + "You don't have enough levels ( " + ChatColor.RED + requiredLevels + ChatColor.RED + " ) to revive that player");
+            }
+        }
+    }
 
     private static void broadcastPacket(Packet<?> packet) {
         MinecraftServer server = MinecraftServer.getServer();

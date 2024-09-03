@@ -3,7 +3,6 @@ package org.mynion.knockoutplugin.listeners;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
 public class CommandListener implements Listener {
