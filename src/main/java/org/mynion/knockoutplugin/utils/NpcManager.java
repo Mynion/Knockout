@@ -49,6 +49,7 @@ public class NpcManager {
         ServerPlayer sp = cp.getHandle();
         MinecraftServer server = sp.getServer();
         ServerLevel level = sp.serverLevel();
+        GameMode playerGameMode = p.getGameMode();
 
         // Create dead body
         ServerPlayer deadBodyPlayer = createDeadBody(p);
@@ -78,7 +79,7 @@ public class NpcManager {
         applyKnockoutEffects(p);
 
         // Create npc
-        Npc npc = new Npc(p, deadBodyPlayer, armorStand);
+        Npc npc = new Npc(p, deadBodyPlayer, armorStand, playerGameMode);
         NPCs.add(npc);
 
         setNoCollisions(npc);
@@ -121,9 +122,11 @@ public class NpcManager {
 
     // Resets knockout but does not kill the player
     public static void resetKnockout(Npc npc) {
+        Player p = npc.getPlayer();
+        GameMode previousGameMode = npc.getPreviousGameMode();
 
         // Reset knockout effects
-        resetKnockoutEffects(npc.getPlayer());
+        resetKnockoutEffects(p);
 
         // Remove dead body
         ClientboundPlayerInfoRemovePacket removeNpcPacket = new ClientboundPlayerInfoRemovePacket(List.of(npc.getDeadBody().getGameProfile().getId()));
@@ -136,6 +139,9 @@ public class NpcManager {
 
         // Remove npc from npc list
         NPCs.remove(npc);
+
+        // Set previous gamemode
+        p.setGameMode(previousGameMode);
 
     }
 
@@ -200,11 +206,11 @@ public class NpcManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if(NpcManager.npcExists(p) && !p.isInsideVehicle() && !NpcManager.getNpc(p).isBeingRevived()){
-                    if (knockoutCooldown[0] > 0){
+                if (NpcManager.npcExists(p) && !p.isInsideVehicle() && !NpcManager.getNpc(p).isBeingRevived()) {
+                    if (knockoutCooldown[0] > 0) {
                         p.sendTitle(ChatColor.RED + "Knockout", Integer.toString(knockoutCooldown[0]), 1, 20 * 3600, 1);
                         knockoutCooldown[0]--;
-                    }else{
+                    } else {
                         forceKill(p);
                         this.cancel();
                     }

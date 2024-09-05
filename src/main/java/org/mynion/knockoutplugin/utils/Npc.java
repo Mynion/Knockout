@@ -1,6 +1,7 @@
 package org.mynion.knockoutplugin.utils;
 
 import net.minecraft.server.level.ServerPlayer;
+import org.bukkit.GameMode;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 
@@ -10,11 +11,13 @@ public class Npc {
     private final ArmorStand armorStand;
     private Player vehicle;
     private boolean isBeingRevived;
+    private final GameMode previousGameMode;
 
-    public Npc(Player player, ServerPlayer deadBody, ArmorStand armorStand) {
+    public Npc(Player player, ServerPlayer deadBody, ArmorStand armorStand, GameMode previousGameMode) {
         this.player = player;
         this.deadBody = deadBody;
         this.armorStand = armorStand;
+        this.previousGameMode = previousGameMode;
         isBeingRevived = false;
     }
 
@@ -44,5 +47,9 @@ public class Npc {
 
     public void setBeingRevived(boolean beingRevived) {
         isBeingRevived = beingRevived;
+    }
+
+    public GameMode getPreviousGameMode() {
+        return previousGameMode;
     }
 }
