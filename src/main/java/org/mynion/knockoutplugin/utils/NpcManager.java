@@ -33,6 +33,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -42,6 +43,7 @@ import java.util.*;
 
 public class NpcManager {
     private static final List<Npc> NPCs = new ArrayList<>();
+    private static final Plugin plugin = KnockoutPlugin.getPlugin();
 
     public static void knockoutPlayer(Player p) {
 
@@ -69,7 +71,10 @@ public class NpcManager {
         // Create hologram
         ArmorStand armorStand = (ArmorStand) p.getWorld().spawnEntity(p.getLocation(), EntityType.ARMOR_STAND);
         armorStand.setSmall(true);
-        armorStand.setCustomName(ChatColor.RED + "Knockout");
+        String hologramName = plugin.getConfig().getString("knockout-hologram");
+        if (hologramName != null) {
+            armorStand.setCustomName(ChatColor.translateAlternateColorCodes('&', hologramName));
+        }
         armorStand.setCustomNameVisible(true);
         armorStand.setInvulnerable(true);
         armorStand.setInvisible(true);
@@ -208,7 +213,10 @@ public class NpcManager {
             public void run() {
                 if (NpcManager.npcExists(p) && !p.isInsideVehicle() && !NpcManager.getNpc(p).isBeingRevived()) {
                     if (knockoutCooldown[0] > 0) {
-                        p.sendTitle(ChatColor.RED + "Knockout", Integer.toString(knockoutCooldown[0]), 1, 20 * 3600, 1);
+                        String knockoutTitle = plugin.getConfig().getString("knockout-title");
+                        if (knockoutTitle != null) {
+                            p.sendTitle(ChatColor.translateAlternateColorCodes('&', knockoutTitle), Integer.toString(knockoutCooldown[0]), 1, 20 * 3600, 1);
+                        }
                         knockoutCooldown[0]--;
                     } else {
                         forceKill(p);
@@ -340,8 +348,16 @@ public class NpcManager {
 
                         // Update timer and send titles
                         timer += period;
-                        revivingPlayer.sendTitle(ChatColor.GREEN + "Reviving...", (int) (((float) timer / (float) timeInTicks) * 100) + "%", 1, period, 1);
-                        knockedOutPlayer.sendTitle(ChatColor.GREEN + "You are being revived... ", (int) (((float) timer / (float) timeInTicks) * 100) + "%", 1, period, 1);
+
+                        String revivingTitle = plugin.getConfig().getString("rescuer-reviving-title");
+                        if (revivingTitle != null) {
+                            revivingPlayer.sendTitle(ChatColor.translateAlternateColorCodes('&', revivingTitle), (int) (((float) timer / (float) timeInTicks) * 100) + "%", 1, period, 1);
+                        }
+
+                        String revivedTitle = plugin.getConfig().getString("rescued-reviving-title");
+                        if (revivedTitle != null) {
+                            knockedOutPlayer.sendTitle(ChatColor.translateAlternateColorCodes('&', revivedTitle), (int) (((float) timer / (float) timeInTicks) * 100) + "%", 1, period, 1);
+                        }
 
                         // Check if the player has used required levels
                         if (usedLevels >= requiredLevels) {
@@ -355,15 +371,26 @@ public class NpcManager {
                                 // Revive a KO player
                                 getNpc(knockedOutPlayer).setBeingRevived(false);
                                 NpcManager.resetKnockout(NpcManager.getNpc(knockedOutPlayer));
-                                revivingPlayer.sendMessage("You revived " + knockedOutPlayer.getDisplayName());
-                                knockedOutPlayer.sendMessage("You have been revived by " + revivingPlayer.getDisplayName());
+
+                                String revivingMessage = plugin.getConfig().getString("rescuer-revived-message");
+                                if (revivingMessage != null) {
+                                    revivingMessage = revivingMessage.replace("%player%", knockedOutPlayer.getDisplayName());
+                                    revivingPlayer.sendMessage(revivingMessage);
+                                }
+
+                                String revivedMessage = plugin.getConfig().getString("rescued-revived-message");
+                                if (revivedMessage != null) {
+                                    revivedMessage = revivedMessage.replace("%player%", revivingPlayer.getDisplayName());
+                                    knockedOutPlayer.sendMessage(revivedMessage);
+                                }
+
                                 revivingPlayer.setExpCooldown(0);
                                 this.cancel();
 
                             }
                         }
                     } else {
-                        if(NpcManager.npcExists(knockedOutPlayer)){
+                        if (NpcManager.npcExists(knockedOutPlayer)) {
                             getNpc(knockedOutPlayer).setBeingRevived(false);
                         }
                         revivingPlayer.setExpCooldown(0);
@@ -373,7 +400,11 @@ public class NpcManager {
             }.runTaskTimer(KnockoutPlugin.getPlugin(), 0, period);
         } else {
             if (!revivingPlayer.isSneaking() && !knockedOutPlayer.isInsideVehicle()) {
-                revivingPlayer.sendMessage(ChatColor.RED + "You don't have enough levels ( " + ChatColor.RED + requiredLevels + ChatColor.RED + " ) to revive that player");
+                String noLevelsMessage = plugin.getConfig().getString("no-levels-message");
+                if (noLevelsMessage != null) {
+                    noLevelsMessage = noLevelsMessage.replace("%levels%", String.valueOf(requiredLevels));
+                    revivingPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&', noLevelsMessage));
+                }
             }
         }
     }

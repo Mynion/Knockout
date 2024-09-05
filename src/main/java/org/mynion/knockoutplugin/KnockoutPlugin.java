@@ -15,6 +15,7 @@ public final class KnockoutPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
+        saveDefaultConfig();
         getServer().getPluginManager().registerEvents(new PlayerDamageListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerSneakListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(), this);

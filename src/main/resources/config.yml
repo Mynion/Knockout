@@ -1,0 +1,8 @@
+rescuer-revived-message: '&aYou revived %player%'
+rescued-revived-message: '&aYou have been revived by %player%'
+rescuer-reviving-title: '&aReviving...'
+rescued-reviving-title: '&aYou are being revived...'
+not-allowed-message: "&cYou can't do that when knocked out!"
+knockout-title: '&cKnockout'
+knockout-hologram: '&cKnockout'
+no-levels-message: "&cYou don't have enough levels (%levels%) to revive that player"
