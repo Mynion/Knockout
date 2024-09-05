@@ -353,17 +353,19 @@ public class NpcManager {
                             if (revivingPlayer.getExp() <= playerStartingExp) {
 
                                 // Revive a KO player
+                                getNpc(knockedOutPlayer).setBeingRevived(false);
                                 NpcManager.resetKnockout(NpcManager.getNpc(knockedOutPlayer));
                                 revivingPlayer.sendMessage("You revived " + knockedOutPlayer.getDisplayName());
                                 knockedOutPlayer.sendMessage("You have been revived by " + revivingPlayer.getDisplayName());
                                 revivingPlayer.setExpCooldown(0);
-                                getNpc(knockedOutPlayer).setBeingRevived(false);
                                 this.cancel();
 
                             }
                         }
                     } else {
-                        getNpc(knockedOutPlayer).setBeingRevived(false);
+                        if(NpcManager.npcExists(knockedOutPlayer)){
+                            getNpc(knockedOutPlayer).setBeingRevived(false);
+                        }
                         revivingPlayer.setExpCooldown(0);
                         this.cancel();
                     }
