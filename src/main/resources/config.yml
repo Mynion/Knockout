@@ -1,3 +1,5 @@
+knockout-time: 60
+revive-levels: 5
 rescuer-revived-message: '&aYou revived %player%'
 rescued-revived-message: '&aYou have been revived by %player%'
 rescuer-reviving-title: '&aReviving...'

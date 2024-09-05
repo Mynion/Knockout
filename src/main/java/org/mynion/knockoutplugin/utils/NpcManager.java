@@ -206,9 +206,13 @@ public class NpcManager {
     }
 
     private static void startTimer(Player p) {
-
-        final int[] knockoutCooldown = {60};
+        int seconds = plugin.getConfig().getInt("knockout-time");
+        if (seconds == 0) {
+            seconds = 60;
+        }
+        final int[] knockoutCooldown = {seconds};
         new BukkitRunnable() {
+
             @Override
             public void run() {
                 if (NpcManager.npcExists(p)) {
@@ -320,7 +324,10 @@ public class NpcManager {
 
     public static void startReviving(Player revivingPlayer, Player knockedOutPlayer) {
 
-        int requiredLevels = 5;
+        int requiredLevels = plugin.getConfig().getInt("revive-levels");
+        if (requiredLevels == 0) {
+            requiredLevels = 5;
+        }
         int playerStartingLevel = revivingPlayer.getLevel();
         float playerStartingExp = revivingPlayer.getExp();
         int timeInTicks = 10 * 20;
@@ -330,6 +337,7 @@ public class NpcManager {
 
         if (playerStartingLevel >= requiredLevels) {
             getNpc(knockedOutPlayer).setBeingRevived(true);
+            int finalRequiredLevels = requiredLevels;
             new BukkitRunnable() {
                 int timer = 0;
                 float usedLevels = 0;
@@ -364,7 +372,7 @@ public class NpcManager {
                         }
 
                         // Check if the player has used required levels
-                        if (usedLevels >= requiredLevels) {
+                        if (usedLevels >= finalRequiredLevels) {
                             if (revivingPlayer.getExp() < expDecrement) {
                                 revivingPlayer.setExp(0);
                             }
