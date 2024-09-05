@@ -211,17 +211,21 @@ public class NpcManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (NpcManager.npcExists(p) && !p.isInsideVehicle() && !NpcManager.getNpc(p).isBeingRevived()) {
-                    if (knockoutCooldown[0] > 0) {
-                        String knockoutTitle = plugin.getConfig().getString("knockout-title");
-                        if (knockoutTitle != null) {
-                            p.sendTitle(ChatColor.translateAlternateColorCodes('&', knockoutTitle), Integer.toString(knockoutCooldown[0]), 1, 20 * 3600, 1);
+                if (NpcManager.npcExists(p)) {
+                    if (!p.isInsideVehicle() && !NpcManager.getNpc(p).isBeingRevived()) {
+                        if (knockoutCooldown[0] > 0) {
+                            String knockoutTitle = plugin.getConfig().getString("knockout-title");
+                            if (knockoutTitle != null) {
+                                p.sendTitle(ChatColor.translateAlternateColorCodes('&', knockoutTitle), Integer.toString(knockoutCooldown[0]), 1, 20 * 3600, 1);
+                            }
+                            knockoutCooldown[0]--;
+                        } else {
+                            forceKill(p);
+                            this.cancel();
                         }
-                        knockoutCooldown[0]--;
-                    } else {
-                        forceKill(p);
-                        this.cancel();
                     }
+                } else {
+                    this.cancel();
                 }
             }
         }.runTaskTimer(KnockoutPlugin.getPlugin(), 0, 20);
