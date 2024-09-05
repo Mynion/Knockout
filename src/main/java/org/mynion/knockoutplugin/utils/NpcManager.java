@@ -200,15 +200,13 @@ public class NpcManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (knockoutCooldown[0] > 0 && NpcManager.npcExists(p)) {
-                    if (!p.isInsideVehicle()) {
-                        p.sendTitle(ChatColor.RED + "Knockout", Integer.toString(knockoutCooldown[0]), 1, 20 * 60, 1);
+                if(NpcManager.npcExists(p) && !p.isInsideVehicle() && !NpcManager.getNpc(p).isBeingRevived()){
+                    if (knockoutCooldown[0] > 0){
+                        p.sendTitle(ChatColor.RED + "Knockout", Integer.toString(knockoutCooldown[0]), 1, 20 * 3600, 1);
                         knockoutCooldown[0]--;
-                    }
-                } else {
-                    this.cancel();
-                    if (NpcManager.npcExists(p)) {
+                    }else{
                         forceKill(p);
+                        this.cancel();
                     }
                 }
             }
@@ -313,6 +311,7 @@ public class NpcManager {
         Location reviveLocation = revivingPlayer.getLocation();
 
         if (playerStartingLevel >= requiredLevels) {
+            getNpc(knockedOutPlayer).setBeingRevived(true);
             new BukkitRunnable() {
                 int timer = 0;
                 float usedLevels = 0;
@@ -320,6 +319,7 @@ public class NpcManager {
                 @Override
                 public void run() {
                     if (canBeRevivedBy(revivingPlayer, knockedOutPlayer, reviveLocation)) {
+                        revivingPlayer.setExpCooldown(-1);
 
                         // Checks if the player has enough xp to be decremented
                         if (revivingPlayer.getExp() >= expDecrement) {
@@ -332,7 +332,7 @@ public class NpcManager {
                             usedLevels = playerStartingLevel - revivingPlayer.getLevel();
                         }
 
-                        // Update timer and send the title
+                        // Update timer and send titles
                         timer += period;
                         revivingPlayer.sendTitle(ChatColor.GREEN + "Reviving...", (int) (((float) timer / (float) timeInTicks) * 100) + "%", 1, period, 1);
                         knockedOutPlayer.sendTitle(ChatColor.GREEN + "You are being revived... ", (int) (((float) timer / (float) timeInTicks) * 100) + "%", 1, period, 1);
@@ -350,11 +350,15 @@ public class NpcManager {
                                 NpcManager.resetKnockout(NpcManager.getNpc(knockedOutPlayer));
                                 revivingPlayer.sendMessage("You revived " + knockedOutPlayer.getDisplayName());
                                 knockedOutPlayer.sendMessage("You have been revived by " + revivingPlayer.getDisplayName());
+                                revivingPlayer.setExpCooldown(0);
+                                getNpc(knockedOutPlayer).setBeingRevived(false);
                                 this.cancel();
 
                             }
                         }
                     } else {
+                        getNpc(knockedOutPlayer).setBeingRevived(false);
+                        revivingPlayer.setExpCooldown(0);
                         this.cancel();
                     }
                 }

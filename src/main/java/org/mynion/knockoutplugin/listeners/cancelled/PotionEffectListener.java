@@ -10,10 +10,8 @@ public class PotionEffectListener implements Listener {
     @EventHandler
     public void onPotionEffect(EntityPotionEffectEvent e) {
         if (e.getEntity() instanceof Player p) {
-            if (NpcManager.npcExists(p)) {
-                if (!e.getCause().equals(EntityPotionEffectEvent.Cause.PLUGIN)) {
-                    e.setCancelled(true);
-                }
+            if (NpcManager.npcExists(p) && !e.getCause().equals(EntityPotionEffectEvent.Cause.PLUGIN)) {
+                e.setCancelled(true);
             }
         }
     }
