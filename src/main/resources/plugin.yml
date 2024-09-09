@@ -4,8 +4,8 @@ main: org.mynion.knockoutplugin.KnockoutPlugin
 api-version: '1.21'
 commands:
   pick:
-    description: pick up a knocked out player
+    description: Pick up a knocked out player
   throw:
-    description: throw a knocked out player
+    description: Throw a knocked out player
   die:
-    description: die when you are knocked out
+    description: Die when you are knocked out

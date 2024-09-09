@@ -1,10 +1,32 @@
+# Time of knockout in seconds
 knockout-time: 60
+
+# Amount of levels required to revive a player
 revive-levels: 5
+
+# Successful revive message for the rescuer
+# Use variable %player% to show the rescued player name
 rescuer-revived-message: '&aYou revived %player%'
+
+# Successful revive message for the rescued
+# Use variable %player% to show the rescuer player name
 rescued-revived-message: '&aYou have been revived by %player%'
+
+# Title message for the rescuer when reviving
 rescuer-reviving-title: '&aReviving...'
+
+# Title message for the rescued when reviving
 rescued-reviving-title: '&aYou are being revived...'
+
+# Message for not allowed actions when knocked out
 not-allowed-message: "&cYou can't do that when knocked out!"
+
+# Title message for the player when knocked out
 knockout-title: '&cKnockout'
+
+# Hologram title above the player when knocked out
 knockout-hologram: '&cKnockout'
+
+# Message for the player with not enough levels to revive
+# Use variable %levels% to show the required levels
 no-levels-message: "&cYou don't have enough levels (%levels%) to revive that player"

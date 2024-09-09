@@ -398,7 +398,6 @@ public class NpcManager {
 
                                 revivingPlayer.setExpCooldown(0);
                                 this.cancel();
-
                             }
                         }
                     } else {
