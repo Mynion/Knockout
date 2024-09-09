@@ -39,3 +39,12 @@ rescuer-revived-message: '&aYou revived %player%'
 # Successful revive message for the rescued
 # Use variable %player% to show the rescuer player name
 rescued-revived-message: '&aYou have been revived by %player%'
+
+# Message when the player uses /die command and is not knocked out
+invalid-die-message: "&cYou can use /die only when knocked out!"
+
+# Message when the player uses /carry command and there is no knocked out player nearby
+invalid-carry-message: "&cDidn't find any nearby knocked out player to carry!"
+
+# Message when the player uses /drop command and is not carrying any knocked out player
+invalid-drop-message: "&cYou are not carrying any knocked out player to drop!"
