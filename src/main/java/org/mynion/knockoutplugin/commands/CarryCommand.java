@@ -15,6 +15,18 @@ public class CarryCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player p) {
 
+            // Check if the player is already carrying a knocked out player
+            if (p.getPassengers().stream()
+                    .filter(passenger -> passenger instanceof Player)
+                    .map(passenger -> (Player) passenger)
+                    .anyMatch(NpcManager::npcExists)) {
+                String alreadyCarryingMessage = KnockoutPlugin.getPlugin().getConfig().getString("already-carrying-message");
+                if (alreadyCarryingMessage != null) {
+                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', alreadyCarryingMessage));
+                }
+                return true;
+            }
+
             // Find knocked out player
             Optional<Player> knockedOutPlayer = p.getNearbyEntities(1, 1, 1).stream()
                     .filter(entity -> entity instanceof Player)
