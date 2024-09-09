@@ -4,6 +4,9 @@ import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.GameMode;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.mynion.knockoutplugin.KnockoutPlugin;
 
 public class Npc {
     private final Player player;
@@ -38,6 +41,13 @@ public class Npc {
     }
 
     public void setVehicle(Player vehicle) {
+        if (KnockoutPlugin.getPlugin().getConfig().getBoolean(("slowness-for-carrier"))) {
+            if (vehicle != null) {
+                vehicle.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 999999999, 1, false, false));
+            } else {
+                this.vehicle.removePotionEffect(PotionEffectType.SLOWNESS);
+            }
+        }
         this.vehicle = vehicle;
     }
 
