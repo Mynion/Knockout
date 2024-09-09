@@ -2,6 +2,7 @@ name: KnockoutPlugin
 version: '${project.version}'
 main: org.mynion.knockoutplugin.KnockoutPlugin
 api-version: '1.21'
+
 commands:
   carry:
     description: Carry a knocked out player
@@ -12,3 +13,17 @@ commands:
   die:
     description: Die at once when knocked out
     usage: /die
+
+permissions:
+  knockout.carry:
+    description: Permission to use carry command
+    default: true
+  knockout.drop:
+    description: Permission to use drop command
+    default: true
+  knockout.die:
+    description: Permission to use die command
+    default: true
+  knockout.revive:
+    description: Permission to revive a player
+    default: true

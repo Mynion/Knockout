@@ -15,6 +15,14 @@ public class DropCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player p) {
 
+            if(!p.hasPermission("knockout.drop")) {
+                String noPermissionMessage = KnockoutPlugin.getPlugin().getConfig().getString("no-permission-message");
+                if (noPermissionMessage != null) {
+                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', noPermissionMessage));
+                }
+                return true;
+            }
+
             // Get knocked out passenger
             Optional<Player> knockedOutPlayer = p.getPassengers().stream()
                     .filter(passenger -> passenger instanceof Player)

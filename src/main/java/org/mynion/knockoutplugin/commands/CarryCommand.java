@@ -15,6 +15,14 @@ public class CarryCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player p) {
 
+            if (!p.hasPermission("knockout.carry")) {
+                String noPermissionMessage = KnockoutPlugin.getPlugin().getConfig().getString("no-permission-message");
+                if (noPermissionMessage != null) {
+                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', noPermissionMessage));
+                }
+                return true;
+            }
+
             // Check if the player is already carrying a knocked out player
             if (p.getPassengers().stream()
                     .filter(passenger -> passenger instanceof Player)

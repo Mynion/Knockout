@@ -44,13 +44,16 @@ rescued-revived-message: '&aYou have been revived by %player%'
 invalid-die-message: "&cYou can use this command only when knocked out!"
 
 # Message when the player uses /drop command and is not carrying any knocked out player
-invalid-drop-message: "&cYou are not carrying any knocked out player to drop!"
+invalid-drop-message: "&cYou are not carrying any knocked out player!"
 
 # Message when the player uses /carry command and there is no knocked out player nearby
 invalid-carry-message: "&cDidn't find any nearby knocked out player to carry!"
 
 # Message when the player uses /carry command and is already carrying a knocked out player
 already-carrying-message: "&cYou are already carrying a knocked out player!"
+
+# Message when the player doesn't have permission to do something
+no-permission-message: "&4You don't have permission to do that!"
 
 # Aliases for the commands
 aliases:
