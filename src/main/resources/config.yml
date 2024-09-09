@@ -4,10 +4,14 @@ knockout-time: 60
 # Amount of levels required to revive a player
 revive-levels: 5
 
-# Add slowness effect for the player carrying a knocked out player
+# When true: add slowness effect for the player carrying a knocked out player
 slowness-for-carrier: true
 
+# Slowness amplifier for the player carrying a knocked out player; Slowness level is equal to amplifier + 1
 slowness-amplifier: 0
+
+# When true: when carrying player is hit, drop the knocked out player
+drop-when-hit: true
 
 # Title message for the player when knocked out
 knockout-title: '&cKnockout'
