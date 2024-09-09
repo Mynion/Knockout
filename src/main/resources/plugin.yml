@@ -5,7 +5,10 @@ api-version: '1.21'
 commands:
   carry:
     description: Carry a knocked out player
+    usage: /carry
   drop:
     description: Drop a knocked out player
+    usage: /drop
   die:
     description: Die at once when knocked out
+    usage: /die

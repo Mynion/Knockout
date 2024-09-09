@@ -1,5 +1,7 @@
 package org.mynion.knockoutplugin;
 
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandMap;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
@@ -10,13 +12,19 @@ import org.mynion.knockoutplugin.listeners.*;
 import org.mynion.knockoutplugin.listeners.cancelled.*;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
+import java.lang.reflect.Field;
+import java.util.List;
+
 public final class KnockoutPlugin extends JavaPlugin {
     private static Plugin plugin;
 
     @Override
     public void onEnable() {
         plugin = this;
+        getConfig().options().copyDefaults(true);
         saveDefaultConfig();
+        saveConfig();
+        loadAliases();
         getServer().getPluginManager().registerEvents(new PlayerDamageListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerSneakListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerInteractListener(), this);
@@ -45,11 +53,27 @@ public final class KnockoutPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         NpcManager.getNPCs().forEach(npc -> {
-            if(npc.getVehicle() != null){
+            if (npc.getVehicle() != null) {
                 npc.getVehicle().removePotionEffect(PotionEffectType.SLOWNESS);
             }
             NpcManager.forceKill(npc.getPlayer());
         });
+    }
+
+    private void loadAliases() {
+        try {
+            final Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+
+            bukkitCommandMap.setAccessible(true);
+            CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
+
+            getConfig().getStringList("aliases.carry").forEach(alias -> commandMap.register(alias, "knockoutplugin", getCommand("carry")));
+            getConfig().getStringList("aliases.drop").forEach(alias -> commandMap.register(alias, "knockoutplugin", getCommand("drop")));
+            getConfig().getStringList("aliases.die").forEach(alias -> commandMap.register(alias, "knockoutplugin", getCommand("die")));
+
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     public static Plugin getPlugin() {

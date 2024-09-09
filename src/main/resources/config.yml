@@ -41,7 +41,7 @@ rescuer-revived-message: '&aYou revived %player%'
 rescued-revived-message: '&aYou have been revived by %player%'
 
 # Message when the player uses /die command and is not knocked out
-invalid-die-message: "&cYou can use /die only when knocked out!"
+invalid-die-message: "&cYou can use this command only when knocked out!"
 
 # Message when the player uses /drop command and is not carrying any knocked out player
 invalid-drop-message: "&cYou are not carrying any knocked out player to drop!"
@@ -51,3 +51,14 @@ invalid-carry-message: "&cDidn't find any nearby knocked out player to carry!"
 
 # Message when the player uses /carry command and is already carrying a knocked out player
 already-carrying-message: "&cYou are already carrying a knocked out player!"
+
+# Aliases for the commands
+aliases:
+    carry:
+        - podnies
+        -
+    drop:
+        - zrzuc
+        -
+    die:
+        - zgin
