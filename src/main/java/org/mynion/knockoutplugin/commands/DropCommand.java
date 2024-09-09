@@ -8,7 +8,7 @@ import org.mynion.knockoutplugin.utils.NpcManager;
 
 import java.util.Optional;
 
-public class ThrowCommand implements CommandExecutor {
+public class DropCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player p) {
@@ -20,7 +20,7 @@ public class ThrowCommand implements CommandExecutor {
                     .filter(NpcManager::npcExists)
                     .findFirst();
 
-            // Stop riding a player
+            // Stop carrying a player
             knockedOutPlayer.ifPresent(ko -> NpcManager.stopCarrying(ko, p));
 
         }

@@ -4,8 +4,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 import org.mynion.knockoutplugin.commands.DieCommand;
-import org.mynion.knockoutplugin.commands.PickCommand;
-import org.mynion.knockoutplugin.commands.ThrowCommand;
+import org.mynion.knockoutplugin.commands.CarryCommand;
+import org.mynion.knockoutplugin.commands.DropCommand;
 import org.mynion.knockoutplugin.listeners.*;
 import org.mynion.knockoutplugin.listeners.cancelled.*;
 import org.mynion.knockoutplugin.utils.NpcManager;
@@ -37,8 +37,8 @@ public final class KnockoutPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SwapHandItemsListener(), this);
         getServer().getPluginManager().registerEvents(new ExpChangeListener(), this);
         getServer().getPluginManager().registerEvents(new CommandListener(), this);
-        getCommand("pick").setExecutor(new PickCommand());
-        getCommand("throw").setExecutor(new ThrowCommand());
+        getCommand("pick").setExecutor(new CarryCommand());
+        getCommand("throw").setExecutor(new DropCommand());
         getCommand("die").setExecutor(new DieCommand());
     }
 
