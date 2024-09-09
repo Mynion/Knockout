@@ -174,7 +174,9 @@ public class NpcManager {
         p.addPotionEffect(blindness);
         p.addPotionEffect(invisibility);
 
-        p.setHealth(2);
+        AttributeInstance maxHealthAttribute = sp.getAttribute(Attributes.MAX_HEALTH);
+        double maxHealth = maxHealthAttribute.getValue();
+        p.setHealth(maxHealth);
         p.setWalkSpeed(0);
         p.setFlySpeed(0);
         p.setFireTicks(0);
