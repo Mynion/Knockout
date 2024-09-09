@@ -21,10 +21,7 @@ public class PickCommand implements CommandExecutor {
                     .findFirst();
 
             // Pick up a knocked out player
-            knockedOutPlayer.ifPresent(ko -> {
-                NpcManager.getNpc(ko).setVehicle(p);
-                NpcManager.trackVehicle(ko);
-            });
+            knockedOutPlayer.ifPresent(ko -> NpcManager.startCarrying(ko, p));
 
         }
         return true;

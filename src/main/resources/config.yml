@@ -7,6 +7,8 @@ revive-levels: 5
 # Add slowness effect for the player carrying a knocked out player
 slowness-for-carrier: true
 
+slowness-amplifier: 0
+
 # Title message for the player when knocked out
 knockout-title: '&cKnockout'
 

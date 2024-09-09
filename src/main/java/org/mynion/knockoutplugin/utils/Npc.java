@@ -41,13 +41,6 @@ public class Npc {
     }
 
     public void setVehicle(Player vehicle) {
-        if (KnockoutPlugin.getPlugin().getConfig().getBoolean(("slowness-for-carrier"))) {
-            if (vehicle != null) {
-                vehicle.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 999999999, 1, false, false));
-            } else {
-                this.vehicle.removePotionEffect(PotionEffectType.SLOWNESS);
-            }
-        }
         this.vehicle = vehicle;
     }
 

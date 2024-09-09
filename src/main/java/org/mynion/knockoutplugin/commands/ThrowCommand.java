@@ -21,10 +21,7 @@ public class ThrowCommand implements CommandExecutor {
                     .findFirst();
 
             // Stop riding a player
-            knockedOutPlayer.ifPresent(ko -> {
-                p.removePassenger(ko);
-                NpcManager.getNpc(ko).setVehicle(null);
-            });
+            knockedOutPlayer.ifPresent(ko -> NpcManager.stopCarrying(ko, p));
 
         }
         return true;

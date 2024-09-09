@@ -297,8 +297,26 @@ public class NpcManager {
 
     }
 
+    // Start carrying a knocked out player
+    public static void startCarrying(Player knockedOutPlayer, Player vehicle) {
+        getNpc(knockedOutPlayer).setVehicle(vehicle);
+        trackVehicle(knockedOutPlayer);
+    }
+
+    // Stop carrying a knocked out player
+    public static void stopCarrying(Player knockedOutPlayer, Player vehicle) {
+        getNpc(knockedOutPlayer).setVehicle(null);
+        vehicle.removePassenger(knockedOutPlayer);
+
+        // Remove slowness effect only if applied by the plugin
+        int slowness_amplifier = vehicle.getPotionEffect(PotionEffectType.SLOWNESS).getAmplifier();
+        if (plugin.getConfig().getInt("slowness-amplifier") == slowness_amplifier) {
+            vehicle.removePotionEffect(PotionEffectType.SLOWNESS);
+        }
+    }
+
     // Tracking a knocked out player vehicle to prevent dismount
-    public static void trackVehicle(Player knockedOutPlayer) {
+    private static void trackVehicle(Player knockedOutPlayer) {
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -307,6 +325,9 @@ public class NpcManager {
                     if (currentVehicle != null) {
                         if (currentVehicle.isOnline()) {
                             currentVehicle.addPassenger(knockedOutPlayer);
+                            if (KnockoutPlugin.getPlugin().getConfig().getBoolean(("slowness-for-carrier"))) {
+                                currentVehicle.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20 * 2, plugin.getConfig().getInt("slowmess"), false, false));
+                            }
                         } else {
                             knockedOutPlayer.leaveVehicle();
                             getNpc(knockedOutPlayer).setVehicle(null);
