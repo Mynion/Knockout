@@ -27,3 +27,6 @@ permissions:
   knockout.revive:
     description: Permission to revive a player
     default: true
+  knockout.command:
+    description: Permission to use commands when knocked out
+    default: op
