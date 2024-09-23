@@ -457,7 +457,7 @@ public class NpcManager {
         return !knockedOutPlayer.isInsideVehicle() && revivingPlayer.isSneaking() && reviveLocation.getBlock().equals(revivingPlayer.getLocation().getBlock());
     }
 
-    private static void broadcastPacket(Packet<?> packet) {
+    public static void broadcastPacket(Packet<?> packet) {
         MinecraftServer server = MinecraftServer.getServer();
         List<ServerPlayer> onlinePlayers = server.getPlayerList().players;
         onlinePlayers.forEach(p -> p.connection.send(packet));
