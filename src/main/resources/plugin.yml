@@ -13,6 +13,9 @@ commands:
   die:
     description: Die at once when knocked out
     usage: /die
+  knockout:
+    description: Admin commands for Knockout plugin
+    usage: /knockout revive <player>, /knockout reload
 
 permissions:
   knockout.carry:
@@ -29,4 +32,7 @@ permissions:
     default: true
   knockout.command:
     description: Permission to use commands when knocked out
+    default: op
+  knockout.admin:
+    description: Permission to use admin /knockout commands
     default: op

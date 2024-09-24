@@ -10,6 +10,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.mynion.knockoutplugin.commands.DieCommand;
 import org.mynion.knockoutplugin.commands.CarryCommand;
 import org.mynion.knockoutplugin.commands.DropCommand;
+import org.mynion.knockoutplugin.commands.KnockoutCommand;
 import org.mynion.knockoutplugin.listeners.*;
 import org.mynion.knockoutplugin.listeners.cancelled.*;
 import org.mynion.knockoutplugin.utils.NpcManager;
@@ -51,6 +52,7 @@ public final class KnockoutPlugin extends JavaPlugin {
         getCommand("carry").setExecutor(new CarryCommand());
         getCommand("drop").setExecutor(new DropCommand());
         getCommand("die").setExecutor(new DieCommand());
+        getCommand("knockout").setExecutor(new KnockoutCommand());
     }
 
     @Override

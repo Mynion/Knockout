@@ -1,7 +1,7 @@
 # Time of knockout in seconds
 knockout-time: 60
 
-# Amount of levels required to revive a player
+# Amount of xp levels required to revive a player
 revive-levels: 5
 
 # When true: add slowness effect for the player carrying a knocked out player
@@ -14,7 +14,7 @@ slowness-amplifier: 0
 drop-when-hit: true
 
 # Message for the player when knocked out
-knockout-message: '&cYou have been knocked out! Use /die to die at once.'
+knockout-message: '&cYou have been knocked out! Ask someone to revive you or use /die to die at once.'
 
 # Title message for the player when knocked out
 knockout-title: '&cKnockout'
