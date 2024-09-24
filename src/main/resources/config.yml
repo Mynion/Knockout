@@ -13,6 +13,12 @@ slowness-amplifier: 0
 # When true: when carrying player is hit, drop the knocked out player
 drop-when-hit: true
 
+# If true knocked out player will die when the knockout time ends otherwise will be revived
+death-on-end: true
+
+# When true: player will have blindness effect when knocked out
+knockout-blindness: true
+
 # Message for the player when knocked out
 knockout-message: '&cYou have been knocked out! Ask someone to revive you or use /die to die at once.'
 

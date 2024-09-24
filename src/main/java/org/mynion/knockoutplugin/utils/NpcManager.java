@@ -174,10 +174,12 @@ public class NpcManager {
         Arrays.asList(potionEffects).forEach(p::removePotionEffect);
 
         // Add custom potion effects
-        PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 999999999, 1, false, false);
         PotionEffect invisibility = new PotionEffect(PotionEffectType.INVISIBILITY, 999999999, 100, false, false);
-        p.addPotionEffect(blindness);
         p.addPotionEffect(invisibility);
+        if(plugin.getConfig().getBoolean("knockout-blindness")){
+            PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 999999999, 1, false, false);
+            p.addPotionEffect(blindness);
+        }
 
         // Set player health to max
         AttributeInstance maxHealthAttribute = sp.getAttribute(Attributes.MAX_HEALTH);
@@ -233,7 +235,11 @@ public class NpcManager {
                             }
                             knockoutCooldown[0]--;
                         } else {
-                            forceKill(p);
+                            if (KnockoutPlugin.getPlugin().getConfig().getBoolean("death-on-end")) {
+                                forceKill(p);
+                            } else {
+                                resetKnockout(getNpc(p));
+                            }
                             this.cancel();
                         }
                     }
