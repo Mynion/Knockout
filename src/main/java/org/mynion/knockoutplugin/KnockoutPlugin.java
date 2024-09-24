@@ -12,11 +12,9 @@ import org.mynion.knockoutplugin.commands.CarryCommand;
 import org.mynion.knockoutplugin.commands.DropCommand;
 import org.mynion.knockoutplugin.listeners.*;
 import org.mynion.knockoutplugin.listeners.cancelled.*;
-import org.mynion.knockoutplugin.utils.Npc;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
 import java.lang.reflect.Field;
-import java.util.Iterator;
 import java.util.List;
 
 public final class KnockoutPlugin extends JavaPlugin {

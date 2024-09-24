@@ -90,6 +90,11 @@ public class NpcManager {
         setNoCollisions(npc);
         teleportBody(npc);
 
+        String knockoutMessage = plugin.getConfig().getString("knockout-message");
+        if (knockoutMessage != null) {
+            p.sendMessage(ChatColor.translateAlternateColorCodes('&', knockoutMessage));
+        }
+
     }
 
     private static ServerPlayer createDeadBody(Player p) {

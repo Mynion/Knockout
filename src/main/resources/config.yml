@@ -13,6 +13,9 @@ slowness-amplifier: 0
 # When true: when carrying player is hit, drop the knocked out player
 drop-when-hit: true
 
+# Message for the player when knocked out
+knockout-message: '&cYou have been knocked out! Use /die to die at once.'
+
 # Title message for the player when knocked out
 knockout-title: '&cKnockout'
 
