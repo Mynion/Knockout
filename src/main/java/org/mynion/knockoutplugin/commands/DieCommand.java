@@ -14,7 +14,7 @@ public class DieCommand implements CommandExecutor {
         String invalidCommandMessage = KnockoutPlugin.getPlugin().getConfig().getString("invalid-die-message");
         if (sender instanceof Player p) {
 
-            if(!p.hasPermission("knockout.die")) {
+            if (!p.hasPermission("knockout.die")) {
                 String noPermissionMessage = KnockoutPlugin.getPlugin().getConfig().getString("no-permission-message");
                 if (noPermissionMessage != null) {
                     p.sendMessage(ChatColor.translateAlternateColorCodes('&', noPermissionMessage));

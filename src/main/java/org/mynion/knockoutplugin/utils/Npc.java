@@ -4,9 +4,6 @@ import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.GameMode;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.mynion.knockoutplugin.KnockoutPlugin;
 
 public class Npc {
     private final Player player;

@@ -69,11 +69,11 @@ no-permission-message: "&4You don't have permission to do that!"
 
 # Aliases for the commands
 aliases:
-    carry:
-        - podnies
-        -
-    drop:
-        - zrzuc
-        -
-    die:
-        - zgin
+  carry:
+    - podnies
+    -
+  drop:
+    - zrzuc
+    -
+  die:
+    - zgin
