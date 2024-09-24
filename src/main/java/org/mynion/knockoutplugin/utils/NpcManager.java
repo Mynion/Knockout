@@ -176,7 +176,7 @@ public class NpcManager {
         // Add custom potion effects
         PotionEffect invisibility = new PotionEffect(PotionEffectType.INVISIBILITY, 999999999, 100, false, false);
         p.addPotionEffect(invisibility);
-        if(plugin.getConfig().getBoolean("knockout-blindness")){
+        if (plugin.getConfig().getBoolean("knockout-blindness")) {
             PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 999999999, 1, false, false);
             p.addPotionEffect(blindness);
         }
@@ -341,7 +341,7 @@ public class NpcManager {
                         if (currentVehicle.isOnline()) {
                             currentVehicle.addPassenger(knockedOutPlayer);
                             if (KnockoutPlugin.getPlugin().getConfig().getBoolean(("slowness-for-carrier"))) {
-                                currentVehicle.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20 * 2, plugin.getConfig().getInt("slowmess"), false, false));
+                                currentVehicle.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20 * 2, plugin.getConfig().getInt("slowness-amplifier"), false, false));
                             }
                         } else {
                             knockedOutPlayer.leaveVehicle();
@@ -368,23 +368,23 @@ public class NpcManager {
             return;
         }
 
-        int requiredLevels = plugin.getConfig().getInt("revive-levels");
-        if (requiredLevels == 0) {
-            requiredLevels = 5;
+        int reviveTime = KnockoutPlugin.getPlugin().getConfig().getInt("revive-time");
+        if (reviveTime <= 0) {
+            reviveNow(revivingPlayer, knockedOutPlayer);
+            return;
         }
-        int playerStartingLevel = revivingPlayer.getLevel();
-        float playerStartingExp = revivingPlayer.getExp();
-        int timeInTicks = 10 * 20;
+
+        int timeInTicks = reviveTime * 20;
+        int requiredLevels = plugin.getConfig().getInt("revive-levels");
         int period = 1;
         float expDecrement = (float) requiredLevels / ((float) timeInTicks / period);
         Location reviveLocation = revivingPlayer.getLocation();
 
-        if (playerStartingLevel >= requiredLevels) {
+        if (revivingPlayer.getLevel() >= requiredLevels) {
             getNpc(knockedOutPlayer).setBeingRevived(true);
-            int finalRequiredLevels = requiredLevels;
             new BukkitRunnable() {
                 int timer = 0;
-                float usedLevels = 0;
+                int percent = 0;
 
                 @Override
                 public void run() {
@@ -399,50 +399,28 @@ public class NpcManager {
                             // Reduce player level by 1 and set xp bar to maximum
                             revivingPlayer.setLevel(revivingPlayer.getLevel() - 1);
                             revivingPlayer.setExp(0.9999f);
-                            usedLevels = playerStartingLevel - revivingPlayer.getLevel();
                         }
 
                         // Update timer and send titles
                         timer += period;
+                        percent = (int) (((float) timer / (float) timeInTicks) * 100);
 
                         String revivingTitle = plugin.getConfig().getString("rescuer-reviving-title");
                         if (revivingTitle != null) {
-                            revivingPlayer.sendTitle(ChatColor.translateAlternateColorCodes('&', revivingTitle), (int) (((float) timer / (float) timeInTicks) * 100) + "%", 1, period, 1);
+                            revivingPlayer.sendTitle(ChatColor.translateAlternateColorCodes('&', revivingTitle), percent + "%", 1, period, 1);
                         }
 
                         String revivedTitle = plugin.getConfig().getString("rescued-reviving-title");
                         if (revivedTitle != null) {
-                            knockedOutPlayer.sendTitle(ChatColor.translateAlternateColorCodes('&', revivedTitle), (int) (((float) timer / (float) timeInTicks) * 100) + "%", 1, period, 1);
+                            knockedOutPlayer.sendTitle(ChatColor.translateAlternateColorCodes('&', revivedTitle), percent + "%", 1, period, 1);
                         }
 
-                        // Check if the player has used required levels
-                        if (usedLevels >= finalRequiredLevels) {
-                            if (revivingPlayer.getExp() < expDecrement) {
-                                revivingPlayer.setExp(0);
-                            }
+                        // Check if the revive process is complete
+                        if (percent == 100) {
 
-                            // Check if the player has used required xp on xp bar
-                            if (revivingPlayer.getExp() <= playerStartingExp) {
-
-                                // Revive a KO player
-                                getNpc(knockedOutPlayer).setBeingRevived(false);
-                                NpcManager.resetKnockout(NpcManager.getNpc(knockedOutPlayer));
-
-                                String revivingMessage = plugin.getConfig().getString("rescuer-revived-message");
-                                if (revivingMessage != null) {
-                                    revivingMessage = revivingMessage.replace("%player%", knockedOutPlayer.getDisplayName());
-                                    revivingPlayer.sendMessage(revivingMessage);
-                                }
-
-                                String revivedMessage = plugin.getConfig().getString("rescued-revived-message");
-                                if (revivedMessage != null) {
-                                    revivedMessage = revivedMessage.replace("%player%", revivingPlayer.getDisplayName());
-                                    knockedOutPlayer.sendMessage(revivedMessage);
-                                }
-
-                                revivingPlayer.setExpCooldown(0);
-                                this.cancel();
-                            }
+                            // Revive a KO player
+                            reviveNow(revivingPlayer, knockedOutPlayer);
+                            this.cancel();
                         }
                     } else {
                         if (NpcManager.npcExists(knockedOutPlayer)) {
@@ -462,6 +440,22 @@ public class NpcManager {
                 }
             }
         }
+    }
+
+    private static void reviveNow(Player revivingPlayer, Player knockedOutPlayer) {
+        getNpc(knockedOutPlayer).setBeingRevived(false);
+        resetKnockout(getNpc(knockedOutPlayer));
+        String revivingMessage = plugin.getConfig().getString("rescuer-revived-message");
+        if (revivingMessage != null) {
+            revivingMessage = revivingMessage.replace("%player%", knockedOutPlayer.getDisplayName());
+            revivingPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&', revivingMessage));
+        }
+        String revivedMessage = plugin.getConfig().getString("rescued-revived-message");
+        if (revivedMessage != null) {
+            revivedMessage = revivedMessage.replace("%player%", revivingPlayer.getDisplayName());
+            knockedOutPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&', revivedMessage));
+        }
+        revivingPlayer.setExpCooldown(0);
     }
 
     private static boolean canBeRevivedBy(Player revivingPlayer, Player knockedOutPlayer, Location reviveLocation) {

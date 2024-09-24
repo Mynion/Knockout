@@ -4,6 +4,9 @@ knockout-time: 60
 # Amount of xp levels required to revive a player
 revive-levels: 5
 
+# Time in seconds to revive a player
+revive-time: 10
+
 # When true: add slowness effect for the player carrying a knocked out player
 slowness-for-carrier: true
 
@@ -11,7 +14,7 @@ slowness-for-carrier: true
 slowness-amplifier: 0
 
 # When true: when carrying player is hit, drop the knocked out player
-drop-when-hit: true
+drop-on-hit: true
 
 # If true knocked out player will die when the knockout time ends otherwise will be revived
 death-on-end: true

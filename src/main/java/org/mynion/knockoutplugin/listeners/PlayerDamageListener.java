@@ -26,7 +26,7 @@ public class PlayerDamageListener implements Listener {
                     e.setCancelled(true);
                     NpcManager.knockoutPlayer(p);
                 }
-            } else if (KnockoutPlugin.getPlugin().getConfig().getBoolean("drop-when-hit")) {
+            } else if (KnockoutPlugin.getPlugin().getConfig().getBoolean("drop-on-hit")) {
                 // Drop knocked out player when hit
                 p.getPassengers().stream()
                         .filter(passenger -> passenger instanceof Player)
