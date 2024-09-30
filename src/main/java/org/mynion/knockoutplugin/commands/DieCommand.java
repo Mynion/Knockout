@@ -1,31 +1,26 @@
 package org.mynion.knockoutplugin.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.mynion.knockoutplugin.KnockoutPlugin;
+import org.mynion.knockoutplugin.utils.ChatUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
 public class DieCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        String invalidCommandMessage = KnockoutPlugin.getPlugin().getConfig().getString("invalid-die-message");
         if (sender instanceof Player p) {
 
             if (!p.hasPermission("knockout.die")) {
-                String noPermissionMessage = KnockoutPlugin.getPlugin().getConfig().getString("no-permission-message");
-                if (noPermissionMessage != null) {
-                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', noPermissionMessage));
-                }
+                ChatUtils.sendPlayerMessage(p, "no-permission-message");
                 return true;
             }
 
             if (NpcManager.npcExists(p)) {
                 NpcManager.forceKill(p);
-            } else if (invalidCommandMessage != null) {
-                p.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidCommandMessage));
+            } else {
+                ChatUtils.sendPlayerMessage(p, "invalid-die-message");
             }
         }
         return true;

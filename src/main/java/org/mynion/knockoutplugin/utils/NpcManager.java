@@ -90,10 +90,7 @@ public class NpcManager {
         setNoCollisions(npc);
         teleportBody(npc);
 
-        String knockoutMessage = plugin.getConfig().getString("knockout-message");
-        if (knockoutMessage != null) {
-            p.sendMessage(ChatColor.translateAlternateColorCodes('&', knockoutMessage));
-        }
+        ChatUtils.sendPlayerMessage(p, "knockout-message");
 
     }
 
@@ -361,10 +358,7 @@ public class NpcManager {
     public static void startReviving(Player revivingPlayer, Player knockedOutPlayer) {
 
         if (!revivingPlayer.hasPermission("knockout.revive")) {
-            String noPermissionMessage = KnockoutPlugin.getPlugin().getConfig().getString("no-permission-message");
-            if (noPermissionMessage != null) {
-                revivingPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&', noPermissionMessage));
-            }
+            ChatUtils.sendPlayerMessage(revivingPlayer, "no-permission-message");
             return;
         }
 

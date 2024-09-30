@@ -1,11 +1,10 @@
 package org.mynion.knockoutplugin.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.mynion.knockoutplugin.KnockoutPlugin;
+import org.mynion.knockoutplugin.utils.ChatUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
 import java.util.Optional;
@@ -16,10 +15,7 @@ public class CarryCommand implements CommandExecutor {
         if (sender instanceof Player p) {
 
             if (!p.hasPermission("knockout.carry")) {
-                String noPermissionMessage = KnockoutPlugin.getPlugin().getConfig().getString("no-permission-message");
-                if (noPermissionMessage != null) {
-                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', noPermissionMessage));
-                }
+                ChatUtils.sendPlayerMessage(p, "no-permission-message");
                 return true;
             }
 
@@ -28,10 +24,7 @@ public class CarryCommand implements CommandExecutor {
                     .filter(passenger -> passenger instanceof Player)
                     .map(passenger -> (Player) passenger)
                     .anyMatch(NpcManager::npcExists)) {
-                String alreadyCarryingMessage = KnockoutPlugin.getPlugin().getConfig().getString("already-carrying-message");
-                if (alreadyCarryingMessage != null) {
-                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', alreadyCarryingMessage));
-                }
+                ChatUtils.sendPlayerMessage(p, "already-carrying-message");
                 return true;
             }
 
@@ -43,12 +36,7 @@ public class CarryCommand implements CommandExecutor {
                     .findFirst();
 
             // Carry a knocked out player
-            String invalidCommandMessage = KnockoutPlugin.getPlugin().getConfig().getString("invalid-carry-message");
-            knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.startCarrying(ko, p), () -> {
-                if (invalidCommandMessage != null) {
-                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', invalidCommandMessage));
-                }
-            });
+            knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.startCarrying(ko, p), () -> ChatUtils.sendPlayerMessage(p, "invalid-carry-message"));
 
         }
         return true;

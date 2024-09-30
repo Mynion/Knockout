@@ -1,10 +1,9 @@
 package org.mynion.knockoutplugin.listeners.cancelled;
 
-import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.mynion.knockoutplugin.KnockoutPlugin;
+import org.mynion.knockoutplugin.utils.ChatUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
 public class PlayerInteractEntityListener implements Listener {
@@ -12,10 +11,7 @@ public class PlayerInteractEntityListener implements Listener {
     public void onPlayerInteractEntity(PlayerInteractEntityEvent e) {
         if (NpcManager.npcExists(e.getPlayer())) {
             e.setCancelled(true);
-            String message = KnockoutPlugin.getPlugin().getConfig().getString("not-allowed-message");
-            if (message != null) {
-                e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-            }
+            ChatUtils.sendPlayerMessage(e.getPlayer(), "not-allowed-message");
         }
     }
 }

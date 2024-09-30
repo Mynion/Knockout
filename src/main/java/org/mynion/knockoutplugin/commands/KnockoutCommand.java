@@ -7,6 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.mynion.knockoutplugin.KnockoutPlugin;
+import org.mynion.knockoutplugin.utils.ChatUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
 import java.util.List;
@@ -17,10 +18,7 @@ public class KnockoutCommand implements TabExecutor {
 
         if (sender instanceof Player p) {
             if (!p.hasPermission("knockout.admin")) {
-                String noPermissionMessage = KnockoutPlugin.getPlugin().getConfig().getString("no-permission-message");
-                if (noPermissionMessage != null) {
-                    p.sendMessage(ChatColor.translateAlternateColorCodes('&', noPermissionMessage));
-                }
+                ChatUtils.sendPlayerMessage(p, "no-permission-message");
                 return true;
             }
         }
