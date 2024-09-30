@@ -32,6 +32,7 @@ public class KnockoutCommand implements TabExecutor {
         if (args[0].equalsIgnoreCase("reload")) {
             Knockout.getPlugin().reloadConfig();
             sender.sendMessage(ChatColor.GREEN + "Knockout config reloaded.");
+
         } else if (args[0].equalsIgnoreCase("revive") && args.length >= 2) {
             Player ko = Bukkit.getPlayer(args[1]);
             if (NpcManager.npcExists(ko)) {
@@ -41,6 +42,18 @@ public class KnockoutCommand implements TabExecutor {
             } else {
                 sender.sendMessage(ChatColor.RED + "That player is not knocked out!");
             }
+
+        } else if (args[0].equalsIgnoreCase("knockout") && args.length >= 2) {
+            Player ko = Bukkit.getPlayer(args[1]);
+            if (NpcManager.npcExists(ko)) {
+                sender.sendMessage(ChatColor.RED + "That player is already knocked out!");
+            } else if (ko != null) {
+                NpcManager.knockoutPlayer(ko);
+                sender.sendMessage(ChatColor.GREEN + "Player knocked out.");
+                ChatUtils.sendMessage(ko, "knocked-out-message");
+            } else {
+                sender.sendMessage(ChatColor.RED + "Player not found.");
+            }
         }
 
         return true;
@@ -49,7 +62,7 @@ public class KnockoutCommand implements TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1 && sender.hasPermission("knockout.admin")) {
-            return List.of("reload", "revive");
+            return List.of("reload", "revive", "knockout");
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("revive") && sender.hasPermission("knockout.admin")) {
             return Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
