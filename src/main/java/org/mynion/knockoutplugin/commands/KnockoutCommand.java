@@ -51,6 +51,9 @@ public class KnockoutCommand implements TabExecutor {
         if (args.length == 1 && sender.hasPermission("knockout.admin")) {
             return List.of("reload", "revive");
         }
+        if (args.length == 2 && args[0].equalsIgnoreCase("revive") && sender.hasPermission("knockout.admin")) {
+            return Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
+        }
         return null;
     }
 }
