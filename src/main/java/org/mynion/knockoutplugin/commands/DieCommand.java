@@ -13,14 +13,14 @@ public class DieCommand implements CommandExecutor {
         if (sender instanceof Player p) {
 
             if (!p.hasPermission("knockout.die")) {
-                ChatUtils.sendPlayerMessage(p, "no-permission-message");
+                ChatUtils.sendMessage(p, "no-permission-message");
                 return true;
             }
 
             if (NpcManager.npcExists(p)) {
                 NpcManager.forceKill(p);
             } else {
-                ChatUtils.sendPlayerMessage(p, "invalid-die-message");
+                ChatUtils.sendMessage(p, "invalid-die-message");
             }
         }
         return true;

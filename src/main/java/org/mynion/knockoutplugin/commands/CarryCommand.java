@@ -15,7 +15,7 @@ public class CarryCommand implements CommandExecutor {
         if (sender instanceof Player p) {
 
             if (!p.hasPermission("knockout.carry")) {
-                ChatUtils.sendPlayerMessage(p, "no-permission-message");
+                ChatUtils.sendMessage(p, "no-permission-message");
                 return true;
             }
 
@@ -24,7 +24,7 @@ public class CarryCommand implements CommandExecutor {
                     .filter(passenger -> passenger instanceof Player)
                     .map(passenger -> (Player) passenger)
                     .anyMatch(NpcManager::npcExists)) {
-                ChatUtils.sendPlayerMessage(p, "already-carrying-message");
+                ChatUtils.sendMessage(p, "already-carrying-message");
                 return true;
             }
 
@@ -36,7 +36,7 @@ public class CarryCommand implements CommandExecutor {
                     .findFirst();
 
             // Carry a knocked out player
-            knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.startCarrying(ko, p), () -> ChatUtils.sendPlayerMessage(p, "invalid-carry-message"));
+            knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.startCarrying(ko, p), () -> ChatUtils.sendMessage(p, "invalid-carry-message"));
 
         }
         return true;

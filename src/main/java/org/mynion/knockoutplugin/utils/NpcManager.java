@@ -90,7 +90,7 @@ public class NpcManager {
         setNoCollisions(npc);
         teleportBody(npc);
 
-        ChatUtils.sendPlayerMessage(p, "knockout-message");
+        ChatUtils.sendMessage(p, "knockout-message");
 
     }
 
@@ -358,7 +358,7 @@ public class NpcManager {
     public static void startReviving(Player revivingPlayer, Player knockedOutPlayer) {
 
         if (!revivingPlayer.hasPermission("knockout.revive")) {
-            ChatUtils.sendPlayerMessage(revivingPlayer, "no-permission-message");
+            ChatUtils.sendMessage(revivingPlayer, "no-permission-message");
             return;
         }
 
@@ -427,11 +427,7 @@ public class NpcManager {
             }.runTaskTimer(KnockoutPlugin.getPlugin(), 0, period);
         } else {
             if (!revivingPlayer.isSneaking() && !knockedOutPlayer.isInsideVehicle()) {
-                String noLevelsMessage = plugin.getConfig().getString("no-levels-message");
-                if (noLevelsMessage != null) {
-                    noLevelsMessage = noLevelsMessage.replace("%levels%", String.valueOf(requiredLevels));
-                    revivingPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&', noLevelsMessage));
-                }
+                ChatUtils.sendMessage(revivingPlayer, "no-levels-message", new HashMap<>(Map.of("%levels%", String.valueOf(requiredLevels))));
             }
         }
     }
@@ -439,16 +435,8 @@ public class NpcManager {
     private static void reviveNow(Player revivingPlayer, Player knockedOutPlayer) {
         getNpc(knockedOutPlayer).setBeingRevived(false);
         resetKnockout(getNpc(knockedOutPlayer));
-        String revivingMessage = plugin.getConfig().getString("rescuer-revived-message");
-        if (revivingMessage != null) {
-            revivingMessage = revivingMessage.replace("%player%", knockedOutPlayer.getDisplayName());
-            revivingPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&', revivingMessage));
-        }
-        String revivedMessage = plugin.getConfig().getString("rescued-revived-message");
-        if (revivedMessage != null) {
-            revivedMessage = revivedMessage.replace("%player%", revivingPlayer.getDisplayName());
-            knockedOutPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&', revivedMessage));
-        }
+        ChatUtils.sendMessage(revivingPlayer, "rescuer-revived-message", new HashMap<>(Map.of("%player%", knockedOutPlayer.getDisplayName())));
+        ChatUtils.sendMessage(knockedOutPlayer, "rescued-revived-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
         revivingPlayer.setExpCooldown(0);
     }
 

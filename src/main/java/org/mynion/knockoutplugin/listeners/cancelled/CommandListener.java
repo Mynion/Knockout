@@ -27,6 +27,6 @@ public class CommandListener implements Listener {
 
         // Cancel the command
         e.setCancelled(true);
-        ChatUtils.sendPlayerMessage(p, "not-allowed-message");
+        ChatUtils.sendMessage(p, "not-allowed-message");
     }
 }

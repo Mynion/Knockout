@@ -11,7 +11,7 @@ public class SwapHandItemsListener implements Listener {
     public void onSwapHandItems(PlayerSwapHandItemsEvent e) {
         if (NpcManager.npcExists(e.getPlayer())) {
             e.setCancelled(true);
-            ChatUtils.sendPlayerMessage(e.getPlayer(), "not-allowed-message");
+            ChatUtils.sendMessage(e.getPlayer(), "not-allowed-message");
 
         }
     }

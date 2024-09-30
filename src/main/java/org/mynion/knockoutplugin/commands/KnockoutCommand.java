@@ -10,7 +10,9 @@ import org.mynion.knockoutplugin.KnockoutPlugin;
 import org.mynion.knockoutplugin.utils.ChatUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class KnockoutCommand implements TabExecutor {
     @Override
@@ -18,7 +20,7 @@ public class KnockoutCommand implements TabExecutor {
 
         if (sender instanceof Player p) {
             if (!p.hasPermission("knockout.admin")) {
-                ChatUtils.sendPlayerMessage(p, "no-permission-message");
+                ChatUtils.sendMessage(p, "no-permission-message");
                 return true;
             }
         }
@@ -34,10 +36,8 @@ public class KnockoutCommand implements TabExecutor {
             Player ko = Bukkit.getPlayer(args[1]);
             if (NpcManager.npcExists(ko)) {
                 NpcManager.resetKnockout(NpcManager.getNpc(ko));
-                String revivedMessage = KnockoutPlugin.getPlugin().getConfig().getString("rescuer-revived-message");
-                if (revivedMessage != null) {
-                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', revivedMessage.replace("%player%", ko.getName())));
-                }
+                ChatUtils.sendMessage(sender, "rescuer-revived-message", new HashMap<>(Map.of("%player%", ko.getName())));
+                ChatUtils.sendMessage(ko, "rescued-revived-message", new HashMap<>(Map.of("%player%", sender.getName())));
             } else {
                 sender.sendMessage(ChatColor.RED + "That player is not knocked out!");
             }

@@ -11,7 +11,7 @@ public class PlayerInteractEntityListener implements Listener {
     public void onPlayerInteractEntity(PlayerInteractEntityEvent e) {
         if (NpcManager.npcExists(e.getPlayer())) {
             e.setCancelled(true);
-            ChatUtils.sendPlayerMessage(e.getPlayer(), "not-allowed-message");
+            ChatUtils.sendMessage(e.getPlayer(), "not-allowed-message");
         }
     }
 }

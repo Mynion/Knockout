@@ -13,7 +13,7 @@ public class InventoryClickListener implements Listener {
         Player p = (Player) e.getWhoClicked();
         if (NpcManager.npcExists(p)) {
             e.setCancelled(true);
-            ChatUtils.sendPlayerMessage(p, "not-allowed-message");
+            ChatUtils.sendMessage(p, "not-allowed-message");
         }
     }
 }

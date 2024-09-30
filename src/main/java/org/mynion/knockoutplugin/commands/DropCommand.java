@@ -1,11 +1,9 @@
 package org.mynion.knockoutplugin.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.mynion.knockoutplugin.KnockoutPlugin;
 import org.mynion.knockoutplugin.utils.ChatUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
@@ -17,7 +15,7 @@ public class DropCommand implements CommandExecutor {
         if (sender instanceof Player p) {
 
             if (!p.hasPermission("knockout.drop")) {
-                ChatUtils.sendPlayerMessage(p, "no-permission-message");
+                ChatUtils.sendMessage(p, "no-permission-message");
                 return true;
             }
 
@@ -29,7 +27,7 @@ public class DropCommand implements CommandExecutor {
                     .findFirst();
 
             // Stop carrying a player
-            knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.stopCarrying(ko, p), () -> ChatUtils.sendPlayerMessage(p, "invalid-drop-message"));
+            knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.stopCarrying(ko, p), () -> ChatUtils.sendMessage(p, "invalid-drop-message"));
 
         }
         return true;
