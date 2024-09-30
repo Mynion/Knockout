@@ -1,2 +1,2 @@
 # Knockout
-Minecraft plugin
+Source code of Knockout plugin for Minecraft
