@@ -88,6 +88,7 @@ public final class Knockout extends JavaPlugin {
             getConfig().getStringList("aliases.carry").forEach(alias -> commandMap.register(alias, "knockoutplugin", getCommand("carry")));
             getConfig().getStringList("aliases.drop").forEach(alias -> commandMap.register(alias, "knockoutplugin", getCommand("drop")));
             getConfig().getStringList("aliases.die").forEach(alias -> commandMap.register(alias, "knockoutplugin", getCommand("die")));
+            getConfig().getStringList("aliases.knockout").forEach(alias -> commandMap.register(alias, "knockoutplugin", getCommand("knockout")));
 
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();

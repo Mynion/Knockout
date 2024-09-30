@@ -77,3 +77,6 @@ aliases:
     -
   die:
     - zgin
+    -
+  knockout:
+    - ko
