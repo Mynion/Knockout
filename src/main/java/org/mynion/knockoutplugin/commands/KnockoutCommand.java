@@ -6,7 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
-import org.mynion.knockoutplugin.KnockoutPlugin;
+import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.ChatUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
@@ -30,7 +30,7 @@ public class KnockoutCommand implements TabExecutor {
         }
 
         if (args[0].equalsIgnoreCase("reload")) {
-            KnockoutPlugin.getPlugin().reloadConfig();
+            Knockout.getPlugin().reloadConfig();
             sender.sendMessage(ChatColor.GREEN + "Knockout config reloaded.");
         } else if (args[0].equalsIgnoreCase("revive") && args.length >= 2) {
             Player ko = Bukkit.getPlayer(args[1]);

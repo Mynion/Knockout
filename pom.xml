@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.mynion</groupId>
-    <artifactId>KnockoutPlugin</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>Knockout</artifactId>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
-    <name>KnockautPlugin</name>
+    <name>Knockout</name>
 
     <properties>
         <java.version>1.8</java.version>

@@ -37,13 +37,13 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.mynion.knockoutplugin.KnockoutPlugin;
+import org.mynion.knockoutplugin.Knockout;
 
 import java.util.*;
 
 public class NpcManager {
     private static final List<Npc> NPCs = new ArrayList<>();
-    private static final Plugin plugin = KnockoutPlugin.getPlugin();
+    private static final Plugin plugin = Knockout.getPlugin();
 
     public static void knockoutPlayer(Player p) {
 
@@ -207,7 +207,7 @@ public class NpcManager {
         });
 
         // Hide KO player
-        Bukkit.getServer().getOnlinePlayers().forEach(player -> player.hidePlayer(KnockoutPlugin.getPlugin(), p));
+        Bukkit.getServer().getOnlinePlayers().forEach(player -> player.hidePlayer(Knockout.getPlugin(), p));
 
         startTimer(p);
 
@@ -232,7 +232,7 @@ public class NpcManager {
                             }
                             knockoutCooldown[0]--;
                         } else {
-                            if (KnockoutPlugin.getPlugin().getConfig().getBoolean("death-on-end")) {
+                            if (Knockout.getPlugin().getConfig().getBoolean("death-on-end")) {
                                 forceKill(p);
                             } else {
                                 resetKnockout(getNpc(p));
@@ -244,7 +244,7 @@ public class NpcManager {
                     this.cancel();
                 }
             }
-        }.runTaskTimer(KnockoutPlugin.getPlugin(), 0, 20);
+        }.runTaskTimer(Knockout.getPlugin(), 0, 20);
 
     }
 
@@ -264,7 +264,7 @@ public class NpcManager {
         p.setInvisible(false);
         p.setCollidable(true);
 
-        Bukkit.getServer().getOnlinePlayers().forEach(player -> player.showPlayer(KnockoutPlugin.getPlugin(), p));
+        Bukkit.getServer().getOnlinePlayers().forEach(player -> player.showPlayer(Knockout.getPlugin(), p));
 
         p.resetTitle();
 
@@ -295,7 +295,7 @@ public class NpcManager {
                     this.cancel();
                 }
             }
-        }.runTaskTimer(KnockoutPlugin.getPlugin(), 0, 1);
+        }.runTaskTimer(Knockout.getPlugin(), 0, 1);
     }
 
     // Set no collisions for dead body
@@ -337,7 +337,7 @@ public class NpcManager {
                     if (currentVehicle != null) {
                         if (currentVehicle.isOnline()) {
                             currentVehicle.addPassenger(knockedOutPlayer);
-                            if (KnockoutPlugin.getPlugin().getConfig().getBoolean(("slowness-for-carrier"))) {
+                            if (Knockout.getPlugin().getConfig().getBoolean(("slowness-for-carrier"))) {
                                 currentVehicle.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20 * 2, plugin.getConfig().getInt("slowness-amplifier"), false, false));
                             }
                         } else {
@@ -352,7 +352,7 @@ public class NpcManager {
                     this.cancel();
                 }
             }
-        }.runTaskTimer(KnockoutPlugin.getPlugin(), 0, 2);
+        }.runTaskTimer(Knockout.getPlugin(), 0, 2);
     }
 
     public static void startReviving(Player revivingPlayer, Player knockedOutPlayer) {
@@ -362,7 +362,7 @@ public class NpcManager {
             return;
         }
 
-        int reviveTime = KnockoutPlugin.getPlugin().getConfig().getInt("revive-time");
+        int reviveTime = Knockout.getPlugin().getConfig().getInt("revive-time");
         if (reviveTime <= 0) {
             reviveNow(revivingPlayer, knockedOutPlayer);
             return;
@@ -424,7 +424,7 @@ public class NpcManager {
                         this.cancel();
                     }
                 }
-            }.runTaskTimer(KnockoutPlugin.getPlugin(), 0, period);
+            }.runTaskTimer(Knockout.getPlugin(), 0, period);
         } else {
             if (!revivingPlayer.isSneaking() && !knockedOutPlayer.isInsideVehicle()) {
                 ChatUtils.sendMessage(revivingPlayer, "no-levels-message", new HashMap<>(Map.of("%levels%", String.valueOf(requiredLevels))));

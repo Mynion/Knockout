@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.mynion.knockoutplugin.KnockoutPlugin;
+import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
 public class PlayerDamageListener implements Listener {
@@ -26,7 +26,7 @@ public class PlayerDamageListener implements Listener {
                     e.setCancelled(true);
                     NpcManager.knockoutPlayer(p);
                 }
-            } else if (KnockoutPlugin.getPlugin().getConfig().getBoolean("drop-on-hit")) {
+            } else if (Knockout.getPlugin().getConfig().getBoolean("drop-on-hit")) {
                 // Drop knocked out player when hit
                 p.getPassengers().stream()
                         .filter(passenger -> passenger instanceof Player)

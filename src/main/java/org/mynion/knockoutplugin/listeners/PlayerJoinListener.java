@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.mynion.knockoutplugin.KnockoutPlugin;
+import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
 import java.util.EnumSet;
@@ -54,7 +54,7 @@ public class PlayerJoinListener implements Listener {
             sp.connection.send(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
 
             // Hide knocked out players for a new player
-            p.hidePlayer(KnockoutPlugin.getPlugin(), npc.getPlayer());
+            p.hidePlayer(Knockout.getPlugin(), npc.getPlayer());
 
         });
     }

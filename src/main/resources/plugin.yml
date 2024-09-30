@@ -1,6 +1,6 @@
-name: KnockoutPlugin
+name: Knockout
 version: '${project.version}'
-main: org.mynion.knockoutplugin.KnockoutPlugin
+main: org.mynion.knockoutplugin.Knockout
 api-version: '1.21'
 
 commands:

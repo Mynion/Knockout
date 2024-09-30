@@ -18,7 +18,7 @@ import org.mynion.knockoutplugin.utils.NpcManager;
 import java.lang.reflect.Field;
 import java.util.List;
 
-public final class KnockoutPlugin extends JavaPlugin {
+public final class Knockout extends JavaPlugin {
     private static Plugin plugin;
 
     @Override
