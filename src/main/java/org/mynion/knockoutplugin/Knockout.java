@@ -60,27 +60,30 @@ public final class Knockout extends JavaPlugin {
 
         // Remove all NPCs
         NpcManager.getNPCs().forEach(npc -> {
+
             if (npc.getVehicle() != null) {
                 npc.getVehicle().removePotionEffect(PotionEffectType.SLOWNESS);
             }
-            npc.getPlayer().setHealth(0);
+
             ClientboundPlayerInfoRemovePacket removeNpcPacket = new ClientboundPlayerInfoRemovePacket(List.of(npc.getDeadBody().getGameProfile().getId()));
             ClientboundRemoveEntitiesPacket removeEntityPacket = new ClientboundRemoveEntitiesPacket(npc.getDeadBody().getId());
             NpcManager.broadcastPacket(removeNpcPacket);
             NpcManager.broadcastPacket(removeEntityPacket);
-            npc.getPlayer().setGameMode(npc.getPreviousGameMode());
-            npc.getArmorStand().remove();
-            NpcManager.resetKnockoutEffects(npc.getPlayer());
-        });
 
+            npc.getArmorStand().remove();
+            npc.getPlayer().setHealth(0);
+            npc.getPlayer().setGameMode(npc.getPreviousGameMode());
+            NpcManager.resetKnockoutEffects(npc.getPlayer());
+
+        });
     }
 
     private void loadAliases() {
         try {
-            final Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+            final Field commandMapField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
 
-            bukkitCommandMap.setAccessible(true);
-            CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
+            commandMapField.setAccessible(true);
+            CommandMap commandMap = (CommandMap) commandMapField.get(Bukkit.getServer());
 
             getConfig().getStringList("aliases.carry").forEach(alias -> commandMap.register(alias, "knockoutplugin", getCommand("carry")));
             getConfig().getStringList("aliases.drop").forEach(alias -> commandMap.register(alias, "knockoutplugin", getCommand("drop")));
