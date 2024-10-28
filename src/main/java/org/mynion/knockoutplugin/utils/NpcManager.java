@@ -102,7 +102,7 @@ public class NpcManager {
         ServerLevel level = sp.serverLevel();
 
         UUID deadBodyUUID = UUID.randomUUID();
-        String deadBodyName = p.getDisplayName();
+        String deadBodyName = p.getName();
         GameProfile deadBodyProfile = new GameProfile(deadBodyUUID, deadBodyName);
 
         ServerPlayer deadBodyPlayer = new ServerPlayer(server, level, deadBodyProfile, new ClientInformation("en_us", 10, ChatVisiblity.FULL, true, sp.clientInformation().modelCustomisation(), net.minecraft.world.entity.player.Player.DEFAULT_MAIN_HAND, false, false));
