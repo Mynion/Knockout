@@ -67,15 +67,6 @@ public class NpcManager {
         broadcastPacket(infoUpdatePacket);
         broadcastPacket(addEntityPacket);
         broadcastPacket(setEntityDataPacket);
-        deadBodyPlayer.setItemSlot(EquipmentSlot.HEAD, sp.getItemBySlot(EquipmentSlot.HEAD));
-        deadBodyPlayer.setItemSlot(EquipmentSlot.BODY, sp.getItemBySlot(EquipmentSlot.BODY));
-        deadBodyPlayer.setItemSlot(EquipmentSlot.LEGS, sp.getItemBySlot(EquipmentSlot.LEGS));
-        deadBodyPlayer.setItemSlot(EquipmentSlot.FEET, sp.getItemBySlot(EquipmentSlot.FEET));
-        deadBodyPlayer.setItemSlot(EquipmentSlot.MAINHAND, sp.getItemBySlot(EquipmentSlot.MAINHAND));
-        deadBodyPlayer.setItemSlot(EquipmentSlot.OFFHAND, sp.getItemBySlot(EquipmentSlot.OFFHAND));
-        System.out.println(deadBodyPlayer.getItemBySlot(EquipmentSlot.HEAD).toString());
-        System.out.println(deadBodyPlayer.getItemBySlot(EquipmentSlot.MAINHAND).toString());
-        System.out.println(deadBodyPlayer.containerMenu.getItems().toString());
         List<Pair<EquipmentSlot, ItemStack>> items = List.of(
                 Pair.of(EquipmentSlot.HEAD, sp.getItemBySlot(EquipmentSlot.HEAD)),
                 Pair.of(EquipmentSlot.BODY, sp.getItemBySlot(EquipmentSlot.BODY)),
