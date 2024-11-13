@@ -3,6 +3,7 @@ package org.mynion.knockoutplugin.utils;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
@@ -15,10 +16,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.ChatVisiblity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
@@ -27,13 +30,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.craftbukkit.v1_21_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -68,6 +67,25 @@ public class NpcManager {
         broadcastPacket(infoUpdatePacket);
         broadcastPacket(addEntityPacket);
         broadcastPacket(setEntityDataPacket);
+        deadBodyPlayer.setItemSlot(EquipmentSlot.HEAD, sp.getItemBySlot(EquipmentSlot.HEAD));
+        deadBodyPlayer.setItemSlot(EquipmentSlot.BODY, sp.getItemBySlot(EquipmentSlot.BODY));
+        deadBodyPlayer.setItemSlot(EquipmentSlot.LEGS, sp.getItemBySlot(EquipmentSlot.LEGS));
+        deadBodyPlayer.setItemSlot(EquipmentSlot.FEET, sp.getItemBySlot(EquipmentSlot.FEET));
+        deadBodyPlayer.setItemSlot(EquipmentSlot.MAINHAND, sp.getItemBySlot(EquipmentSlot.MAINHAND));
+        deadBodyPlayer.setItemSlot(EquipmentSlot.OFFHAND, sp.getItemBySlot(EquipmentSlot.OFFHAND));
+        System.out.println(deadBodyPlayer.getItemBySlot(EquipmentSlot.HEAD).toString());
+        System.out.println(deadBodyPlayer.getItemBySlot(EquipmentSlot.MAINHAND).toString());
+        System.out.println(deadBodyPlayer.containerMenu.getItems().toString());
+        List<Pair<EquipmentSlot, ItemStack>> items = List.of(
+                Pair.of(EquipmentSlot.HEAD, sp.getItemBySlot(EquipmentSlot.HEAD)),
+                Pair.of(EquipmentSlot.BODY, sp.getItemBySlot(EquipmentSlot.BODY)),
+                Pair.of(EquipmentSlot.LEGS, sp.getItemBySlot(EquipmentSlot.LEGS)),
+                Pair.of(EquipmentSlot.FEET, sp.getItemBySlot(EquipmentSlot.FEET)),
+                Pair.of(EquipmentSlot.MAINHAND, sp.getItemBySlot(EquipmentSlot.MAINHAND)),
+                Pair.of(EquipmentSlot.OFFHAND, sp.getItemBySlot(EquipmentSlot.OFFHAND))
+        );
+        ClientboundSetEquipmentPacket packet = new ClientboundSetEquipmentPacket(deadBodyPlayer.getId(), items);
+        broadcastPacket(packet);
 
         // Create hologram
         ArmorStand armorStand = (ArmorStand) p.getWorld().spawnEntity(p.getLocation(), EntityType.ARMOR_STAND);
@@ -78,8 +96,6 @@ public class NpcManager {
         }
         armorStand.setCustomNameVisible(true);
         armorStand.setInvulnerable(false);
-        //armorStand.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(1337);
-        //armorStand.setHealth(500);
         armorStand.setInvisible(true);
         armorStand.setGravity(false);
 
