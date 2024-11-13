@@ -27,6 +27,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.craftbukkit.v1_21_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer;
 import org.bukkit.entity.ArmorStand;
@@ -76,7 +77,9 @@ public class NpcManager {
             armorStand.setCustomName(ChatColor.translateAlternateColorCodes('&', hologramName));
         }
         armorStand.setCustomNameVisible(true);
-        armorStand.setInvulnerable(true);
+        armorStand.setInvulnerable(false);
+        //armorStand.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(1337);
+        //armorStand.setHealth(500);
         armorStand.setInvisible(true);
         armorStand.setGravity(false);
 

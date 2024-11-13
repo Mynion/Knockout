@@ -22,6 +22,9 @@ death-on-end: true
 # When true: player will have blindness effect when knocked out
 knockout-blindness: true
 
+# When true: it will be possible to attack knocked out players
+knockout-vulnerable: true
+
 # Message for the player when knocked out
 knockout-message: '&cYou have been knocked out! Ask someone to revive you or use /die to die at once.'
 
