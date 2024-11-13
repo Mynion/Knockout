@@ -69,7 +69,7 @@ public class NpcManager {
         broadcastPacket(setEntityDataPacket);
         List<Pair<EquipmentSlot, ItemStack>> items = List.of(
                 Pair.of(EquipmentSlot.HEAD, sp.getItemBySlot(EquipmentSlot.HEAD)),
-                Pair.of(EquipmentSlot.BODY, sp.getItemBySlot(EquipmentSlot.BODY)),
+                Pair.of(EquipmentSlot.CHEST, sp.getItemBySlot(EquipmentSlot.CHEST)),
                 Pair.of(EquipmentSlot.LEGS, sp.getItemBySlot(EquipmentSlot.LEGS)),
                 Pair.of(EquipmentSlot.FEET, sp.getItemBySlot(EquipmentSlot.FEET)),
                 Pair.of(EquipmentSlot.MAINHAND, sp.getItemBySlot(EquipmentSlot.MAINHAND)),
