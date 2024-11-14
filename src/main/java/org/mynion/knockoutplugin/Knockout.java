@@ -26,7 +26,6 @@ public final class Knockout extends JavaPlugin {
         plugin = this;
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
-        saveConfig();
         loadAliases();
         getServer().getPluginManager().registerEvents(new PlayerDamageListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerSneakListener(), this);

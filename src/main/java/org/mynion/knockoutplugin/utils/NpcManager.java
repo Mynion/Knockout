@@ -207,12 +207,12 @@ public class NpcManager {
         p.leaveVehicle();
         p.getPassengers().forEach(p::removePassenger);
 
+        // Remove parrots from shoulders
         new BukkitRunnable() {
             @Override
             public void run() {
                 if (!NpcManager.npcExists(p)) this.cancel();
 
-                // Remove parrots from shoulders
                 if (!sp.getShoulderEntityLeft().isEmpty()) {
                     net.minecraft.world.entity.EntityType.create(sp.getShoulderEntityLeft(), sp.level()).map((entity) -> {
                         if (entity instanceof TamableAnimal) {
