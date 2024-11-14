@@ -29,12 +29,17 @@ public class EntityDamageListener implements Listener {
             // Cancel damage for the armor stand of knocked out player
             e.setCancelled(true);
 
-            if(!Knockout.getPlugin().getConfig().getBoolean("knockout-vulnerable")){
+            if (!Knockout.getPlugin().getConfig().getBoolean("knockout-vulnerable")) {
                 return;
             }
 
-            // Damage attacked knocked out player
             Npc npc = NpcManager.getNpc(armorStand);
+
+            if (e.getDamager() instanceof Player p) {
+                if (npc.getPlayer().equals(p)) return;
+            }
+
+            // Damage attacked knocked out player
             ClientboundHurtAnimationPacket packet = new ClientboundHurtAnimationPacket(npc.getDeadBody().getId(), 0);
             NpcManager.broadcastPacket(packet);
             npc.getPlayer().damage(e.getFinalDamage());
