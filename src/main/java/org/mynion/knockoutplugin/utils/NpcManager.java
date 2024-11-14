@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
@@ -18,6 +19,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.ChatVisiblity;
@@ -33,6 +35,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_21_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer;
 import org.bukkit.entity.*;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -203,6 +206,36 @@ public class NpcManager {
         p.setGameMode(GameMode.SURVIVAL);
         p.leaveVehicle();
         p.getPassengers().forEach(p::removePassenger);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!NpcManager.npcExists(p)) this.cancel();
+
+                // Remove parrots from shoulders
+                if (!sp.getShoulderEntityLeft().isEmpty()) {
+                    net.minecraft.world.entity.EntityType.create(sp.getShoulderEntityLeft(), sp.level()).map((entity) -> {
+                        if (entity instanceof TamableAnimal) {
+                            ((TamableAnimal) entity).setOwnerUUID(p.getUniqueId());
+                        }
+                        entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
+                        return ((ServerLevel) sp.level()).addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
+                    });
+                    sp.setShoulderEntityLeft(new CompoundTag());
+                }
+
+                if (!sp.getShoulderEntityRight().isEmpty()) {
+                    net.minecraft.world.entity.EntityType.create(sp.getShoulderEntityRight(), sp.level()).map((entity) -> {
+                        if (entity instanceof TamableAnimal) {
+                            ((TamableAnimal) entity).setOwnerUUID(p.getUniqueId());
+                        }
+                        entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
+                        return ((ServerLevel) sp.level()).addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
+                    });
+                    sp.setShoulderEntityRight(new CompoundTag());
+                }
+            }
+        }.runTaskTimer(Knockout.getPlugin(), 0, 2);
 
         // Reset nearby mobs focus on a KO player
         List<org.bukkit.entity.Entity> nearbyMobs = p.getNearbyEntities(50, 50, 50);
