@@ -14,15 +14,34 @@ import org.mynion.knockoutplugin.commands.KnockoutCommand;
 import org.mynion.knockoutplugin.listeners.*;
 import org.mynion.knockoutplugin.listeners.cancelled.*;
 import org.mynion.knockoutplugin.utils.NpcManager;
+import org.mynion.knockoutplugin.versions.VersionAdapter;
+import org.mynion.knockoutplugin.versions.v1_21_R1.v1_21_R1;
+import org.mynion.knockoutplugin.versions.v1_21_R2.v1_21_R2;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
 public final class Knockout extends JavaPlugin {
     private static Plugin plugin;
+    private static VersionAdapter versionAdapter;
 
     @Override
     public void onEnable() {
+
+        String version = Bukkit.getServer().getClass().getPackageName().split("\\.")[3];
+        switch (version) {
+            case "v1_21_R1":
+                versionAdapter = new v1_21_R1();
+                break;
+            case "v1_21_R2":
+                versionAdapter = new v1_21_R2();
+                break;
+            default:
+                System.out.println("Unsupported server version" + version);
+                getServer().getPluginManager().disablePlugin(this);
+                return;
+        }
+
         plugin = this;
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
@@ -96,5 +115,9 @@ public final class Knockout extends JavaPlugin {
 
     public static Plugin getPlugin() {
         return plugin;
+    }
+
+    public static VersionAdapter getVersionAdapter() {
+        return versionAdapter;
     }
 }
