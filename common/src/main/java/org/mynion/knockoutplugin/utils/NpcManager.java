@@ -32,8 +32,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_21_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.Plugin;
@@ -50,8 +48,7 @@ public class NpcManager {
 
     public static void knockoutPlayer(Player p) {
 
-        CraftPlayer cp = (CraftPlayer) p;
-        ServerPlayer sp = cp.getHandle();
+        ServerPlayer sp = Knockout.getVersionAdapter().getServerPlayer(p);
         MinecraftServer server = sp.getServer();
         ServerLevel level = sp.serverLevel();
         GameMode playerGameMode = p.getGameMode();
@@ -109,8 +106,7 @@ public class NpcManager {
 
     private static ServerPlayer createDeadBody(Player p) {
 
-        CraftPlayer cp = (CraftPlayer) p;
-        ServerPlayer sp = cp.getHandle();
+        ServerPlayer sp = Knockout.getVersionAdapter().getServerPlayer(p);
         MinecraftServer server = sp.getServer();
         ServerLevel level = sp.serverLevel();
 
@@ -118,7 +114,7 @@ public class NpcManager {
         String deadBodyName = p.getName();
         GameProfile deadBodyProfile = new GameProfile(deadBodyUUID, deadBodyName);
 
-        ServerPlayer deadBodyPlayer = new ServerPlayer(server, level, deadBodyProfile, new ClientInformation("en_us", 10, ChatVisiblity.FULL, true, sp.clientInformation().modelCustomisation(), net.minecraft.world.entity.player.Player.DEFAULT_MAIN_HAND, false, false));
+        ServerPlayer deadBodyPlayer = new ServerPlayer(server, level, deadBodyProfile, ClientInformation.createDefault());
         deadBodyPlayer.setPos(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
         deadBodyPlayer.setXRot(sp.getXRot());
         deadBodyPlayer.setYRot(sp.getYRot());
@@ -173,8 +169,7 @@ public class NpcManager {
 
     private static void applyKnockoutEffects(Player p) {
 
-        CraftPlayer cp = (CraftPlayer) p;
-        ServerPlayer sp = cp.getHandle();
+        ServerPlayer sp = Knockout.getVersionAdapter().getServerPlayer(p);
 
         AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
         jumpAttribute.setBaseValue(0);
@@ -208,34 +203,7 @@ public class NpcManager {
         p.getPassengers().forEach(p::removePassenger);
 
         // Remove parrots from shoulders
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!NpcManager.npcExists(p)) this.cancel();
 
-                if (!sp.getShoulderEntityLeft().isEmpty()) {
-                    net.minecraft.world.entity.EntityType.create(sp.getShoulderEntityLeft(), sp.level()).map((entity) -> {
-                        if (entity instanceof TamableAnimal) {
-                            ((TamableAnimal) entity).setOwnerUUID(p.getUniqueId());
-                        }
-                        entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
-                        return ((ServerLevel) sp.level()).addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
-                    });
-                    sp.setShoulderEntityLeft(new CompoundTag());
-                }
-
-                if (!sp.getShoulderEntityRight().isEmpty()) {
-                    net.minecraft.world.entity.EntityType.create(sp.getShoulderEntityRight(), sp.level()).map((entity) -> {
-                        if (entity instanceof TamableAnimal) {
-                            ((TamableAnimal) entity).setOwnerUUID(p.getUniqueId());
-                        }
-                        entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
-                        return ((ServerLevel) sp.level()).addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
-                    });
-                    sp.setShoulderEntityRight(new CompoundTag());
-                }
-            }
-        }.runTaskTimer(Knockout.getPlugin(), 0, 2);
 
         // Reset nearby mobs focus on a KO player
         List<org.bukkit.entity.Entity> nearbyMobs = p.getNearbyEntities(50, 50, 50);
@@ -293,8 +261,7 @@ public class NpcManager {
 
     public static void resetKnockoutEffects(Player p) {
 
-        CraftPlayer cp = (CraftPlayer) p;
-        ServerPlayer sp = cp.getHandle();
+        ServerPlayer sp = Knockout.getVersionAdapter().getServerPlayer(p);
 
         AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
         jumpAttribute.setBaseValue(0.42);
@@ -316,24 +283,25 @@ public class NpcManager {
     // Teleporting body and hologram to the player while knocked out
     private static void teleportBody(Npc npc) {
 
-        CraftEntity craftArmorStand = (CraftEntity) npc.getArmorStand();
-        Entity armorStand = craftArmorStand.getHandle();
+        Entity armorStand = Knockout.getVersionAdapter().getArmorStand(npc.getArmorStand());
         ServerPlayer deadBody = npc.getDeadBody();
+        ServerPlayer sp = Knockout.getVersionAdapter().getServerPlayer(npc.getPlayer());
         Player p = npc.getPlayer();
 
         new BukkitRunnable() {
             @Override
             public void run() {
                 if (NpcManager.npcExists(p)) {
-                    ClientboundTeleportEntityPacket teleportBodyPacket = new ClientboundTeleportEntityPacket(deadBody);
-                    broadcastPacket(teleportBodyPacket);
+                    double yDiff;
                     if (p.isInsideVehicle()) {
-                        deadBody.teleportTo(p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
-                        armorStand.teleportTo(p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
+                        yDiff = 0.6;
                     } else {
-                        deadBody.teleportTo(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
-                        armorStand.teleportTo(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
+                        yDiff = -0.2;
                     }
+                    //ClientboundTeleportEntityPacket teleportBodyPacket = Knockout.getVersionAdapter().getTeleportPacket(deadBody, sp, yDiff);
+                    //broadcastPacket(teleportBodyPacket);
+                    deadBody.teleportTo(p.getLocation().getX(), p.getLocation().getY() + yDiff, p.getLocation().getZ());
+                    armorStand.teleportTo(p.getLocation().getX(), p.getLocation().getY() + yDiff, p.getLocation().getZ());
                 } else {
                     this.cancel();
                 }

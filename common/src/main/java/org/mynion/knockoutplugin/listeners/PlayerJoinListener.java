@@ -10,13 +10,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team;
-import org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.NpcManager;
+import org.mynion.knockoutplugin.utils.VersionAdapter;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -27,8 +27,7 @@ public class PlayerJoinListener implements Listener {
         Player p = e.getPlayer();
         NpcManager.resetKnockoutEffects(p);
 
-        CraftPlayer cp = (CraftPlayer) p;
-        ServerPlayer sp = cp.getHandle();
+        ServerPlayer sp = Knockout.getVersionAdapter().getServerPlayer(p);
         ServerLevel level = sp.serverLevel();
 
         // Perform actions for a new player
