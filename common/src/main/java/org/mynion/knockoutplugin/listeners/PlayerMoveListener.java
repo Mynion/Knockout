@@ -5,12 +5,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.NpcManager;
-
 public class PlayerMoveListener implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
+        NpcManager NpcManager = Knockout.getNpcManager();
 
         // Prevent a KO player from moving in water
         if (NpcManager.npcExists(p) && p.isInWater()) {

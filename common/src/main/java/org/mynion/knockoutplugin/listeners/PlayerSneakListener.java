@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
 import java.util.Optional;
@@ -12,7 +13,7 @@ public class PlayerSneakListener implements Listener {
     @EventHandler
     public void onPlayerToggleSneak(PlayerToggleSneakEvent e) {
         Player p = e.getPlayer();
-
+        NpcManager NpcManager = Knockout.getNpcManager();
         if (NpcManager.npcExists(p)) {
             e.setCancelled(true);
 
@@ -27,6 +28,7 @@ public class PlayerSneakListener implements Listener {
     }
 
     private Optional<Player> findNearbyKnockedOutPlayer(Player p) {
+        NpcManager NpcManager = Knockout.getNpcManager();
         return p.getNearbyEntities(1, 1, 1).stream()
                 .filter(entity -> entity instanceof Player)
                 .map(entity -> (Player) entity)

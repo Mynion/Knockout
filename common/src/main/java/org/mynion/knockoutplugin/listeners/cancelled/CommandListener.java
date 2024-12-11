@@ -4,14 +4,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.ChatUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
-
 public class CommandListener implements Listener {
     @EventHandler
     public void onCommandSend(PlayerCommandPreprocessEvent e) {
 
         Player p =e.getPlayer();
+        NpcManager NpcManager = Knockout.getNpcManager();
 
         if (!NpcManager.npcExists(p)) {
             return;

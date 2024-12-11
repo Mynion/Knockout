@@ -8,12 +8,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.ChatUtils;
-import org.mynion.knockoutplugin.utils.Npc;
 import org.mynion.knockoutplugin.utils.NpcManager;
-
 public class EntityDamageListener implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent e) {
+        NpcManager NpcManager = Knockout.getNpcManager();
         if (e.getDamager() instanceof Player p) {
             if (NpcManager.npcExists(p)) {
                 e.setCancelled(true);
@@ -33,16 +32,7 @@ public class EntityDamageListener implements Listener {
                 return;
             }
 
-            Npc npc = NpcManager.getNpc(armorStand);
-
-            if (e.getDamager() instanceof Player p) {
-                if (npc.getPlayer().equals(p)) return;
-            }
-
-            // Damage attacked knocked out player
-            ClientboundHurtAnimationPacket packet = new ClientboundHurtAnimationPacket(npc.getDeadBody().getId(), 0);
-            NpcManager.broadcastPacket(packet);
-            npc.getPlayer().damage(e.getFinalDamage());
+            NpcManager.damage(armorStand, e.getDamager(), e.getFinalDamage());
 
         }
     }

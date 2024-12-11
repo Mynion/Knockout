@@ -14,27 +14,30 @@ import org.mynion.knockoutplugin.commands.KnockoutCommand;
 import org.mynion.knockoutplugin.listeners.*;
 import org.mynion.knockoutplugin.listeners.cancelled.*;
 import org.mynion.knockoutplugin.utils.NpcManager;
-import org.mynion.knockoutplugin.utils.VersionAdapter;
-import org.mynion.knockoutplugin.utils.VersionAdapterFactory;
+import org.mynion.knockoutplugin.utils.NpcManagerFactory;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
 public final class Knockout extends JavaPlugin {
     private static Plugin plugin;
-    private static VersionAdapter versionAdapter;
+    //private static VersionAdapter versionAdapter;
+    private static NpcManager NpcManager;
 
     @Override
     public void onEnable() {
+        plugin = this;
 
         String version = Bukkit.getServer().getClass().getPackageName().split("\\.")[3];
         System.out.println("===================================================="+version);
         switch (version) {
             case "v1_21_R1":
-                versionAdapter = VersionAdapterFactory.getVersionAdapter("v1_21_R1");
+                //versionAdapter = VersionAdapterFactory.getVersionAdapter("v1_21_R1");
+                NpcManager = NpcManagerFactory.getNpcManager("v1_21_R1");
                 break;
             case "v1_21_R2":
-                versionAdapter = VersionAdapterFactory.getVersionAdapter("v1_21_R2");
+                //versionAdapter = VersionAdapterFactory.getVersionAdapter("v1_21_R2");
+                NpcManager = NpcManagerFactory.getNpcManager("v1_21_R2");
                 break;
             default:
                 System.out.println("Unsupported server version" + version);
@@ -42,7 +45,6 @@ public final class Knockout extends JavaPlugin {
                 return;
         }
 
-        plugin = this;
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
         loadAliases();
@@ -76,24 +78,7 @@ public final class Knockout extends JavaPlugin {
     @Override
     public void onDisable() {
 
-        // Remove all NPCs
-        NpcManager.getNPCs().forEach(npc -> {
-
-            if (npc.getVehicle() != null) {
-                npc.getVehicle().removePotionEffect(PotionEffectType.SLOWNESS);
-            }
-
-            ClientboundPlayerInfoRemovePacket removeNpcPacket = new ClientboundPlayerInfoRemovePacket(List.of(npc.getDeadBody().getGameProfile().getId()));
-            ClientboundRemoveEntitiesPacket removeEntityPacket = new ClientboundRemoveEntitiesPacket(npc.getDeadBody().getId());
-            NpcManager.broadcastPacket(removeNpcPacket);
-            NpcManager.broadcastPacket(removeEntityPacket);
-
-            npc.getArmorStand().remove();
-            npc.getPlayer().setHealth(0);
-            npc.getPlayer().setGameMode(npc.getPreviousGameMode());
-            NpcManager.resetKnockoutEffects(npc.getPlayer());
-
-        });
+        NpcManager.removeKOPlayers();
     }
 
     private void loadAliases() {
@@ -117,7 +102,11 @@ public final class Knockout extends JavaPlugin {
         return plugin;
     }
 
-    public static VersionAdapter getVersionAdapter() {
-        return versionAdapter;
+    //public static VersionAdapter getVersionAdapter() {
+    //    return versionAdapter;
+    //}
+
+    public static NpcManager getNpcManager() {
+        return NpcManager;
     }
 }

@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.ChatUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +16,8 @@ import java.util.Map;
 public class KnockoutCommand implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
+        NpcManager NpcManager = Knockout.getNpcManager();
 
         if (sender instanceof Player p) {
             if (!p.hasPermission("knockout.admin")) {
@@ -36,7 +37,7 @@ public class KnockoutCommand implements TabExecutor {
         } else if (args[0].equalsIgnoreCase("revive") && args.length >= 2) {
             Player ko = Bukkit.getPlayer(args[1]);
             if (NpcManager.npcExists(ko)) {
-                NpcManager.resetKnockout(NpcManager.getNpc(ko));
+                NpcManager.resetKnockout(ko);
                 ChatUtils.sendMessage(sender, "rescuer-revived-message", new HashMap<>(Map.of("%player%", ko.getName())));
                 ChatUtils.sendMessage(ko, "rescued-revived-message", new HashMap<>(Map.of("%player%", sender.getName())));
             } else {

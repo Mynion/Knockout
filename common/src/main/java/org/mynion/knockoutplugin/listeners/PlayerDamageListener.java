@@ -7,10 +7,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.NpcManager;
-
 public class PlayerDamageListener implements Listener {
     @EventHandler
     public void onPlayerDamage(EntityDamageEvent e) {
+        NpcManager NpcManager = Knockout.getNpcManager();
         if (e.getEntity() instanceof Player p) {
 
             // Check if the player would die
@@ -19,7 +19,7 @@ public class PlayerDamageListener implements Listener {
                 if (NpcManager.npcExists(p)) {
 
                     // Reset knockout
-                    NpcManager.resetKnockout(NpcManager.getNpc(p));
+                    NpcManager.resetKnockout(p);
                 } else {
 
                     // Knockout player
