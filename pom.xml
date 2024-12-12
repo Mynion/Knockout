@@ -6,7 +6,7 @@
 
     <groupId>org.mynion</groupId>
     <artifactId>Knockout</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <packaging>pom</packaging>
 
     <name>Knockout</name>
@@ -80,19 +80,19 @@
         <dependency>
             <groupId>org.mynion</groupId>
             <artifactId>v1_21_R1</artifactId>
-            <version>1.1.0</version>
+            <version>${version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.mynion</groupId>
             <artifactId>v1_21_R2</artifactId>
-            <version>1.1.0</version>
+            <version>${version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.mynion</groupId>
             <artifactId>v1_21_R3</artifactId>
-            <version>1.1.0</version>
+            <version>${version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
