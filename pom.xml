@@ -15,6 +15,7 @@
         <module>common</module>
         <module>versions/v1_21_R1</module>
         <module>versions/v1_21_R2</module>
+        <module>versions/v1_21_R3</module>
     </modules>
 
     <properties>
@@ -24,15 +25,15 @@
 
     <build>
         <plugins>
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-compiler-plugin</artifactId>-->
-<!--                <version>3.8.1</version>-->
-<!--                <configuration>-->
-<!--                    <source>16</source>-->
-<!--                    <target>16</target>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>16</source>
+                    <target>16</target>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -49,20 +50,12 @@
                                     <include>org.mynion:*</include>
                                 </includes>
                             </artifactSet>
-                            <outputFile>${plugin.output.directory}/${project.artifactId}-${project.version}-all.jar</outputFile>
+                            <outputFile>${plugin.output.directory}/${project.artifactId}-${project.version}.jar</outputFile>
                         </configuration>
                     </execution>
                 </executions>
                 <inherited>false</inherited>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-jar-plugin</artifactId>-->
-<!--                <version>2.3.1</version>-->
-<!--                <configuration>-->
-<!--                    <outputDirectory>${plugin.output.directory}</outputDirectory>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
         </plugins>
         <resources>
             <resource>
@@ -93,6 +86,12 @@
         <dependency>
             <groupId>org.mynion</groupId>
             <artifactId>v1_21_R2</artifactId>
+            <version>1.1.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mynion</groupId>
+            <artifactId>v1_21_R3</artifactId>
             <version>1.1.0</version>
             <scope>compile</scope>
         </dependency>

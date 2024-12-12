@@ -31,8 +31,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_21_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_21_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_21_R3.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -42,11 +42,11 @@ import org.mynion.knockoutplugin.Knockout;
 
 import java.util.*;
 
-public class NpcManager_v1_21_R2 implements NpcManager {
+public class NpcManager_v1_21_R3 implements NpcManager {
     private static final List<Npc> NPCs = new ArrayList<>();
     private static final Plugin plugin = Knockout.getPlugin();
 
-    public NpcManager_v1_21_R2() {
+    public NpcManager_v1_21_R3() {
     }
 
     public void knockoutPlayer(Player p) {

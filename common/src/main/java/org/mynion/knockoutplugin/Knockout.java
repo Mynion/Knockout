@@ -1,12 +1,9 @@
 package org.mynion.knockoutplugin;
 
-import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
-import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffectType;
 import org.mynion.knockoutplugin.commands.DieCommand;
 import org.mynion.knockoutplugin.commands.CarryCommand;
 import org.mynion.knockoutplugin.commands.DropCommand;
@@ -17,11 +14,9 @@ import org.mynion.knockoutplugin.utils.NpcManager;
 import org.mynion.knockoutplugin.utils.NpcManagerFactory;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 public final class Knockout extends JavaPlugin {
     private static Plugin plugin;
-    //private static VersionAdapter versionAdapter;
     private static NpcManager NpcManager;
 
     @Override
@@ -29,21 +24,7 @@ public final class Knockout extends JavaPlugin {
         plugin = this;
 
         String version = Bukkit.getServer().getClass().getPackageName().split("\\.")[3];
-        System.out.println("===================================================="+version);
-        switch (version) {
-            case "v1_21_R1":
-                //versionAdapter = VersionAdapterFactory.getVersionAdapter("v1_21_R1");
-                NpcManager = NpcManagerFactory.getNpcManager("v1_21_R1");
-                break;
-            case "v1_21_R2":
-                //versionAdapter = VersionAdapterFactory.getVersionAdapter("v1_21_R2");
-                NpcManager = NpcManagerFactory.getNpcManager("v1_21_R2");
-                break;
-            default:
-                System.out.println("Unsupported server version" + version);
-                getServer().getPluginManager().disablePlugin(this);
-                return;
-        }
+        NpcManager = NpcManagerFactory.getNpcManager(version);
 
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
@@ -77,7 +58,6 @@ public final class Knockout extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
         NpcManager.removeKOPlayers();
     }
 
@@ -101,10 +81,6 @@ public final class Knockout extends JavaPlugin {
     public static Plugin getPlugin() {
         return plugin;
     }
-
-    //public static VersionAdapter getVersionAdapter() {
-    //    return versionAdapter;
-    //}
 
     public static NpcManager getNpcManager() {
         return NpcManager;

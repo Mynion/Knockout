@@ -44,7 +44,7 @@ import org.mynion.knockoutplugin.Knockout;
 
 import java.util.*;
 
-public class NpcManager_v1_21_R1 implements NpcManager{
+public class NpcManager_v1_21_R1 implements NpcManager {
     public NpcManager_v1_21_R1() {
     }
 
@@ -110,7 +110,7 @@ public class NpcManager_v1_21_R1 implements NpcManager{
 
     }
 
-    private static ServerPlayer createDeadBody(Player p) {
+    private ServerPlayer createDeadBody(Player p) {
 
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
@@ -177,7 +177,7 @@ public class NpcManager_v1_21_R1 implements NpcManager{
         p.setHealth(0);
     }
 
-     public void applyKnockoutEffects(Player p) {
+    private void applyKnockoutEffects(Player p) {
 
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
@@ -262,7 +262,7 @@ public class NpcManager_v1_21_R1 implements NpcManager{
 
     }
 
-    public void startTimer(Player p) {
+    private void startTimer(Player p) {
         int seconds = plugin.getConfig().getInt("knockout-time");
         if (seconds == 0) {
             seconds = 60;
@@ -273,7 +273,7 @@ public class NpcManager_v1_21_R1 implements NpcManager{
             @Override
             public void run() {
                 if (npcExists(p)) {
-                    if (!p.isInsideVehicle() && !NpcManager_v1_21_R1.getNpc(p).isBeingRevived()) {
+                    if (!p.isInsideVehicle() && !getNpc(p).isBeingRevived()) {
                         if (knockoutCooldown[0] > 0) {
                             String knockoutTitle = plugin.getConfig().getString("knockout-title");
                             if (knockoutTitle != null) {
@@ -348,7 +348,7 @@ public class NpcManager_v1_21_R1 implements NpcManager{
     }
 
     // Set no collisions for dead body
-    private static void setNoCollisions(Npc npc) {
+    private void setNoCollisions(Npc npc) {
 
         PlayerTeam team = new PlayerTeam(new Scoreboard(), "deadBody");
         team.setCollisionRule(Team.CollisionRule.NEVER);
@@ -377,7 +377,7 @@ public class NpcManager_v1_21_R1 implements NpcManager{
     }
 
     // Tracking a knocked out player vehicle to prevent dismount
-    public void trackVehicle(Player knockedOutPlayer) {
+    private void trackVehicle(Player knockedOutPlayer) {
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -481,7 +481,7 @@ public class NpcManager_v1_21_R1 implements NpcManager{
         }
     }
 
-    public void reviveNow(Player revivingPlayer, Player knockedOutPlayer) {
+    private void reviveNow(Player revivingPlayer, Player knockedOutPlayer) {
         getNpc(knockedOutPlayer).setBeingRevived(false);
         resetKnockout(knockedOutPlayer);
         ChatUtils.sendMessage(revivingPlayer, "rescuer-revived-message", new HashMap<>(Map.of("%player%", knockedOutPlayer.getDisplayName())));
@@ -494,7 +494,7 @@ public class NpcManager_v1_21_R1 implements NpcManager{
         ServerLevel level = sp.serverLevel();
 
         // Perform actions for a new player
-        NpcManager_v1_21_R1.getNPCs().forEach(npc -> {
+        getNPCs().forEach(npc -> {
 
             ServerPlayer deadBodyPlayer = npc.getDeadBody();
             ServerEntity deadBodyEntity = new ServerEntity(level, deadBodyPlayer, 20, false, null, null);
@@ -521,17 +521,17 @@ public class NpcManager_v1_21_R1 implements NpcManager{
         });
     }
 
-    public void hurtAnimation(Player p) {
+    private void hurtAnimation(Player p) {
 
         // Damage attacked knocked out player
         ClientboundHurtAnimationPacket packet = new ClientboundHurtAnimationPacket(getNpc(p).getDeadBody().getId(), 0);
-        NpcManager_v1_21_R1.broadcastPacket(packet);
+        broadcastPacket(packet);
 
     }
 
     public void removeKOPlayers() {
         // Remove all NPCs
-        NpcManager_v1_21_R1.getNPCs().forEach(npc -> {
+        getNPCs().forEach(npc -> {
 
             if (npc.getVehicle() != null) {
                 npc.getVehicle().removePotionEffect(PotionEffectType.SLOWNESS);
@@ -539,8 +539,8 @@ public class NpcManager_v1_21_R1 implements NpcManager{
 
             ClientboundPlayerInfoRemovePacket removeNpcPacket = new ClientboundPlayerInfoRemovePacket(List.of(npc.getDeadBody().getGameProfile().getId()));
             ClientboundRemoveEntitiesPacket removeEntityPacket = new ClientboundRemoveEntitiesPacket(npc.getDeadBody().getId());
-            NpcManager_v1_21_R1.broadcastPacket(removeNpcPacket);
-            NpcManager_v1_21_R1.broadcastPacket(removeEntityPacket);
+            broadcastPacket(removeNpcPacket);
+            broadcastPacket(removeEntityPacket);
 
             npc.getArmorStand().remove();
             npc.getPlayer().setHealth(0);
@@ -550,7 +550,7 @@ public class NpcManager_v1_21_R1 implements NpcManager{
         });
     }
 
-    public void damage(ArmorStand koArmorStand, org.bukkit.entity.Entity attacker, double value){
+    public void damageKOPlayer(ArmorStand koArmorStand, org.bukkit.entity.Entity attacker, double value) {
         Npc npc = getNpc(koArmorStand);
 
         if (attacker instanceof Player p) {
@@ -561,17 +561,17 @@ public class NpcManager_v1_21_R1 implements NpcManager{
         npc.getPlayer().damage(value);
     }
 
-    public boolean canBeRevivedBy(Player revivingPlayer, Player knockedOutPlayer, Location reviveLocation) {
+    private boolean canBeRevivedBy(Player revivingPlayer, Player knockedOutPlayer, Location reviveLocation) {
         return !knockedOutPlayer.isInsideVehicle() && revivingPlayer.isSneaking() && reviveLocation.getBlock().equals(revivingPlayer.getLocation().getBlock());
     }
 
-    public static void broadcastPacket(Packet<?> packet) {
+    private void broadcastPacket(Packet<?> packet) {
         MinecraftServer server = MinecraftServer.getServer();
         List<ServerPlayer> onlinePlayers = server.getPlayerList().players;
         onlinePlayers.forEach(p -> p.connection.send(packet));
     }
 
-    public static List<Npc> getNPCs() {
+    private List<Npc> getNPCs() {
         return NPCs;
     }
 
@@ -585,22 +585,22 @@ public class NpcManager_v1_21_R1 implements NpcManager{
         return matchingNpc.isPresent();
     }
 
-    public static boolean npcExists(ServerPlayer deadBody) {
+    public boolean npcExists(ServerPlayer deadBody) {
         Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getDeadBody().equals(deadBody)).findFirst();
         return matchingNpc.isPresent();
     }
 
-    public static Npc getNpc(Player player) {
+    private Npc getNpc(Player player) {
         Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getPlayer().equals(player)).findFirst();
         return matchingNpc.orElse(null);
     }
 
-    public static Npc getNpc(ArmorStand armorStand) {
+    private Npc getNpc(ArmorStand armorStand) {
         Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getArmorStand().equals(armorStand)).findFirst();
         return matchingNpc.orElse(null);
     }
 
-    public static Npc getNpc(ServerPlayer deadBody) {
+    private Npc getNpc(ServerPlayer deadBody) {
         Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getDeadBody().equals(deadBody)).findFirst();
         return matchingNpc.orElse(null);
     }

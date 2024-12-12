@@ -1,6 +1,5 @@
 package org.mynion.knockoutplugin.listeners;
 
-import net.minecraft.network.protocol.game.ClientboundHurtAnimationPacket;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,7 +31,7 @@ public class EntityDamageListener implements Listener {
                 return;
             }
 
-            NpcManager.damage(armorStand, e.getDamager(), e.getFinalDamage());
+            NpcManager.damageKOPlayer(armorStand, e.getDamager(), e.getFinalDamage());
 
         }
     }
