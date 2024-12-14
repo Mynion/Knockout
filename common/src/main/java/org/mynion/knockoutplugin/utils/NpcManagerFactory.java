@@ -14,6 +14,8 @@ public class NpcManagerFactory {
                 className = "org.mynion.knockoutplugin.utils.NpcManager_v1_21_R2";
             } else if ("v1_21_R3".equals(version)) {
                 className = "org.mynion.knockoutplugin.utils.NpcManager_v1_21_R3";
+            } else if ("v1_19_R1".equals(version)){
+                className = "org.mynion.knockoutplugin.utils.NpcManager_v1_19_R1";
             } else {
                 getServer().getPluginManager().disablePlugin(Knockout.getPlugin());
                 System.out.println("Unsupported server version: " + version);

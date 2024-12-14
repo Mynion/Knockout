@@ -16,6 +16,7 @@
         <module>versions/v1_21_R1</module>
         <module>versions/v1_21_R2</module>
         <module>versions/v1_21_R3</module>
+        <module>versions/v1_19_R1</module>
     </modules>
 
     <properties>
@@ -92,6 +93,12 @@
         <dependency>
             <groupId>org.mynion</groupId>
             <artifactId>v1_21_R3</artifactId>
+            <version>${version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mynion</groupId>
+            <artifactId>v1_19_R1</artifactId>
             <version>${version}</version>
             <scope>compile</scope>
         </dependency>
