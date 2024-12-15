@@ -207,7 +207,7 @@ public class NpcManager_v1_21_R3 implements NpcManager {
         p.getPassengers().forEach(p::removePassenger);
 
         // Remove parrots from shoulders
-
+        //TODO
 
         // Reset nearby mobs focus on a KO player
         List<org.bukkit.entity.Entity> nearbyMobs = p.getNearbyEntities(50, 50, 50);

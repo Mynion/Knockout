@@ -22,9 +22,13 @@ public final class Knockout extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
-
-        String version = Bukkit.getServer().getClass().getPackageName().split("\\.")[3];
-        NpcManager = NpcManagerFactory.getNpcManager(version);
+        String version = getServer().getBukkitVersion();
+        try {
+            NpcManager = NpcManagerFactory.getNpcManager(version);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return;
+        }
 
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();

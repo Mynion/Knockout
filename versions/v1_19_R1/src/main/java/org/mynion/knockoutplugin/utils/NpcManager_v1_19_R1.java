@@ -4,23 +4,19 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.ChatVisiblity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.scores.PlayerTeam;
@@ -33,8 +29,6 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.entity.*;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -64,13 +58,15 @@ public class NpcManager_v1_19_R1 implements NpcManager {
         // Create dead body server connection
         new ServerGamePacketListenerImpl(server, new Connection(PacketFlow.CLIENTBOUND), deadBodyPlayer);
 
+        // Set dead body model customization
+        deadBodyPlayer.restoreFrom(sp, false);
+
         // Broadcast dead body info packets
         ClientboundPlayerInfoPacket infoUpdatePacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, List.of(deadBodyPlayer));
         ClientboundAddPlayerPacket addEntityPacket = new ClientboundAddPlayerPacket(deadBodyPlayer);
         ClientboundSetEntityDataPacket setEntityDataPacket = new ClientboundSetEntityDataPacket(deadBodyPlayer.getId(), deadBodyPlayer.getEntityData(), true);
         broadcastPacket(infoUpdatePacket);
         broadcastPacket(addEntityPacket);
-
         broadcastPacket(setEntityDataPacket);
         List<Pair<EquipmentSlot, ItemStack>> items = List.of(
                 Pair.of(EquipmentSlot.HEAD, sp.getItemBySlot(EquipmentSlot.HEAD)),
@@ -216,34 +212,7 @@ public class NpcManager_v1_19_R1 implements NpcManager {
         p.getPassengers().forEach(p::removePassenger);
 
         // Remove parrots from shoulders
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!npcExists(p)) this.cancel();
-
-                if (!sp.getShoulderEntityLeft().isEmpty()) {
-                    net.minecraft.world.entity.EntityType.create(sp.getShoulderEntityLeft(), sp.getLevel()).map((entity) -> {
-                        if (entity instanceof TamableAnimal) {
-                            ((TamableAnimal) entity).setOwnerUUID(p.getUniqueId());
-                        }
-                        entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
-                        return sp.getLevel().addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
-                    });
-                    sp.setShoulderEntityLeft(new CompoundTag());
-                }
-
-                if (!sp.getShoulderEntityRight().isEmpty()) {
-                    net.minecraft.world.entity.EntityType.create(sp.getShoulderEntityRight(), sp.getLevel()).map((entity) -> {
-                        if (entity instanceof TamableAnimal) {
-                            ((TamableAnimal) entity).setOwnerUUID(p.getUniqueId());
-                        }
-                        entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
-                        return sp.getLevel().addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
-                    });
-                    sp.setShoulderEntityRight(new CompoundTag());
-                }
-            }
-        }.runTaskTimer(Knockout.getPlugin(), 0, 2);
+        //TODO
 
         // Reset nearby mobs focus on a KO player
         List<org.bukkit.entity.Entity> nearbyMobs = p.getNearbyEntities(50, 50, 50);
