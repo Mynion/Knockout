@@ -37,8 +37,8 @@ import org.mynion.knockoutplugin.Knockout;
 
 import java.util.*;
 
-public class NpcManager_v1_19_R1 implements NpcManager {
-    public NpcManager_v1_19_R1() {
+public class NpcManager_v1_19 implements NpcManager {
+    public NpcManager_v1_19() {
     }
 
     private static final List<Npc> NPCs = new ArrayList<>();
@@ -178,9 +178,6 @@ public class NpcManager_v1_19_R1 implements NpcManager {
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
 
-        //AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
-        //jumpAttribute.setBaseValue(0);
-
         // Remove all potion effects
         PotionEffectType[] potionEffects = PotionEffectType.values();
         Arrays.asList(potionEffects).forEach(p::removePotionEffect);
@@ -188,7 +185,7 @@ public class NpcManager_v1_19_R1 implements NpcManager {
         // Add custom potion effects
         PotionEffect invisibility = new PotionEffect(PotionEffectType.INVISIBILITY, 999999999, 100, false, false);
         p.addPotionEffect(invisibility);
-        PotionEffect noJump = new PotionEffect(PotionEffectType.JUMP, 999999999, 255, false, false);
+        PotionEffect noJump = new PotionEffect(PotionEffectType.JUMP, 999999999, 200, false, false);
         p.addPotionEffect(noJump);
         if (plugin.getConfig().getBoolean("knockout-blindness")) {
             PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 999999999, 1, false, false);
@@ -269,12 +266,6 @@ public class NpcManager_v1_19_R1 implements NpcManager {
     }
 
     public void resetKnockoutEffects(Player p) {
-
-        CraftPlayer cp = (CraftPlayer) p;
-        ServerPlayer sp = cp.getHandle();
-
-        //AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
-        //jumpAttribute.setBaseValue(0.42);
 
         p.removePotionEffect(PotionEffectType.BLINDNESS);
         p.removePotionEffect(PotionEffectType.INVISIBILITY);

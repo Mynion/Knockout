@@ -6,7 +6,7 @@
 
     <groupId>org.mynion</groupId>
     <artifactId>Knockout</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
     <packaging>pom</packaging>
 
     <name>Knockout</name>
@@ -16,7 +16,10 @@
         <module>versions/v1_21_R1</module>
         <module>versions/v1_21_R2</module>
         <module>versions/v1_21_R3</module>
-        <module>versions/v1_19_R1</module>
+        <module>versions/v1_19_1</module>
+        <module>versions/v1_19</module>
+        <module>versions/v1_19_3</module>
+        <module>versions/v1_19_4</module>
     </modules>
 
     <properties>
@@ -57,6 +60,34 @@
                 </executions>
                 <inherited>false</inherited>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.15.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>process-resources</id>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -74,6 +105,10 @@
         <repository>
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
         </repository>
     </repositories>
 
@@ -98,7 +133,25 @@
         </dependency>
         <dependency>
             <groupId>org.mynion</groupId>
-            <artifactId>v1_19_R1</artifactId>
+            <artifactId>v1_19</artifactId>
+            <version>${version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mynion</groupId>
+            <artifactId>v1_19_1</artifactId>
+            <version>${version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mynion</groupId>
+            <artifactId>v1_19_3</artifactId>
+            <version>${version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mynion</groupId>
+            <artifactId>v1_19_4</artifactId>
             <version>${version}</version>
             <scope>compile</scope>
         </dependency>

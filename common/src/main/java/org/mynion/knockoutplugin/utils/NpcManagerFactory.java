@@ -16,8 +16,14 @@ public class NpcManagerFactory {
                 className = "org.mynion.knockoutplugin.utils.NpcManager_v1_21_R2";
             } else if ("1.21.4-R0.1-SNAPSHOT".equals(version)) {
                 className = "org.mynion.knockoutplugin.utils.NpcManager_v1_21_R3";
-            } else if (List.of("1.19-R0.1-SNAPSHOT", "1.19.1-R0.1-SNAPSHOT", "1.19.2-R0.1-SNAPSHOT").contains(version)) {
-                className = "org.mynion.knockoutplugin.utils.NpcManager_v1_19_R1";
+            } else if ("1.19-R0.1-SNAPSHOT".equals(version)) {
+                className = "org.mynion.knockoutplugin.utils.NpcManager_v1_19";
+            } else if (List.of("1.19.1-R0.1-SNAPSHOT", "1.19.2-R0.1-SNAPSHOT").contains(version)) {
+                className = "org.mynion.knockoutplugin.utils.NpcManager_v1_19_1";
+            } else if ("1.19.3-R0.1-SNAPSHOT".equals(version)) {
+                className = "org.mynion.knockoutplugin.utils.NpcManager_v1_19_3";
+            } else if ("1.19.4-R0.1-SNAPSHOT".equals(version)) {
+                className = "org.mynion.knockoutplugin.utils.NpcManager_v1_19_4";
             } else {
                 getServer().getPluginManager().disablePlugin(Knockout.getPlugin());
                 System.out.println("Unsupported server version: " + version);
