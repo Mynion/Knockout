@@ -62,7 +62,7 @@ public final class Knockout extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        NpcManager.removeKOPlayers();
+        if(this.isEnabled()) NpcManager.removeKOPlayers();
     }
 
     private void loadAliases() {

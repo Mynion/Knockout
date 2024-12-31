@@ -2,14 +2,48 @@ package org.mynion.knockoutplugin.utils;
 
 import org.mynion.knockoutplugin.Knockout;
 
-import java.util.List;
-
 import static org.bukkit.Bukkit.getServer;
 
 public class NpcManagerFactory {
     public static NpcManager getNpcManager(String version) {
         try {
             String className = "";
+            switch (version){
+                case "1.21-R0.1-SNAPSHOT":
+                case "1.21.1-R0.1-SNAPSHOT":
+                case "1.21.2-R0.1-SNAPSHOT":
+                    className = "org.mynion.knockoutplugin.utils.NpcManager_v1_21_R1";
+                    break;
+                case "1.21.3-R0.1-SNAPSHOT":
+                    className = "org.mynion.knockoutplugin.utils.NpcManager_v1_21_R1";
+                    break;
+                case "1.21.4-R0.1-SNAPSHOT":
+                    className = "org.mynion.knockoutplugin.utils.NpcManager_v1_21_R3";
+                    break;
+                case "1.20-R0.1-SNAPSHOT":
+                case "1.20.1-R0.1-SNAPSHOT":
+                case "1.20.2-R0.1-SNAPSHOT":
+                case "1.20.4-R0.1-SNAPSHOT":
+                    className = "org.mynion.knockoutplugin.utils.NpcManager_v1_20";
+                    break;
+                case "1.19-R0.1-SNAPSHOT":
+                    className = "org.mynion.knockoutplugin.utils.NpcManager_v1_19";
+                    break;
+                case "1.19.1-R0.1-SNAPSHOT":
+                case "1.19.2-R0.1-SNAPSHOT":
+                    className = "org.mynion.knockoutplugin.utils.NpcManager_v1_19_1";
+                    break;
+                case "1.19.3-R0.1-SNAPSHOT":
+                    className = "org.mynion.knockoutplugin.utils.NpcManager_v1_19_3";
+                    break;
+                case "1.19.4-R0.1-SNAPSHOT":
+                    className = "org.mynion.knockoutplugin.utils.NpcManager_v1_19_4";
+                    break;
+                default:
+                    getServer().getPluginManager().disablePlugin(Knockout.getPlugin());
+                    System.out.println("Unsupported server version: " + version);
+            }
+            /*
             if (List.of("1.21-R0.1-SNAPSHOT", "1.21.1-R0.1-SNAPSHOT", "1.21.2-R0.1-SNAPSHOT").contains(version)) {
                 className = "org.mynion.knockoutplugin.utils.NpcManager_v1_21_R1";
             } else if ("1.21.3-R0.1-SNAPSHOT".equals(version)) {
@@ -28,11 +62,12 @@ public class NpcManagerFactory {
                 getServer().getPluginManager().disablePlugin(Knockout.getPlugin());
                 System.out.println("Unsupported server version: " + version);
             }
-
+            */
             Class<?> clazz = Class.forName(className);
             return (NpcManager) clazz.getDeclaredConstructor().newInstance();
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new IllegalArgumentException("Could not create NpcManager for server version: " + version);
         }
     }
