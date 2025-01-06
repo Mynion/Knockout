@@ -26,6 +26,7 @@ public final class Knockout extends JavaPlugin {
         try {
             NpcManager = NpcManagerFactory.getNpcManager(version);
         } catch (IllegalArgumentException e) {
+            getServer().getPluginManager().disablePlugin(this);
             e.printStackTrace();
             return;
         }

@@ -20,7 +20,10 @@
         <module>versions/v1_19</module>
         <module>versions/v1_19_3</module>
         <module>versions/v1_19_4</module>
-        <module>versions/v1_20</module>
+        <module>versions/v1_20_R1</module>
+        <module>versions/v1_20_R2</module>
+        <module>versions/v1_20_R3</module>
+        <module>versions/v1_20_R4</module>
     </modules>
 
     <properties>
@@ -158,7 +161,25 @@
         </dependency>
         <dependency>
             <groupId>org.mynion</groupId>
-            <artifactId>v1_20</artifactId>
+            <artifactId>v1_20_R3</artifactId>
+            <version>${version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mynion</groupId>
+            <artifactId>v1_20_R4</artifactId>
+            <version>${version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mynion</groupId>
+            <artifactId>v1_20_R2</artifactId>
+            <version>${version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mynion</groupId>
+            <artifactId>v1_20_R1</artifactId>
             <version>${version}</version>
             <scope>compile</scope>
         </dependency>

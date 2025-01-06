@@ -31,8 +31,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R4.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_20_R4.entity.CraftPlayer;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Mob;
@@ -46,8 +46,8 @@ import org.mynion.knockoutplugin.Knockout;
 
 import java.util.*;
 
-public class NpcManager_v1_20 implements NpcManager {
-    public NpcManager_v1_20() {
+public class NpcManager_v1_20_R4 implements NpcManager {
+    public NpcManager_v1_20_R4() {
     }
 
     private static final List<Npc> NPCs = new ArrayList<>();
@@ -65,9 +65,10 @@ public class NpcManager_v1_20 implements NpcManager {
         ServerPlayer deadBodyPlayer = createDeadBody(p);
 
         // Create dead body server connection
-        new ServerGamePacketListenerImpl(server, new Connection(PacketFlow.CLIENTBOUND), deadBodyPlayer, CommonListenerCookie.createInitial(deadBodyPlayer.getGameProfile()));
+        new ServerGamePacketListenerImpl(server, new Connection(PacketFlow.SERVERBOUND), deadBodyPlayer, CommonListenerCookie.createInitial(deadBodyPlayer.getGameProfile(), false));
+
         // Set dead body model customization
-        //deadBodyPlayer.restoreFrom(sp, false);
+        deadBodyPlayer.restoreFrom(sp, false);
 
         // Broadcast dead body info packets
         ServerEntity deadBodyEntity = new ServerEntity(level, deadBodyPlayer, 20, false, null, null);
@@ -108,7 +109,7 @@ public class NpcManager_v1_20 implements NpcManager {
         NPCs.add(npc);
 
         setNoCollisions(npc);
-        //teleportBody(npc);
+        teleportBody(npc);
 
         ChatUtils.sendMessage(p, "knockout-message");
 
@@ -134,19 +135,19 @@ public class NpcManager_v1_20 implements NpcManager {
         deadBodyPlayer.setPose(Pose.SWIMMING);
         deadBodyPlayer.setUUID(deadBodyUUID);
         deadBodyPlayer.setGameMode(GameType.SURVIVAL);
-        /*
+
         // Set dead body skin
         try {
             Property skin = (Property) sp.getGameProfile().getProperties().get("textures").toArray()[0];
             PropertyMap properties = sp.getGameProfile().getProperties();
             Set<String> keys = properties.keySet();
             keys.forEach(p::sendMessage);
-            String textures = skin.getValue();
-            String signature = skin.getSignature();
+            String textures = skin.value();
+            String signature = skin.signature();
             deadBodyPlayer.getGameProfile().getProperties().put("textures", new Property("textures", textures, signature));
         } catch (ArrayIndexOutOfBoundsException ignored) {
         }
-*/
+
         return deadBodyPlayer;
     }
 
@@ -193,7 +194,7 @@ public class NpcManager_v1_20 implements NpcManager {
         // Add custom potion effects
         PotionEffect invisibility = new PotionEffect(PotionEffectType.INVISIBILITY, 999999999, 100, false, false);
         p.addPotionEffect(invisibility);
-        PotionEffect noJump = new PotionEffect(PotionEffectType.JUMP, 999999999, 200, false, false);
+        PotionEffect noJump = new PotionEffect(PotionEffectType.JUMP_BOOST, 999999999, 200, false, false);
         p.addPotionEffect(noJump);
         if (plugin.getConfig().getBoolean("knockout-blindness")) {
             PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 999999999, 1, false, false);
@@ -307,7 +308,7 @@ public class NpcManager_v1_20 implements NpcManager {
 
         p.removePotionEffect(PotionEffectType.BLINDNESS);
         p.removePotionEffect(PotionEffectType.INVISIBILITY);
-        p.removePotionEffect(PotionEffectType.JUMP);
+        p.removePotionEffect(PotionEffectType.JUMP_BOOST);
 
         p.setWalkSpeed(0.2f);
         p.setFlySpeed(0.2f);
@@ -371,9 +372,9 @@ public class NpcManager_v1_20 implements NpcManager {
         vehicle.removePassenger(knockedOutPlayer);
 
         // Remove slowness effect only if applied by the plugin
-        int slowness_amplifier = vehicle.getPotionEffect(PotionEffectType.SLOW).getAmplifier();
+        int slowness_amplifier = vehicle.getPotionEffect(PotionEffectType.SLOWNESS).getAmplifier();
         if (plugin.getConfig().getInt("slowness-amplifier") == slowness_amplifier) {
-            vehicle.removePotionEffect(PotionEffectType.SLOW);
+            vehicle.removePotionEffect(PotionEffectType.SLOWNESS);
         }
     }
 
@@ -388,7 +389,7 @@ public class NpcManager_v1_20 implements NpcManager {
                         if (currentVehicle.isOnline()) {
                             currentVehicle.addPassenger(knockedOutPlayer);
                             if (Knockout.getPlugin().getConfig().getBoolean(("slowness-for-carrier"))) {
-                                currentVehicle.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, plugin.getConfig().getInt("slowness-amplifier"), false, false));
+                                currentVehicle.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 20 * 2, plugin.getConfig().getInt("slowness-amplifier"), false, false));
                             }
                         } else {
                             knockedOutPlayer.leaveVehicle();
@@ -535,7 +536,7 @@ public class NpcManager_v1_20 implements NpcManager {
         getNPCs().forEach(npc -> {
 
             if (npc.getVehicle() != null) {
-                npc.getVehicle().removePotionEffect(PotionEffectType.SLOW);
+                npc.getVehicle().removePotionEffect(PotionEffectType.SLOWNESS);
             }
 
             ClientboundPlayerInfoRemovePacket removeNpcPacket = new ClientboundPlayerInfoRemovePacket(List.of(npc.getDeadBody().getGameProfile().getId()));
