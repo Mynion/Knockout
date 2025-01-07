@@ -25,6 +25,16 @@ knockout-blindness: true
 # When true: it will be possible to attack knocked out players
 knockout-vulnerable: true
 
+# When true: player will respawn in the specific location given below
+# WARNING: If true, the player will respawn in this specific location even if it is not safe! Make sure to set it to a safe location!
+respawn-in-custom-location: false
+
+# Specific location where the player will respawn
+custom-location:
+  x: 0
+  y: 100
+  z: 0
+
 # Message for the player when knocked out
 knockout-message: '&cYou have been knocked out! Ask someone to revive you or use /die to die at once.'
 

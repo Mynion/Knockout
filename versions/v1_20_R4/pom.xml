@@ -53,6 +53,28 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>org.mynion:common</include>
+                                </includes>
+                            </artifactSet>
+                            <outputFile>${test.servers.directory}/${project.artifactId}/plugins/${project.artifactId}-${project.version}.jar</outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
+                <inherited>false</inherited>
+            </plugin>
         </plugins>
     </build>
 
