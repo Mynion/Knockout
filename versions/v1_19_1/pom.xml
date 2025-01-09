@@ -6,7 +6,7 @@
 
     <groupId>org.mynion</groupId>
     <artifactId>v1_19_1</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.3</version>
 
     <properties>
         <maven.compiler.source>16</maven.compiler.source>

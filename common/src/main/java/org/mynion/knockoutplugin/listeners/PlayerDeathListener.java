@@ -1,6 +1,7 @@
 package org.mynion.knockoutplugin.listeners;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,7 +31,14 @@ public class PlayerDeathListener implements Listener {
             double x = config.getDouble("custom-location.x");
             double y = config.getDouble("custom-location.y");
             double z = config.getDouble("custom-location.z");
-            Location respawnLocation = new Location(p.getWorld(), x, y, z);
+            World world = Knockout.getPlugin().getServer().getWorld(config.getString("custom-location.world-name"));
+            if (world == null) {
+                world = p.getWorld();
+                if (config.getString("custom-location.world-name") != null) {
+                    Knockout.getPlugin().getLogger().warning("World " + config.getString("custom-location.world-name") + " not found. Using player's world instead.");
+                }
+            }
+            Location respawnLocation = new Location(world, x, y, z);
             if (config.getBoolean("respawn-in-custom-location")) {
                 p.setRespawnLocation(respawnLocation, true);
             } else if (respawnLocation.add(new Vector(0.5, 0.1, 0.5)).equals(p.getRespawnLocation())) {

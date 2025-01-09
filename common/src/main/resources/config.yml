@@ -31,7 +31,9 @@ knockout-vulnerable: true
 respawn-in-custom-location: false
 
 # Specific location where the player will respawn
+# If world-name is empty or incorrect, the player will respawn in the same world where he was knocked out
 custom-location:
+  world-name: world
   x: 0
   y: 100
   z: 0
