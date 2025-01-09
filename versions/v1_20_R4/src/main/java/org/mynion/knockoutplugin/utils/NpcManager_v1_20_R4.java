@@ -20,6 +20,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
@@ -187,6 +188,9 @@ public class NpcManager_v1_20_R4 implements NpcManager {
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
 
+        AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
+        jumpAttribute.setBaseValue(0);
+
         // Remove all potion effects
         PotionEffectType[] potionEffects = PotionEffectType.values();
         Arrays.asList(potionEffects).forEach(p::removePotionEffect);
@@ -194,8 +198,6 @@ public class NpcManager_v1_20_R4 implements NpcManager {
         // Add custom potion effects
         PotionEffect invisibility = new PotionEffect(PotionEffectType.INVISIBILITY, 999999999, 100, false, false);
         p.addPotionEffect(invisibility);
-        PotionEffect noJump = new PotionEffect(PotionEffectType.JUMP_BOOST, 999999999, 200, false, false);
-        p.addPotionEffect(noJump);
         if (plugin.getConfig().getBoolean("knockout-blindness")) {
             PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 999999999, 1, false, false);
             p.addPotionEffect(blindness);
@@ -305,6 +307,9 @@ public class NpcManager_v1_20_R4 implements NpcManager {
 
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
+
+        AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
+        jumpAttribute.setBaseValue(0.42);
 
         p.removePotionEffect(PotionEffectType.BLINDNESS);
         p.removePotionEffect(PotionEffectType.INVISIBILITY);

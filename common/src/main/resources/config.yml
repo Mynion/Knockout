@@ -26,6 +26,7 @@ knockout-blindness: true
 knockout-vulnerable: true
 
 # When true: player will respawn in the specific location given below
+# Works only on 1.20.6+ versions
 # WARNING: If true, the player will respawn in this specific location even if it is not safe! Make sure to set it to a safe location!
 respawn-in-custom-location: false
 

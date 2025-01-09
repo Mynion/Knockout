@@ -20,7 +20,6 @@ public class NpcManagerFactory {
                 case "1.21.4-R0.1-SNAPSHOT":
                     className = "org.mynion.knockoutplugin.utils.NpcManager_v1_21_R3";
                     break;
-                case "1.20.5-R0.1-SNAPSHOT":
                 case "1.20.6-R0.1-SNAPSHOT":
                     className = "org.mynion.knockoutplugin.utils.NpcManager_v1_20_R4";
                     break;
@@ -45,7 +44,6 @@ public class NpcManagerFactory {
             return (NpcManager) clazz.getDeclaredConstructor().newInstance();
 
         } catch (Exception e) {
-            e.printStackTrace();
             throw new IllegalArgumentException("Could not create NpcManager for server version: " + version);
         }
     }

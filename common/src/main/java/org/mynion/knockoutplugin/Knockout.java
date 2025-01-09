@@ -18,11 +18,12 @@ import java.lang.reflect.Field;
 public final class Knockout extends JavaPlugin {
     private static Plugin plugin;
     private static NpcManager NpcManager;
+    private static String version;
 
     @Override
     public void onEnable() {
         plugin = this;
-        String version = getServer().getBukkitVersion();
+        version = getServer().getBukkitVersion();
         try {
             NpcManager = NpcManagerFactory.getNpcManager(version);
         } catch (IllegalArgumentException e) {
@@ -89,5 +90,8 @@ public final class Knockout extends JavaPlugin {
 
     public static NpcManager getNpcManager() {
         return NpcManager;
+    }
+    public static String getVersion() {
+        return version;
     }
 }
