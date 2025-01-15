@@ -112,7 +112,11 @@ public class NpcManager_v1_21_R3 implements NpcManager {
         ServerLevel level = sp.serverLevel();
 
         UUID deadBodyUUID = UUID.randomUUID();
-        String deadBodyName = p.getName();
+
+        //Set different name for dead body to prevent other plugins conflicts
+        String deadBodyName = " " + p.getName() + " ";
+        if (deadBodyName.length() > 16) deadBodyName = deadBodyName.substring(1, 14) + "...";
+
         GameProfile deadBodyProfile = new GameProfile(deadBodyUUID, deadBodyName);
 
         ServerPlayer deadBodyPlayer = new ServerPlayer(server, level, deadBodyProfile, new ClientInformation("en_us", 10, ChatVisiblity.FULL, true, sp.clientInformation().modelCustomisation(), net.minecraft.world.entity.player.Player.DEFAULT_MAIN_HAND, false, false, ParticleStatus.ALL));
@@ -199,6 +203,7 @@ public class NpcManager_v1_21_R3 implements NpcManager {
         p.setFlySpeed(0);
         p.setFireTicks(0);
         p.setNoDamageTicks(11);
+        p.setSprinting(false);
         p.setFlying(false);
         p.setInvisible(true);
         p.setCollidable(false);
