@@ -54,6 +54,7 @@ public class NpcManager_v1_19_3 implements NpcManager {
 
         // Create dead body
         ServerPlayer deadBodyPlayer = createDeadBody(p);
+        deadBodyPlayer.setGameMode(GameType.SURVIVAL);
 
         // Create dead body server connection
         new ServerGamePacketListenerImpl(server, new Connection(PacketFlow.CLIENTBOUND), deadBodyPlayer);

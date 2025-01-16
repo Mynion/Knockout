@@ -60,6 +60,7 @@ public class NpcManager_v1_19_4 implements NpcManager {
 
         // Set dead body model customization
         deadBodyPlayer.restoreFrom(sp, false);
+        deadBodyPlayer.setGameMode(GameType.SURVIVAL);
 
         // Broadcast dead body info packets
         ClientboundPlayerInfoUpdatePacket infoUpdatePacket = new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER), List.of(deadBodyPlayer));

@@ -70,6 +70,7 @@ public class NpcManager_v1_20_R4 implements NpcManager {
 
         // Set dead body model customization
         deadBodyPlayer.restoreFrom(sp, false);
+        deadBodyPlayer.setGameMode(GameType.SURVIVAL);
 
         // Broadcast dead body info packets
         ServerEntity deadBodyEntity = new ServerEntity(level, deadBodyPlayer, 20, false, null, null);
