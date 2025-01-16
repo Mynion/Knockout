@@ -492,7 +492,7 @@ public class NpcManager_v1_19_4 implements NpcManager {
 
             // Show dead bodies for a new player
             ClientboundPlayerInfoUpdatePacket infoUpdatePacket = new ClientboundPlayerInfoUpdatePacket(EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER), List.of(deadBodyPlayer));
-            ClientboundAddEntityPacket addEntityPacket = new ClientboundAddEntityPacket(deadBodyPlayer);
+            ClientboundAddPlayerPacket addEntityPacket = new ClientboundAddPlayerPacket(deadBodyPlayer);
             ClientboundSetEntityDataPacket setEntityDataPacket = new ClientboundSetEntityDataPacket(deadBodyPlayer.getId(), deadBodyPlayer.getEntityData().getNonDefaultValues());
 
             sp.connection.send(infoUpdatePacket);
