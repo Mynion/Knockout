@@ -323,7 +323,8 @@ public class NpcManager_v1_21_R2 implements NpcManager {
 
         PlayerTeam team = new PlayerTeam(new Scoreboard(), "deadBody");
         team.setCollisionRule(Team.CollisionRule.NEVER);
-        team.getPlayers().add(npc.getDeadBody().displayName);
+        team.getPlayers().add(npc.getPlayer().getName());
+        team.getPlayers().add(npc.getDeadBody().getName().getString());
 
         broadcastPacket(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
 
