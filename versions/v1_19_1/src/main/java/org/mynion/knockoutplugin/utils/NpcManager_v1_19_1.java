@@ -281,10 +281,27 @@ public class NpcManager_v1_19_1 implements NpcManager {
         p.setInvisible(false);
         p.setCollidable(true);
 
+        // Reset collisions
+        resetCollisions(p);
+
         Bukkit.getServer().getOnlinePlayers().forEach(player -> player.showPlayer(Knockout.getPlugin(), p));
 
         p.resetTitle();
 
+    }
+
+    private void resetCollisions(Player p) {
+        ServerPlayer sp = ((CraftPlayer) p).getHandle();
+
+        PlayerTeam team = new PlayerTeam(new Scoreboard(), "player");
+        if (sp.getTeam() != null) {
+            team.setCollisionRule(sp.getTeam().getCollisionRule());
+        } else {
+            team.setCollisionRule(Team.CollisionRule.ALWAYS);
+        }
+        team.getPlayers().add(p.getName());
+
+        broadcastPacket(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
     }
 
     // Teleporting body and hologram to the player while knocked out
@@ -322,7 +339,8 @@ public class NpcManager_v1_19_1 implements NpcManager {
 
         PlayerTeam team = new PlayerTeam(new Scoreboard(), "deadBody");
         team.setCollisionRule(Team.CollisionRule.NEVER);
-        team.getPlayers().add(npc.getDeadBody().displayName);
+        team.getPlayers().add(npc.getPlayer().getName());
+        team.getPlayers().add(npc.getDeadBody().getName().getString());
 
         broadcastPacket(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
 
