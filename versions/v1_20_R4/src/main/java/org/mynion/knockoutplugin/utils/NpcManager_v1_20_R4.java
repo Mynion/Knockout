@@ -20,7 +20,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.TamableAnimal;
-import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
@@ -44,6 +43,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.mynion.knockoutplugin.Knockout;
+import org.mynion.knockoutplugin.compatibility.TabAdapter;
 
 import java.util.*;
 
@@ -127,8 +127,7 @@ public class NpcManager_v1_20_R4 implements NpcManager {
         UUID deadBodyUUID = UUID.randomUUID();
 
         //Set different name for dead body to prevent other plugins conflicts
-        String deadBodyName = " " + p.getName() + " ";
-        if (deadBodyName.length() > 16) deadBodyName = deadBodyName.substring(1, 14) + "...";
+        String deadBodyName = p.getName();
 
         GameProfile deadBodyProfile = new GameProfile(deadBodyUUID, deadBodyName);
 
@@ -145,9 +144,6 @@ public class NpcManager_v1_20_R4 implements NpcManager {
         // Set dead body skin
         try {
             Property skin = (Property) sp.getGameProfile().getProperties().get("textures").toArray()[0];
-            PropertyMap properties = sp.getGameProfile().getProperties();
-            Set<String> keys = properties.keySet();
-            keys.forEach(p::sendMessage);
             String textures = skin.value();
             String signature = skin.signature();
             deadBodyPlayer.getGameProfile().getProperties().put("textures", new Property("textures", textures, signature));
@@ -347,6 +343,8 @@ public class NpcManager_v1_20_R4 implements NpcManager {
         team.getPlayers().add(p.getName());
 
         broadcastPacket(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
+
+        TabAdapter.setCollisionRule(p, true);
     }
 
     // Teleporting body and hologram to the player while knocked out
@@ -386,6 +384,8 @@ public class NpcManager_v1_20_R4 implements NpcManager {
         team.getPlayers().add(npc.getDeadBody().getName().getString());
 
         broadcastPacket(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
+
+        TabAdapter.setCollisionRule(npc.getPlayer(), false);
     }
 
     // Start carrying a knocked out player

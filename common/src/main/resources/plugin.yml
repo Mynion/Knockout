@@ -36,3 +36,5 @@ permissions:
   knockout.admin:
     description: Permission to use admin /knockout commands
     default: op
+
+softdepend: [TAB]

@@ -2,7 +2,6 @@ package org.mynion.knockoutplugin.utils;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
@@ -34,6 +33,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.mynion.knockoutplugin.Knockout;
+import org.mynion.knockoutplugin.compatibility.TabAdapter;
 
 import java.util.*;
 
@@ -49,7 +49,6 @@ public class NpcManager_v1_19 implements NpcManager {
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
         MinecraftServer server = sp.getServer();
-        ServerLevel level = sp.getLevel();
         GameMode playerGameMode = p.getGameMode();
 
         // Create dead body
@@ -114,11 +113,7 @@ public class NpcManager_v1_19 implements NpcManager {
         ServerLevel level = sp.getLevel();
 
         UUID deadBodyUUID = UUID.randomUUID();
-
-        //Set different name for dead body to prevent other plugins conflicts
-        String deadBodyName = " " + p.getName() + " ";
-        if (deadBodyName.length() > 16) deadBodyName = deadBodyName.substring(1, 14) + "...";
-
+        String deadBodyName = p.getName();
         GameProfile deadBodyProfile = new GameProfile(deadBodyUUID, deadBodyName);
 
         ServerPlayer deadBodyPlayer = new ServerPlayer(server, level, deadBodyProfile, null);
@@ -135,9 +130,6 @@ public class NpcManager_v1_19 implements NpcManager {
         // Set dead body skin
         try {
             Property skin = (Property) sp.getGameProfile().getProperties().get("textures").toArray()[0];
-            PropertyMap properties = sp.getGameProfile().getProperties();
-            Set<String> keys = properties.keySet();
-            keys.forEach(p::sendMessage);
             String textures = skin.getValue();
             String signature = skin.getSignature();
             deadBodyPlayer.getGameProfile().getProperties().put("textures", new Property("textures", textures, signature));
@@ -303,6 +295,8 @@ public class NpcManager_v1_19 implements NpcManager {
         team.getPlayers().add(p.getName());
 
         broadcastPacket(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
+
+        TabAdapter.setCollisionRule(p, true);
     }
 
     // Teleporting body and hologram to the player while knocked out
@@ -341,10 +335,10 @@ public class NpcManager_v1_19 implements NpcManager {
         PlayerTeam team = new PlayerTeam(new Scoreboard(), "deadBody");
         team.setCollisionRule(Team.CollisionRule.NEVER);
         team.getPlayers().add(npc.getPlayer().getName());
-        team.getPlayers().add(npc.getDeadBody().getName().getString());
 
         broadcastPacket(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
 
+        TabAdapter.setCollisionRule(npc.getPlayer(), false);
     }
 
     // Start carrying a knocked out player
@@ -483,7 +477,6 @@ public class NpcManager_v1_19 implements NpcManager {
 
     public void playerJoinActions(Player p) {
         ServerPlayer sp = ((CraftPlayer) p).getHandle();
-        ServerLevel level = sp.getLevel();
 
         // Perform actions for a new player
         getNPCs().forEach(npc -> {
