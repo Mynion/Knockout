@@ -508,7 +508,7 @@ public class NpcManager_v1_19 implements NpcManager {
     private void hurtAnimation(Player p) {
 
         // Damage attacked knocked out player
-        ClientboundAnimatePacket packet = new ClientboundAnimatePacket(getNpc(p).getDeadBody(), 0);
+        ClientboundAnimatePacket packet = new ClientboundAnimatePacket(getNpc(p).getDeadBody(), 1);
         broadcastPacket(packet);
 
     }

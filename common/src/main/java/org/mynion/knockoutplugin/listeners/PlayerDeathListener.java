@@ -18,7 +18,7 @@ public class PlayerDeathListener implements Listener {
     public void onPlayerDeath(PlayerDeathEvent e) {
         NpcManager NpcManager = Knockout.getNpcManager();
         Player p = e.getEntity();
-
+        
         // Check if the player is knocked out
         if (NpcManager.npcExists(p)) {
 

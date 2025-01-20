@@ -49,7 +49,6 @@ public class NpcManager_v1_19_1 implements NpcManager {
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
         MinecraftServer server = sp.getServer();
-        ServerLevel level = sp.getLevel();
         GameMode playerGameMode = p.getGameMode();
 
         // Create dead body
@@ -513,7 +512,7 @@ public class NpcManager_v1_19_1 implements NpcManager {
     private void hurtAnimation(Player p) {
 
         // Damage attacked knocked out player
-        ClientboundAnimatePacket packet = new ClientboundAnimatePacket(getNpc(p).getDeadBody(), 0);
+        ClientboundAnimatePacket packet = new ClientboundAnimatePacket(getNpc(p).getDeadBody(), 1);
         broadcastPacket(packet);
 
     }
