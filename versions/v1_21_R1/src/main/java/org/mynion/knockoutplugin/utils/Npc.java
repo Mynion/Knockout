@@ -1,9 +1,11 @@
 package org.mynion.knockoutplugin.utils;
 
 import net.minecraft.server.level.ServerPlayer;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
+import org.mynion.knockoutplugin.Knockout;
 
 // Npc is a class that represents a knocked out player in the game
 // It contains the player that is knocked out, the dead body of the player and the armor stand that displays text above the dead body
@@ -15,6 +17,8 @@ public class Npc {
     private Player vehicle;
     private boolean isBeingRevived;
     private final GameMode previousGameMode;
+
+    private int knockoutCooldown;
 
     public Npc(Player player, ServerPlayer deadBody, ArmorStand armorStand, GameMode previousGameMode) {
         this.player = player;
@@ -54,5 +58,25 @@ public class Npc {
 
     public GameMode getPreviousGameMode() {
         return previousGameMode;
+    }
+
+    public int getKnockoutCooldown() {
+        return knockoutCooldown;
+    }
+
+    public void setKnockoutCooldown(int knockoutCooldown) {
+        this.knockoutCooldown = knockoutCooldown;
+        if (knockoutCooldown <= 0) {
+            if (Knockout.getPlugin().getConfig().getBoolean("death-on-end")) {
+                Knockout.getNpcManager().forceKill(player);
+            } else {
+                Knockout.getNpcManager().resetKnockout(player);
+            }
+        } else {
+            String knockoutTitle = Knockout.getPlugin().getConfig().getString("knockout-title");
+            if (knockoutTitle != null) {
+                player.sendTitle(ChatColor.translateAlternateColorCodes('&', knockoutTitle), Integer.toString(getKnockoutCooldown()), 1, 20 * 3600, 1);
+            }
+        }
     }
 }

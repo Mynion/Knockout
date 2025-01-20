@@ -25,6 +25,12 @@ knockout-blindness: true
 # When true: it will be possible to attack knocked out players
 knockout-vulnerable: true
 
+# When true: knocked out player will take damage on hit, else his knockout time will decrease
+damage-on-hit: true
+
+# If damage-on-hit is false, it is amount of knockout time to be decreased on hit
+time-decrease-on-hit: 5
+
 # When true: player will respawn in the specific location given below
 # Works only on 1.20.6+ versions
 # WARNING: If true, the player will respawn in this specific location even if it is not safe! Make sure to set it to a safe location!

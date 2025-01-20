@@ -31,7 +31,11 @@ public class EntityDamageListener implements Listener {
                 return;
             }
 
+            if(armorStand.getNoDamageTicks() > 0) return;
+
             NpcManager.damageKOPlayer(armorStand, e.getDamager(), e.getFinalDamage());
+
+            armorStand.setNoDamageTicks(10);
 
         }
     }

@@ -112,6 +112,7 @@ public class NpcManager_v1_20_R4 implements NpcManager {
 
         setNoCollisions(npc);
         teleportBody(npc);
+        startTimer(p);
 
         ChatUtils.sendMessage(p, "knockout-message");
 
@@ -266,34 +267,29 @@ public class NpcManager_v1_20_R4 implements NpcManager {
         // Hide KO player
         Bukkit.getServer().getOnlinePlayers().forEach(player -> player.hidePlayer(Knockout.getPlugin(), p));
 
-        startTimer(p);
-
     }
 
     private void startTimer(Player p) {
         int seconds = plugin.getConfig().getInt("knockout-time");
-        if (seconds == 0) {
+        if (seconds < 0) {
             seconds = 60;
         }
-        final int[] knockoutCooldown = {seconds};
+        Npc npc = getNpc(p);
+        npc.setKnockoutCooldown(seconds);
+        if(seconds > 0){
+            String knockoutTitle = Knockout.getPlugin().getConfig().getString("knockout-title");
+            if (knockoutTitle != null) {
+                npc.getPlayer().sendTitle(ChatColor.translateAlternateColorCodes('&', knockoutTitle), Integer.toString(npc.getKnockoutCooldown()), 1, 20 * 3600, 1);
+            }
+        }
         new BukkitRunnable() {
-
             @Override
             public void run() {
                 if (npcExists(p)) {
                     if (!p.isInsideVehicle() && !getNpc(p).isBeingRevived()) {
-                        if (knockoutCooldown[0] > 0) {
-                            String knockoutTitle = plugin.getConfig().getString("knockout-title");
-                            if (knockoutTitle != null) {
-                                p.sendTitle(ChatColor.translateAlternateColorCodes('&', knockoutTitle), Integer.toString(knockoutCooldown[0]), 1, 20 * 3600, 1);
-                            }
-                            knockoutCooldown[0]--;
+                        if (npc.getKnockoutCooldown() > 0) {
+                            npc.setKnockoutCooldown(npc.getKnockoutCooldown() - 1);
                         } else {
-                            if (Knockout.getPlugin().getConfig().getBoolean("death-on-end")) {
-                                forceKill(p);
-                            } else {
-                                resetKnockout(p);
-                            }
                             this.cancel();
                         }
                     }
@@ -301,7 +297,7 @@ public class NpcManager_v1_20_R4 implements NpcManager {
                     this.cancel();
                 }
             }
-        }.runTaskTimer(Knockout.getPlugin(), 0, 20);
+        }.runTaskTimer(Knockout.getPlugin(), 20, 20);
 
     }
 
@@ -586,9 +582,16 @@ public class NpcManager_v1_20_R4 implements NpcManager {
         if (attacker instanceof Player p) {
             if (npc.getPlayer().equals(p)) return;
         }
-
         hurtAnimation(npc.getPlayer());
-        npc.getPlayer().damage(value);
+
+        if (Knockout.getPlugin().getConfig().getBoolean("damage-on-hit")) {
+            npc.getPlayer().damage(value);
+
+        } else {
+            int timeDecrease = Knockout.getPlugin().getConfig().getInt("time-decrease-on-hit");
+            npc.setKnockoutCooldown(npc.getKnockoutCooldown() - timeDecrease);
+
+        }
     }
 
     private boolean canBeRevivedBy(Player revivingPlayer, Player knockedOutPlayer, Location reviveLocation) {
