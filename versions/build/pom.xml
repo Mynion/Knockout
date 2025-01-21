@@ -14,6 +14,10 @@
     <artifactId>Build-Plugin</artifactId>
     <packaging>pom</packaging>
 
+    <properties>
+        <output.version>1.19</output.version>
+    </properties>
+
     <profiles>
         <profile>
             <id>build-one-version</id>
@@ -23,7 +27,7 @@
             <dependencies>
                 <dependency>
                     <groupId>org.mynion</groupId>
-                    <artifactId>v1_21_R1</artifactId>
+                    <artifactId>${output.version}</artifactId>
                     <version>1.2.3</version>
                     <scope>compile</scope>
                 </dependency>
@@ -37,31 +41,31 @@
             <dependencies>
                 <dependency>
                     <groupId>org.mynion</groupId>
-                    <artifactId>v1_21_R1</artifactId>
+                    <artifactId>1.21</artifactId>
                     <version>${project.version}</version>
                     <scope>compile</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.mynion</groupId>
-                    <artifactId>v1_21_R2</artifactId>
+                    <artifactId>1.21.3</artifactId>
                     <version>${project.version}</version>
                     <scope>compile</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.mynion</groupId>
-                    <artifactId>v1_21_R3</artifactId>
+                    <artifactId>1.21.4</artifactId>
                     <version>${project.version}</version>
                     <scope>compile</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.mynion</groupId>
-                    <artifactId>v1_19</artifactId>
+                    <artifactId>1.19</artifactId>
                     <version>${project.version}</version>
                     <scope>compile</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.mynion</groupId>
-                    <artifactId>v1_19_1</artifactId>
+                    <artifactId>1.19.1</artifactId>
                     <version>${project.version}</version>
                     <scope>compile</scope>
                 </dependency>
@@ -79,7 +83,7 @@
                 </dependency>
                 <dependency>
                     <groupId>org.mynion</groupId>
-                    <artifactId>v1_20_R4</artifactId>
+                    <artifactId>1.20.6</artifactId>
                     <version>${project.version}</version>
                     <scope>compile</scope>
                 </dependency>
@@ -105,7 +109,7 @@
                                     <include>org.mynion:*</include>
                                 </includes>
                             </artifactSet>
-                            <outputFile>${plugin.output.directory}/${project.parent.artifactId}-${project.parent.version}.jar</outputFile>
+                            <outputFile>${plugin.output.directory}${output.version}/plugins/${project.parent.artifactId}-${project.parent.version}.jar</outputFile>
                         </configuration>
                     </execution>
                 </executions>
