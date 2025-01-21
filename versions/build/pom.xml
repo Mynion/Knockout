@@ -28,7 +28,7 @@
                 <dependency>
                     <groupId>org.mynion</groupId>
                     <artifactId>${output.version}</artifactId>
-                    <version>1.2.3</version>
+                    <version>${project.version}</version>
                     <scope>compile</scope>
                 </dependency>
             </dependencies>
