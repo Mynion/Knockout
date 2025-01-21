@@ -32,7 +32,7 @@
                                     <include>org.mynion:*</include>
                                 </includes>
                             </artifactSet>
-                            <outputFile>${plugin.output.directory}/${parent.artifactId}-${project.version}.jar</outputFile>
+                            <outputFile>${plugin.output.directory}/${project.parent.artifactId}-${project.version}.jar</outputFile>
                         </configuration>
                     </execution>
                 </executions>
