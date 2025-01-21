@@ -21,12 +21,12 @@
         <module>versions/v1_21_R1</module>
         <module>versions/v1_21_R2</module>
         <module>versions/v1_21_R3</module>
+        <module>versions</module>
     </modules>
 
     <properties>
         <java.version>16</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <ablal>v1_19</ablal>
     </properties>
 
     <build>
@@ -39,28 +39,6 @@
                     <source>16</source>
                     <target>16</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <artifactSet>
-                                <includes>
-                                    <include>org.mynion:*</include>
-                                </includes>
-                            </artifactSet>
-                            <outputFile>${plugin.output.directory}/${project.artifactId}-${project.version}.jar</outputFile>
-                        </configuration>
-                    </execution>
-                </executions>
-                <inherited>false</inherited>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -113,56 +91,5 @@
             <url>https://repo.maven.apache.org/maven2</url>
         </repository>
     </repositories>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.mynion</groupId>
-            <artifactId>v1_21_R1</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mynion</groupId>
-            <artifactId>v1_21_R2</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mynion</groupId>
-            <artifactId>v1_21_R3</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mynion</groupId>
-            <artifactId>v1_19</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mynion</groupId>
-            <artifactId>v1_19_1</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mynion</groupId>
-            <artifactId>v1_19_3</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mynion</groupId>
-            <artifactId>v1_19_4</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mynion</groupId>
-            <artifactId>v1_20_R4</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
 
 </project>

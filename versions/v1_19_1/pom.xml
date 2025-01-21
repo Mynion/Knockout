@@ -4,9 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.mynion</groupId>
+    <parent>
+        <groupId>org.mynion</groupId>
+        <artifactId>Knockout</artifactId>
+        <version>1.2.3</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
     <artifactId>v1_19_1</artifactId>
-    <version>1.2.3</version>
 
     <properties>
         <maven.compiler.source>16</maven.compiler.source>
