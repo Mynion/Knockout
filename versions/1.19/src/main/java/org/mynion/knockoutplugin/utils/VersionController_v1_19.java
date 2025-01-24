@@ -38,7 +38,7 @@ import org.mynion.knockoutplugin.enums.PotionType;
 import java.util.List;
 import java.util.UUID;
 
-public class NmsController_v1_19 implements NmsController {
+public class VersionController_v1_19 implements VersionController {
     @Override
     public void setMaxHealth(Player p) {
         AttributeInstance maxHealthAttribute = getServerPlayer(p).getAttribute(Attributes.MAX_HEALTH);

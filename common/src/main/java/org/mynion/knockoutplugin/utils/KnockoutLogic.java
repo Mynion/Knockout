@@ -19,10 +19,10 @@ import org.mynion.knockoutplugin.enums.PotionType;
 import java.util.*;
 
 public class KnockoutLogic implements NpcManager {
-    private final NmsController nmsController;
+    private final VersionController versionController;
 
     public KnockoutLogic() {
-        nmsController = Knockout.getNmsController();
+        versionController = Knockout.getNmsController();
     }
 
     private static final List<NpcModel> NPCs = new ArrayList<>();
@@ -48,16 +48,16 @@ public class KnockoutLogic implements NpcManager {
         armorStand.setGravity(false);
 
         // Create npc
-        NpcModel npc = nmsController.createNpc(p, armorStand, playerGameMode, koCause, damager);
+        NpcModel npc = versionController.createNpc(p, armorStand, playerGameMode, koCause, damager);
         NPCs.add(npc);
 
         // Broadcast body info packets
-        nmsController.broadcastPacket(npc, PacketType.INFO_UPDATE);
-        nmsController.broadcastPacket(npc, PacketType.ADD_ENTITY);
-        nmsController.broadcastPacket(npc, PacketType.SET_ENTITY_DATA);
-        nmsController.broadcastPacket(npc, PacketType.SET_EQUIPMENT);
+        versionController.broadcastPacket(npc, PacketType.INFO_UPDATE);
+        versionController.broadcastPacket(npc, PacketType.ADD_ENTITY);
+        versionController.broadcastPacket(npc, PacketType.SET_ENTITY_DATA);
+        versionController.broadcastPacket(npc, PacketType.SET_EQUIPMENT);
 
-        nmsController.setCollisions(p, false);
+        versionController.setCollisions(p, false);
         TabAdapter.setCollisionRule(npc.getPlayer(), false);
 
         teleportBody(npc);
@@ -76,8 +76,8 @@ public class KnockoutLogic implements NpcManager {
         resetKnockoutEffects(p);
 
         // Remove body
-        nmsController.broadcastPacket(npc, PacketType.INFO_REMOVE);
-        nmsController.broadcastPacket(npc, PacketType.REMOVE_ENTITY);
+        versionController.broadcastPacket(npc, PacketType.INFO_REMOVE);
+        versionController.broadcastPacket(npc, PacketType.REMOVE_ENTITY);
 
         // Remove hologram
         npc.getArmorStand().remove();
@@ -108,14 +108,14 @@ public class KnockoutLogic implements NpcManager {
         // Add custom potion effects
         PotionEffect invisibility = new PotionEffect(PotionEffectType.INVISIBILITY, 999999999, 100, false, false);
         p.addPotionEffect(invisibility);
-        nmsController.addPotionEffect(p, PotionType.JUMP_BOOST, 999999999, 200, false, false);
+        versionController.addPotionEffect(p, PotionType.JUMP_BOOST, 999999999, 200, false, false);
         if (plugin.getConfig().getBoolean("knockout-blindness")) {
             PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 999999999, 1, false, false);
             p.addPotionEffect(blindness);
         }
 
         // Set player health to max
-        nmsController.setMaxHealth(p);
+        versionController.setMaxHealth(p);
 
         p.setWalkSpeed(0);
         p.setFlySpeed(0);
@@ -185,7 +185,7 @@ public class KnockoutLogic implements NpcManager {
 
         p.removePotionEffect(PotionEffectType.BLINDNESS);
         p.removePotionEffect(PotionEffectType.INVISIBILITY);
-        nmsController.removePotionEffect(p, PotionType.JUMP_BOOST);
+        versionController.removePotionEffect(p, PotionType.JUMP_BOOST);
 
         p.setWalkSpeed(0.2f);
         p.setFlySpeed(0.2f);
@@ -202,19 +202,7 @@ public class KnockoutLogic implements NpcManager {
     }
 
     private void resetCollisions(Player p) {
-//        ServerPlayer sp = ((CraftPlayer) p).getHandle();
-//
-//        PlayerTeam team = new PlayerTeam(new Scoreboard(), "player");
-//        if (sp.getTeam() != null) {
-//            team.setCollisionRule(sp.getTeam().getCollisionRule());
-//        } else {
-//            team.setCollisionRule(Team.CollisionRule.ALWAYS);
-//        }
-//        team.getPlayers().add(p.getName());
-//
-//        broadcastPacket(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
-        nmsController.setCollisions(p, true);
-
+        versionController.setCollisions(p, true);
         TabAdapter.setCollisionRule(p, true);
     }
 
@@ -226,13 +214,13 @@ public class KnockoutLogic implements NpcManager {
             @Override
             public void run() {
                 if (npcExists(p)) {
-                    nmsController.broadcastPacket(npc, PacketType.TELEPORT);
+                    versionController.broadcastPacket(npc, PacketType.TELEPORT);
                     if (p.isInsideVehicle()) {
-                        nmsController.teleportBody(npc, p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
-                        nmsController.teleportHologram(npc, p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
+                        versionController.teleportBody(npc, p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
+                        versionController.teleportHologram(npc, p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
                     } else {
-                        nmsController.teleportBody(npc, p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
-                        nmsController.teleportHologram(npc, p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
+                        versionController.teleportBody(npc, p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
+                        versionController.teleportHologram(npc, p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
                     }
                 } else {
                     this.cancel();
@@ -255,9 +243,9 @@ public class KnockoutLogic implements NpcManager {
         vehicle.removePassenger(knockedOutPlayer);
 
         // Remove slowness effect only if applied by the plugin
-        int slowness_amplifier = nmsController.getPotionAmplifier(vehicle, PotionType.SLOWNESS);
+        int slowness_amplifier = versionController.getPotionAmplifier(vehicle, PotionType.SLOWNESS);
         if (plugin.getConfig().getInt("slowness-amplifier") == slowness_amplifier) {
-            nmsController.removePotionEffect(vehicle, PotionType.SLOWNESS);
+            versionController.removePotionEffect(vehicle, PotionType.SLOWNESS);
         }
     }
 
@@ -272,7 +260,7 @@ public class KnockoutLogic implements NpcManager {
                         if (currentVehicle.isOnline()) {
                             currentVehicle.addPassenger(knockedOutPlayer);
                             if (Knockout.getPlugin().getConfig().getBoolean(("slowness-for-carrier"))) {
-                                nmsController.addPotionEffect(currentVehicle, PotionType.SLOWNESS, 20 * 2, plugin.getConfig().getInt("slowness-amplifier"), false, false);
+                                versionController.addPotionEffect(currentVehicle, PotionType.SLOWNESS, 20 * 2, plugin.getConfig().getInt("slowness-amplifier"), false, false);
                             }
                         } else {
                             knockedOutPlayer.leaveVehicle();
@@ -317,7 +305,7 @@ public class KnockoutLogic implements NpcManager {
                 @Override
                 public void run() {
                     if (canBeRevivedBy(revivingPlayer, knockedOutPlayer, reviveLocation)) {
-                        nmsController.setXpDelay(revivingPlayer, -1);
+                        versionController.setXpDelay(revivingPlayer, -1);
 
                         // Checks if the player has enough xp to be decremented
                         if (revivingPlayer.getExp() >= expDecrement) {
@@ -354,7 +342,7 @@ public class KnockoutLogic implements NpcManager {
                         if (npcExists(knockedOutPlayer)) {
                             getNpc(knockedOutPlayer).setBeingRevived(false);
                         }
-                        nmsController.setXpDelay(revivingPlayer, 0);
+                        versionController.setXpDelay(revivingPlayer, 0);
                         this.cancel();
                     }
                 }
@@ -371,7 +359,7 @@ public class KnockoutLogic implements NpcManager {
         resetKnockout(knockedOutPlayer);
         ChatUtils.sendMessage(revivingPlayer, "rescuer-revived-message", new HashMap<>(Map.of("%player%", knockedOutPlayer.getDisplayName())));
         ChatUtils.sendMessage(knockedOutPlayer, "rescued-revived-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
-        nmsController.setXpDelay(revivingPlayer, 0);
+        versionController.setXpDelay(revivingPlayer, 0);
     }
 
     public void playerJoinActions(Player p) {
@@ -383,17 +371,12 @@ public class KnockoutLogic implements NpcManager {
             //ServerPlayer deadBodyPlayer = npc.getDeadBody();
 
             // Show bodies for a new player
-            nmsController.sendPacket(p, npc, PacketType.INFO_UPDATE);
-            nmsController.sendPacket(p, npc, PacketType.ADD_ENTITY);
-            nmsController.sendPacket(p, npc, PacketType.SET_ENTITY_DATA);
+            versionController.sendPacket(p, npc, PacketType.INFO_UPDATE);
+            versionController.sendPacket(p, npc, PacketType.ADD_ENTITY);
+            versionController.sendPacket(p, npc, PacketType.SET_ENTITY_DATA);
 
-            // Set no collisions for dead bodies and a new player
-//            PlayerTeam team = new PlayerTeam(new Scoreboard(), "deadBody");
-//            team.setCollisionRule(Team.CollisionRule.NEVER);
-//            team.getPlayers().add(npc.getDeadBody().displayName);
-//
-//            sp.connection.send(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
-            nmsController.setCollisions(p, false);
+            // Set no collisions for bodies and a new player
+            versionController.setCollisions(p, false);
 
             // Hide knocked out players for a new player
             p.hidePlayer(Knockout.getPlugin(), npc.getPlayer());
@@ -404,7 +387,7 @@ public class KnockoutLogic implements NpcManager {
     private void hurtAnimation(Player p) {
 
         // Play damage animation attacked knocked out player
-        nmsController.broadcastPacket(getNpc(p), PacketType.ANIMATE);
+        versionController.broadcastPacket(getNpc(p), PacketType.ANIMATE);
 
     }
 
@@ -413,15 +396,11 @@ public class KnockoutLogic implements NpcManager {
         getNPCs().forEach(npc -> {
 
             if (npc.getVehicle() != null) {
-                nmsController.removePotionEffect(npc.getVehicle(), PotionType.SLOWNESS);
+                versionController.removePotionEffect(npc.getVehicle(), PotionType.SLOWNESS);
             }
 
-//            ClientboundPlayerInfoPacket removeNpcPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, npc.getDeadBody());
-//            ClientboundRemoveEntitiesPacket removeEntityPacket = new ClientboundRemoveEntitiesPacket(npc.getDeadBody().getId());
-//            broadcastPacket(removeNpcPacket);
-//            broadcastPacket(removeEntityPacket);
-            nmsController.broadcastPacket(npc, PacketType.INFO_REMOVE);
-            nmsController.broadcastPacket(npc, PacketType.REMOVE_ENTITY);
+            versionController.broadcastPacket(npc, PacketType.INFO_REMOVE);
+            versionController.broadcastPacket(npc, PacketType.REMOVE_ENTITY);
 
             npc.getArmorStand().remove();
             npc.getPlayer().setHealth(0);

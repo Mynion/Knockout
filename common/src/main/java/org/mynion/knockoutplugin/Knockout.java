@@ -17,7 +17,7 @@ import java.lang.reflect.Field;
 public final class Knockout extends JavaPlugin {
     private static Plugin plugin;
     private static NpcManager NpcManager;
-    private static NmsController nmsController;
+    private static VersionController versionController;
     private static String version;
 
     @Override
@@ -25,7 +25,7 @@ public final class Knockout extends JavaPlugin {
         plugin = this;
         version = getServer().getBukkitVersion();
         try {
-            nmsController = NmsControllerFactory.getNmsController(version);
+            versionController = NmsControllerFactory.getNmsController(version);
         } catch (IllegalArgumentException e) {
             getServer().getPluginManager().disablePlugin(this);
             e.printStackTrace();
@@ -102,7 +102,7 @@ public final class Knockout extends JavaPlugin {
         return version;
     }
 
-    public static NmsController getNmsController() {
-        return nmsController;
+    public static VersionController getNmsController() {
+        return versionController;
     }
 }
