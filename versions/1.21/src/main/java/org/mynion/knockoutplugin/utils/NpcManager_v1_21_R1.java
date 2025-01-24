@@ -51,7 +51,7 @@
 //    }
 //
 //    private static final List<Npc> NPCs = new ArrayList<>();
-//    private static final Plugin plugin = Knockout.getPlugin();
+//    private static afinal Plugin plugin = Knockout.getPlugin();
 //
 //    public void knockoutPlayer(Player p, @Nullable EntityDamageEvent.DamageCause koCause, @Nullable org.bukkit.entity.Entity damager) {
 //

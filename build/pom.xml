@@ -8,14 +8,14 @@
         <groupId>org.mynion</groupId>
         <artifactId>Knockout</artifactId>
         <version>1.2.3</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>Build-Plugin</artifactId>
     <packaging>pom</packaging>
 
     <properties>
-        <output.version>1.20.6</output.version>
+        <output.version>1.21.4</output.version>
     </properties>
 
     <profiles>

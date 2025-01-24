@@ -21,7 +21,7 @@
         <module>versions/1.21</module>
         <module>versions/1.21.3</module>
         <module>versions/1.21.4</module>
-        <module>versions/build</module>
+        <module>build</module>
     </modules>
 
     <properties>

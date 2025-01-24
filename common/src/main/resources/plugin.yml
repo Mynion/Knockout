@@ -1,7 +1,7 @@
 name: Knockout
-version: 1.2.2
+version: 1.2.3
 main: org.mynion.knockoutplugin.Knockout
-api-version: '1.19'
+api-version: '1.21'
 
 commands:
   carry:
