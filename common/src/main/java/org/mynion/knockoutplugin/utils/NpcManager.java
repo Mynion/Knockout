@@ -16,6 +16,8 @@ import org.mynion.knockoutplugin.compatibility.TabAdapter;
 import org.mynion.knockoutplugin.enums.PacketType;
 import org.mynion.knockoutplugin.enums.PotionType;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class NpcManager {
@@ -154,12 +156,18 @@ public class NpcManager {
         if (seconds < 0) {
             seconds = 60;
         }
+
+        LocalTime time = LocalTime.ofSecondOfDay(seconds);
+        String formattedTime = time.format(
+                seconds < 3600 ? DateTimeFormatter.ofPattern("m:ss") : DateTimeFormatter.ofPattern("H:mm:ss")
+        );
+
         NpcModel npc = getNpc(p);
         npc.setKnockoutCooldown(seconds);
         if (seconds > 0) {
             String knockoutTitle = Knockout.getPlugin().getConfig().getString("knockout-title");
             if (knockoutTitle != null) {
-                npc.getPlayer().sendTitle(ChatColor.translateAlternateColorCodes('&', knockoutTitle), Integer.toString(npc.getKnockoutCooldown()), 1, 20 * 3600, 1);
+                npc.getPlayer().sendTitle(ChatColor.translateAlternateColorCodes('&', knockoutTitle), formattedTime, 1, 20 * 3600, 1);
             }
         }
         new BukkitRunnable() {

@@ -9,6 +9,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.mynion.knockoutplugin.Knockout;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
 // NpcModel is a spigot api part of class Npc
 
 public abstract class NpcModel {
@@ -70,8 +73,14 @@ public abstract class NpcModel {
             }
         } else {
             String knockoutTitle = Knockout.getPlugin().getConfig().getString("knockout-title");
+
             if (knockoutTitle != null) {
-                player.sendTitle(ChatColor.translateAlternateColorCodes('&', knockoutTitle), Integer.toString(getKnockoutCooldown()), 1, 20 * 3600, 1);
+                LocalTime time = LocalTime.ofSecondOfDay(knockoutCooldown);
+                String formattedTime = time.format(
+                        knockoutCooldown < 3600 ? DateTimeFormatter.ofPattern("m:ss") : DateTimeFormatter.ofPattern("H:mm:ss")
+                );
+
+                player.sendTitle(ChatColor.translateAlternateColorCodes('&', knockoutTitle), formattedTime, 1, 20 * 3600, 1);
             }
         }
     }
