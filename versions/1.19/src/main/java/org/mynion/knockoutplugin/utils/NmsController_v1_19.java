@@ -65,7 +65,11 @@ public class NmsController_v1_19 implements NmsController {
             team.setCollisionRule(Team.CollisionRule.NEVER);
         }
         team.getPlayers().add(p.getName());
-        ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true);
+
+        ClientboundSetPlayerTeamPacket packet = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true);
+        MinecraftServer server = MinecraftServer.getServer();
+        List<ServerPlayer> onlinePlayers = server.getPlayerList().players;
+        onlinePlayers.forEach(player -> player.connection.send(packet));
     }
 
     @Override

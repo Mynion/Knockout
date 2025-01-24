@@ -382,15 +382,7 @@ public class KnockoutLogic implements NpcManager {
 
             //ServerPlayer deadBodyPlayer = npc.getDeadBody();
 
-            // Show dead bodies for a new player
-//            ClientboundPlayerInfoPacket infoUpdatePacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, List.of(deadBodyPlayer));
-//            ClientboundAddPlayerPacket addEntityPacket = new ClientboundAddPlayerPacket(deadBodyPlayer);
-//            ClientboundSetEntityDataPacket setEntityDataPacket = new ClientboundSetEntityDataPacket(deadBodyPlayer.getId(), deadBodyPlayer.getEntityData(), true);
-//
-//            sp.connection.send(infoUpdatePacket);
-//            sp.connection.send(addEntityPacket);
-//            sp.connection.send(setEntityDataPacket);
-
+            // Show bodies for a new player
             nmsController.sendPacket(p, npc, PacketType.INFO_UPDATE);
             nmsController.sendPacket(p, npc, PacketType.ADD_ENTITY);
             nmsController.sendPacket(p, npc, PacketType.SET_ENTITY_DATA);
