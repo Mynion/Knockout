@@ -25,6 +25,15 @@ knockout-blindness: true
 # Blindness amplifier for the knocked out player; Blindness level is equal to amplifier + 1
 blindness-amplifier: 0
 
+# When true: player will be able to move when knocked out
+move-when-knocked-out: true
+
+# When true: player will be able to swim when knocked out
+swim-when-knocked-out: true
+
+# When true: player will be able to jump when knocked out
+jump-when-knocked-out: true
+
 # When true: it will be possible to attack knocked out players
 knockout-vulnerable: true
 

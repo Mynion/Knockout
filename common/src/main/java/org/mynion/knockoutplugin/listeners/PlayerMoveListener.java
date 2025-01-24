@@ -15,7 +15,7 @@ public class PlayerMoveListener implements Listener {
         NpcManager NpcManager = Knockout.getNpcManager();
 
         // Prevent a KO player from moving in water
-        if (NpcManager.npcExists(p) && p.isInWater()) {
+        if (NpcManager.npcExists(p) && p.isInWater() && !Knockout.getPlugin().getConfig().getBoolean("swim-when-knocked-out")) {
             Location from = e.getFrom();
             Location to = e.getTo();
             Location newTo = createNewLocation(from, to);

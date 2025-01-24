@@ -110,7 +110,9 @@ public class NpcManager {
         // Add custom potion effects
         PotionEffect invisibility = new PotionEffect(PotionEffectType.INVISIBILITY, 999999999, 100, false, false);
         p.addPotionEffect(invisibility);
-        versionController.setAbleToJump(p, false);
+        if(!plugin.getConfig().getBoolean("jump-when-knocked-out")) {
+            versionController.setAbleToJump(p, false);
+        }
         if (plugin.getConfig().getBoolean("knockout-blindness")) {
             PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 999999999, plugin.getConfig().getInt("blindness-amplifier"), false, false);
             p.addPotionEffect(blindness);
@@ -120,6 +122,9 @@ public class NpcManager {
         versionController.setMaxHealth(p);
 
         p.setWalkSpeed(0);
+        if(plugin.getConfig().getBoolean(("move-when-knocked-out"))) {
+            p.setWalkSpeed(0.05f);
+        }
         p.setFlySpeed(0);
         p.setFireTicks(0);
         p.setNoDamageTicks(11);
