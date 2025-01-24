@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.ChatUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
+
 import java.util.Optional;
 
 public class CarryCommand implements CommandExecutor {

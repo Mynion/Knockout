@@ -6,6 +6,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.ChatUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
+
 public class DropItemListener implements Listener {
     @EventHandler
     public void onDropItem(PlayerDropItemEvent e) {

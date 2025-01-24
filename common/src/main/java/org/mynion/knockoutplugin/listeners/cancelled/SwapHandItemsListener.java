@@ -6,6 +6,7 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.ChatUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
+
 public class SwapHandItemsListener implements Listener {
     @EventHandler
     public void onSwapHandItems(PlayerSwapHandItemsEvent e) {

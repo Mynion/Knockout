@@ -17,27 +17,21 @@ import java.lang.reflect.Field;
 public final class Knockout extends JavaPlugin {
     private static Plugin plugin;
     private static NpcManager NpcManager;
-    private static VersionController versionController;
     private static String version;
 
     @Override
     public void onEnable() {
         plugin = this;
         version = getServer().getBukkitVersion();
+        VersionController versionController;
         try {
-            versionController = NmsControllerFactory.getNmsController(version);
+            versionController = VersionControllerFactory.getNmsController(version);
         } catch (IllegalArgumentException e) {
             getServer().getPluginManager().disablePlugin(this);
             e.printStackTrace();
             return;
         }
-        try {
-            NpcManager = new KnockoutLogic();
-        } catch (IllegalArgumentException e) {
-            getServer().getPluginManager().disablePlugin(this);
-            e.printStackTrace();
-            return;
-        }
+        NpcManager = new NpcManager(versionController);
 
         getConfig().options().copyDefaults(true);
         saveDefaultConfig();
@@ -100,9 +94,5 @@ public final class Knockout extends JavaPlugin {
     }
     public static String getVersion() {
         return version;
-    }
-
-    public static VersionController getNmsController() {
-        return versionController;
     }
 }

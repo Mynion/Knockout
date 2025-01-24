@@ -6,6 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.NpcManager;
+
 public class PickupItemListener implements Listener {
     @EventHandler
     public void onPickupItem(EntityPickupItemEvent e) {

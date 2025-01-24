@@ -6,6 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.NpcManager;
+
 public class PotionEffectListener implements Listener {
     @EventHandler
     public void onPotionEffect(EntityPotionEffectEvent e) {

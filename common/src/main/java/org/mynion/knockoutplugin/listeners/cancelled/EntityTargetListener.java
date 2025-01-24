@@ -6,6 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.NpcManager;
+
 public class EntityTargetListener implements Listener {
     @EventHandler
     public void onPlayerTarget(EntityTargetEvent e) {

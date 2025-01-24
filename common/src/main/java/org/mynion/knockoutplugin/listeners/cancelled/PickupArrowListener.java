@@ -5,6 +5,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.NpcManager;
+
 public class PickupArrowListener implements Listener {
     @EventHandler
     public void onPickupArrow(PlayerPickupArrowEvent e) {

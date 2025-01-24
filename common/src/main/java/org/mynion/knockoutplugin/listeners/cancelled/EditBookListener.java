@@ -6,6 +6,7 @@ import org.bukkit.event.player.PlayerEditBookEvent;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.ChatUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
+
 public class EditBookListener implements Listener {
     @EventHandler
     public void onEditBook(PlayerEditBookEvent e) {
