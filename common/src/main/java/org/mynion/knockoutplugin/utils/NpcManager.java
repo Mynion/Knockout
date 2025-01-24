@@ -81,6 +81,10 @@ public class NpcManager {
         NpcModel npc = getNpc(p);
         GameMode previousGameMode = npc.getPreviousGameMode();
 
+        if(p.isInsideVehicle()){
+            p.leaveVehicle();
+        }
+
         // Reset knockout effects
         resetKnockoutEffects(p);
 
