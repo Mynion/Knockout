@@ -22,7 +22,7 @@ public class PlayerDamageListener implements Listener {
                 if (NpcManager.npcExists(p)) {
 
                     // Reset knockout
-                    if(NpcManager.getDamager(p) != null){
+                    if (NpcManager.getDamager(p) != null) {
                         p.damage(1, NpcManager.getDamager(p));
                     }
                     NpcManager.resetKnockout(p);
@@ -30,7 +30,7 @@ public class PlayerDamageListener implements Listener {
 
                     e.setCancelled(true);
                     Entity damager = null;
-                    if(e instanceof EntityDamageByEntityEvent ebyEntity){
+                    if (e instanceof EntityDamageByEntityEvent ebyEntity) {
                         damager = ebyEntity.getDamager();
                     }
 
@@ -54,7 +54,7 @@ public class PlayerDamageListener implements Listener {
     }
 
     // Check if the player has totem of undying in either of his hands
-    private boolean hasTotemOfUndying(Player p){
+    private boolean hasTotemOfUndying(Player p) {
         return p.getInventory().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING)
                 || p.getInventory().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING);
     }

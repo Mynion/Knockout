@@ -32,6 +32,13 @@ public class NpcManager {
 
     public void knockoutPlayer(Player p, @Nullable Entity damager) {
 
+        // Drop all carried knocked out players
+        p.getPassengers().stream()
+                .filter(passenger -> passenger instanceof Player)
+                .map(passenger -> (Player) passenger)
+                .filter(this::npcExists)
+                .forEach(knockedOutPlayer -> stopCarrying(knockedOutPlayer, p));
+
         GameMode playerGameMode = p.getGameMode();
 
         // Has to be done before creating NPC
@@ -459,7 +466,7 @@ public class NpcManager {
         return matchingNpc.isPresent();
     }
 
-    private NpcModel getNpc(Player player) {
+    public NpcModel getNpc(Player player) {
         Optional<NpcModel> matchingNpc = NPCs.stream().filter(npc -> npc.getPlayer().equals(player)).findFirst();
         return matchingNpc.orElse(null);
     }
