@@ -15,7 +15,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <output.version>1.19.1</output.version>
+        <output.version>1.19</output.version>
     </properties>
 
     <profiles>

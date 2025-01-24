@@ -1,0 +1,197 @@
+package org.mynion.knockoutplugin.utils;
+
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.datafixers.util.Pair;
+import jline.internal.Nullable;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.game.*;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.Team;
+import org.bukkit.GameMode;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+public class NmsController_v1_19 implements NmsController {
+    @Override
+    public void setMaxHealth(Player p) {
+        AttributeInstance maxHealthAttribute = getServerPlayer(p).getAttribute(Attributes.MAX_HEALTH);
+        double maxHealth = maxHealthAttribute.getValue();
+        p.setHealth(maxHealth);
+    }
+
+    @Override
+    public void setXpDelay(Player p, int delay) {
+        ((CraftPlayer) p).getHandle().takeXpDelay = delay;
+    }
+
+    @Override
+    public void teleportBody(NpcModel npc, double x, double y, double z) {
+        ServerPlayer deadBody = ((Npc) npc).getDeadBody();
+        deadBody.teleportTo(x, y, z);
+    }
+
+    @Override
+    public void teleportHologram(NpcModel npc, double x, double y, double z) {
+        CraftEntity craftArmorStand = (CraftEntity) npc.getArmorStand();
+        net.minecraft.world.entity.Entity armorStand = craftArmorStand.getHandle();
+        armorStand.teleportTo(x, y, z);
+    }
+
+    @Override
+    public NpcModel createNpc(Player player, ArmorStand armorStand, GameMode previousGameMode, @Nullable EntityDamageEvent.DamageCause damageCause, @Nullable Entity damager) {
+        ServerPlayer deadBody = createDeadBody(player);
+        return new Npc(player, deadBody, armorStand, previousGameMode, damageCause, damager);
+    }
+
+    @Override
+    public void addPotionEffect(LivingEntity p, @NotNull PotionType type, int duration, int amplifier, boolean ambient, boolean particles) {
+        p.addPotionEffect(new PotionEffect(getPotionEffectType(type), duration, amplifier, ambient, particles));
+    }
+
+    @Override
+    public void removePotionEffect(LivingEntity p, @NotNull PotionType type) {
+        p.removePotionEffect(getPotionEffectType(type));
+    }
+
+    @Override
+    public int getPotionAmplifier(LivingEntity p, @NotNull PotionType type) {
+        return p.getPotionEffect(getPotionEffectType(type)).getAmplifier();
+    }
+
+    @Override
+    public void sendPacket(Player p, NpcModel npcmodel, PacketType packetType) {
+        ServerPlayer receiver = getServerPlayer(p);
+        Packet<?> packet = createPacket((Npc) npcmodel, packetType);
+        receiver.connection.send(packet);
+    }
+
+    @Override
+    public void broadcastPacket(NpcModel npc, PacketType packetType) {
+        Packet<?> packet = createPacket((Npc) npc, packetType);
+        MinecraftServer server = MinecraftServer.getServer();
+        List<ServerPlayer> onlinePlayers = server.getPlayerList().players;
+        onlinePlayers.forEach(p -> p.connection.send(packet));
+    }
+
+    private Packet<?> createPacket(Npc npc, PacketType packetType) {
+        ServerPlayer sp = getServerPlayer(npc.getPlayer());
+        ServerPlayer body = npc.getDeadBody();
+        return switch (packetType) {
+            case ANIMATE -> new ClientboundAnimatePacket(body, 1);
+            case ADD_ENTITY -> new ClientboundAddPlayerPacket(body);
+            case INFO_UPDATE ->
+                    new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, List.of(body));
+            case SET_ENTITY_DATA -> new ClientboundSetEntityDataPacket(body.getId(), body.getEntityData(), true);
+            case SET_EQUIPMENT -> new ClientboundSetEquipmentPacket(body.getId(), getItems(sp));
+            case INFO_REMOVE -> new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, body);
+            case REMOVE_ENTITY -> new ClientboundRemoveEntitiesPacket(npc.getDeadBody().getId());
+            case COLLISIONS_ON -> ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(createTeam(npc, true), true);
+            case COLLISIONS_OFF -> ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(createTeam(npc, false), true);
+            case TELEPORT -> new ClientboundTeleportEntityPacket(body);
+        };
+    }
+
+    private PlayerTeam createTeam(Npc npc, boolean collisions) {
+        ServerPlayer sp = getServerPlayer(npc.getPlayer());
+        PlayerTeam team = new PlayerTeam(new Scoreboard(), "Body");
+        if (collisions) {
+            if (sp.getTeam() != null) {
+                team.setCollisionRule(sp.getTeam().getCollisionRule());
+            } else {
+                team.setCollisionRule(Team.CollisionRule.ALWAYS);
+            }
+        } else {
+            team.setCollisionRule(Team.CollisionRule.NEVER);
+        }
+        team.getPlayers().add(npc.getDeadBody().displayName);
+        return team;
+    }
+
+    private List<Pair<EquipmentSlot, ItemStack>> getItems(ServerPlayer sp) {
+        return List.of(
+                Pair.of(EquipmentSlot.HEAD, sp.getItemBySlot(EquipmentSlot.HEAD)),
+                Pair.of(EquipmentSlot.CHEST, sp.getItemBySlot(EquipmentSlot.CHEST)),
+                Pair.of(EquipmentSlot.LEGS, sp.getItemBySlot(EquipmentSlot.LEGS)),
+                Pair.of(EquipmentSlot.FEET, sp.getItemBySlot(EquipmentSlot.FEET)),
+                Pair.of(EquipmentSlot.MAINHAND, sp.getItemBySlot(EquipmentSlot.MAINHAND)),
+                Pair.of(EquipmentSlot.OFFHAND, sp.getItemBySlot(EquipmentSlot.OFFHAND))
+        );
+    }
+
+    private PotionEffectType getPotionEffectType(PotionType potionType) {
+        if (potionType == PotionType.JUMP) return PotionEffectType.JUMP;
+        if (potionType == PotionType.SLOW) return PotionEffectType.SLOW;
+        return null;
+    }
+
+    private ServerPlayer createDeadBody(Player p) {
+
+        CraftPlayer cp = (CraftPlayer) p;
+        ServerPlayer sp = cp.getHandle();
+        MinecraftServer server = sp.getServer();
+        ServerLevel level = sp.getLevel();
+
+        UUID deadBodyUUID = UUID.randomUUID();
+        String deadBodyName = p.getName();
+        GameProfile deadBodyProfile = new GameProfile(deadBodyUUID, deadBodyName);
+
+        ServerPlayer deadBodyPlayer = new ServerPlayer(server, level, deadBodyProfile, null);
+
+        deadBodyPlayer.setPos(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
+        deadBodyPlayer.setXRot(sp.getXRot());
+        deadBodyPlayer.setYRot(sp.getYRot());
+        deadBodyPlayer.setYHeadRot(sp.getYHeadRot());
+        deadBodyPlayer.setShoulderEntityLeft(sp.getShoulderEntityLeft());
+        deadBodyPlayer.setPose(Pose.SWIMMING);
+        deadBodyPlayer.setUUID(deadBodyUUID);
+        deadBodyPlayer.setGameMode(GameType.SURVIVAL);
+
+        // Set dead body skin
+        try {
+            Property skin = (Property) sp.getGameProfile().getProperties().get("textures").toArray()[0];
+            String textures = skin.getValue();
+            String signature = skin.getSignature();
+            deadBodyPlayer.getGameProfile().getProperties().put("textures", new Property("textures", textures, signature));
+        } catch (ArrayIndexOutOfBoundsException ignored) {
+        }
+
+        // Create dead body server connection
+        new ServerGamePacketListenerImpl(server, new Connection(PacketFlow.CLIENTBOUND), deadBodyPlayer);
+
+        // Set dead body model customization
+        deadBodyPlayer.restoreFrom(sp, false);
+        deadBodyPlayer.setGameMode(GameType.SURVIVAL);
+
+        return deadBodyPlayer;
+    }
+
+    private ServerPlayer getServerPlayer(Player p) {
+        return ((CraftPlayer) p).getHandle();
+    }
+}

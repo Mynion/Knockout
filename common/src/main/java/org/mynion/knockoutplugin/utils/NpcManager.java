@@ -8,7 +8,6 @@ import org.mynion.knockoutplugin.Knockout;
 import javax.annotation.Nullable;
 
 public interface NpcManager {
-    Plugin plugin = Knockout.getPlugin();
 
     void knockoutPlayer(Player p, @Nullable EntityDamageEvent.DamageCause koCause, @Nullable Entity damager);
 

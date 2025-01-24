@@ -10,14 +10,14 @@ import org.mynion.knockoutplugin.commands.DropCommand;
 import org.mynion.knockoutplugin.commands.KnockoutCommand;
 import org.mynion.knockoutplugin.listeners.*;
 import org.mynion.knockoutplugin.listeners.cancelled.*;
-import org.mynion.knockoutplugin.utils.NpcManager;
-import org.mynion.knockoutplugin.utils.NpcManagerFactory;
+import org.mynion.knockoutplugin.utils.*;
 
 import java.lang.reflect.Field;
 
 public final class Knockout extends JavaPlugin {
     private static Plugin plugin;
     private static NpcManager NpcManager;
+    private static NmsController nmsController;
     private static String version;
 
     @Override
@@ -25,7 +25,14 @@ public final class Knockout extends JavaPlugin {
         plugin = this;
         version = getServer().getBukkitVersion();
         try {
-            NpcManager = NpcManagerFactory.getNpcManager(version);
+            nmsController = NmsControllerFactory.getNmsController(version);
+        } catch (IllegalArgumentException e) {
+            getServer().getPluginManager().disablePlugin(this);
+            e.printStackTrace();
+            return;
+        }
+        try {
+            NpcManager = new KnockoutLogic();
         } catch (IllegalArgumentException e) {
             getServer().getPluginManager().disablePlugin(this);
             e.printStackTrace();
@@ -93,5 +100,9 @@ public final class Knockout extends JavaPlugin {
     }
     public static String getVersion() {
         return version;
+    }
+
+    public static NmsController getNmsController() {
+        return nmsController;
     }
 }

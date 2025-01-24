@@ -1,33 +1,10 @@
 package org.mynion.knockoutplugin.utils;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
-import com.mojang.datafixers.util.Pair;
 import jline.internal.Nullable;
-import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.PacketFlow;
-import net.minecraft.network.protocol.game.*;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.scores.PlayerTeam;
-import net.minecraft.world.scores.Scoreboard;
-import net.minecraft.world.scores.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.plugin.Plugin;
@@ -39,41 +16,21 @@ import org.mynion.knockoutplugin.compatibility.TabAdapter;
 
 import java.util.*;
 
-public class NpcManager_v1_19 implements NpcManager {
-
-
-    public NpcManager_v1_19() {
+public class KnockoutLogic implements NpcManager {
+    private NmsController nmsController;
+    public KnockoutLogic() {
+        nmsController = Knockout.getNmsController();
     }
 
-    private static final List<Npc> NPCs = new ArrayList<>();
+    private static final List<NpcModel> NPCs = new ArrayList<>();
     private static final Plugin plugin = Knockout.getPlugin();
 
-    public void knockoutPlayer(Player p, @Nullable EntityDamageEvent.DamageCause koCause, @Nullable org.bukkit.entity.Entity damager) {
+    public void knockoutPlayer(Player p, @Nullable EntityDamageEvent.DamageCause koCause, @Nullable Entity damager) {
 
-        CraftPlayer cp = (CraftPlayer) p;
-        ServerPlayer sp = cp.getHandle();
         GameMode playerGameMode = p.getGameMode();
 
-        // Create dead body
-        ServerPlayer deadBodyPlayer = createDeadBody(p);
-
-        // Broadcast dead body info packets
-        ClientboundPlayerInfoPacket infoUpdatePacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, List.of(deadBodyPlayer));
-        ClientboundAddPlayerPacket addEntityPacket = new ClientboundAddPlayerPacket(deadBodyPlayer);
-        ClientboundSetEntityDataPacket setEntityDataPacket = new ClientboundSetEntityDataPacket(deadBodyPlayer.getId(), deadBodyPlayer.getEntityData(), true);
-        broadcastPacket(infoUpdatePacket);
-        broadcastPacket(addEntityPacket);
-        broadcastPacket(setEntityDataPacket);
-        List<Pair<EquipmentSlot, ItemStack>> items = List.of(
-                Pair.of(EquipmentSlot.HEAD, sp.getItemBySlot(EquipmentSlot.HEAD)),
-                Pair.of(EquipmentSlot.CHEST, sp.getItemBySlot(EquipmentSlot.CHEST)),
-                Pair.of(EquipmentSlot.LEGS, sp.getItemBySlot(EquipmentSlot.LEGS)),
-                Pair.of(EquipmentSlot.FEET, sp.getItemBySlot(EquipmentSlot.FEET)),
-                Pair.of(EquipmentSlot.MAINHAND, sp.getItemBySlot(EquipmentSlot.MAINHAND)),
-                Pair.of(EquipmentSlot.OFFHAND, sp.getItemBySlot(EquipmentSlot.OFFHAND))
-        );
-        ClientboundSetEquipmentPacket packet = new ClientboundSetEquipmentPacket(deadBodyPlayer.getId(), items);
-        broadcastPacket(packet);
+        // Has to be done before creating NPC
+        applyKnockoutEffects(p);
 
         // Create hologram
         ArmorStand armorStand = (ArmorStand) p.getWorld().spawnEntity(p.getLocation(), EntityType.ARMOR_STAND);
@@ -87,75 +44,62 @@ public class NpcManager_v1_19 implements NpcManager {
         armorStand.setInvisible(true);
         armorStand.setGravity(false);
 
-        // Has to be done before creating NPC
-        applyKnockoutEffects(p);
-
         // Create npc
-        Npc npc = new Npc(p, deadBodyPlayer, armorStand, playerGameMode, koCause, damager);
+        NpcModel npc = nmsController.createNpc(p, armorStand, playerGameMode, koCause, damager);
         NPCs.add(npc);
 
-        setNoCollisions(npc);
+        // Broadcast dead body info packets
+//        ClientboundPlayerInfoPacket infoUpdatePacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, List.of(deadBodyPlayer));
+//        ClientboundAddPlayerPacket addEntityPacket = new ClientboundAddPlayerPacket(deadBodyPlayer);
+//        ClientboundSetEntityDataPacket setEntityDataPacket = new ClientboundSetEntityDataPacket(deadBodyPlayer.getId(), deadBodyPlayer.getEntityData(), true);
+//        broadcastPacket(infoUpdatePacket);
+//        broadcastPacket(addEntityPacket);
+//        broadcastPacket(setEntityDataPacket);
+        nmsController.broadcastPacket(npc, PacketType.INFO_UPDATE);
+        nmsController.broadcastPacket(npc, PacketType.ADD_ENTITY);
+        nmsController.broadcastPacket(npc, PacketType.SET_ENTITY_DATA);
+
+
+//        List<Pair<EquipmentSlot, ItemStack>> items = List.of(
+//                Pair.of(EquipmentSlot.HEAD, sp.getItemBySlot(EquipmentSlot.HEAD)),
+//                Pair.of(EquipmentSlot.CHEST, sp.getItemBySlot(EquipmentSlot.CHEST)),
+//                Pair.of(EquipmentSlot.LEGS, sp.getItemBySlot(EquipmentSlot.LEGS)),
+//                Pair.of(EquipmentSlot.FEET, sp.getItemBySlot(EquipmentSlot.FEET)),
+//                Pair.of(EquipmentSlot.MAINHAND, sp.getItemBySlot(EquipmentSlot.MAINHAND)),
+//                Pair.of(EquipmentSlot.OFFHAND, sp.getItemBySlot(EquipmentSlot.OFFHAND))
+//        );
+//        ClientboundSetEquipmentPacket packet = new ClientboundSetEquipmentPacket(deadBodyPlayer.getId(), items);
+//        broadcastPacket(packet);
+        nmsController.broadcastPacket(npc, PacketType.SET_EQUIPMENT);
+
+//        nmsController.setNoCollisions(npc);
+        nmsController.broadcastPacket(npc, PacketType.COLLISIONS_OFF);
+
+
+        TabAdapter.setCollisionRule(npc.getPlayer(), false);
         teleportBody(npc);
         startTimer(p);
 
         ChatUtils.sendMessage(p, "knockout-message");
-        deadBodyPlayer.setInvisible(false);
     }
 
-    private ServerPlayer createDeadBody(Player p) {
-
-        CraftPlayer cp = (CraftPlayer) p;
-        ServerPlayer sp = cp.getHandle();
-        MinecraftServer server = sp.getServer();
-        ServerLevel level = sp.getLevel();
-
-        UUID deadBodyUUID = UUID.randomUUID();
-        String deadBodyName = p.getName();
-        GameProfile deadBodyProfile = new GameProfile(deadBodyUUID, deadBodyName);
-
-        ServerPlayer deadBodyPlayer = new ServerPlayer(server, level, deadBodyProfile, null);
-
-        deadBodyPlayer.setPos(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
-        deadBodyPlayer.setXRot(sp.getXRot());
-        deadBodyPlayer.setYRot(sp.getYRot());
-        deadBodyPlayer.setYHeadRot(sp.getYHeadRot());
-        deadBodyPlayer.setShoulderEntityLeft(sp.getShoulderEntityLeft());
-        deadBodyPlayer.setPose(Pose.SWIMMING);
-        deadBodyPlayer.setUUID(deadBodyUUID);
-        deadBodyPlayer.setGameMode(GameType.SURVIVAL);
-
-        // Set dead body skin
-        try {
-            Property skin = (Property) sp.getGameProfile().getProperties().get("textures").toArray()[0];
-            String textures = skin.getValue();
-            String signature = skin.getSignature();
-            deadBodyPlayer.getGameProfile().getProperties().put("textures", new Property("textures", textures, signature));
-        } catch (ArrayIndexOutOfBoundsException ignored) {
-        }
-
-        // Create dead body server connection
-        new ServerGamePacketListenerImpl(server, new Connection(PacketFlow.CLIENTBOUND), deadBodyPlayer);
-
-        // Set dead body model customization
-        deadBodyPlayer.restoreFrom(sp, false);
-        deadBodyPlayer.setGameMode(GameType.SURVIVAL);
-
-        return deadBodyPlayer;
-    }
 
     // Resets knockout but does not kill the player
     public void resetKnockout(Player p) {
-        Npc npc = getNpc(p);
+        NpcModel npc = getNpc(p);
         GameMode previousGameMode = npc.getPreviousGameMode();
 
         // Reset knockout effects
         resetKnockoutEffects(p);
 
         // Remove dead body
-        ClientboundPlayerInfoPacket removeNpcPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, getNpc(p).getDeadBody());
-        ClientboundRemoveEntitiesPacket removeEntityPacket = new ClientboundRemoveEntitiesPacket(npc.getDeadBody().getId());
-        broadcastPacket(removeNpcPacket);
-        broadcastPacket(removeEntityPacket);
+//        ClientboundPlayerInfoPacket removeNpcPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, getNpc(p).getDeadBody());
+//        ClientboundRemoveEntitiesPacket removeEntityPacket = new ClientboundRemoveEntitiesPacket(npc.getDeadBody().getId());
+//        broadcastPacket(removeNpcPacket);
+//        broadcastPacket(removeEntityPacket);
+        nmsController.broadcastPacket(npc, PacketType.INFO_REMOVE);
+        nmsController.broadcastPacket(npc, PacketType.REMOVE_ENTITY);
+
 
         // Remove hologram
         npc.getArmorStand().remove();
@@ -179,9 +123,6 @@ public class NpcManager_v1_19 implements NpcManager {
 
     private void applyKnockoutEffects(Player p) {
 
-        CraftPlayer cp = (CraftPlayer) p;
-        ServerPlayer sp = cp.getHandle();
-
         // Remove all potion effects
         PotionEffectType[] potionEffects = PotionEffectType.values();
         Arrays.asList(potionEffects).forEach(p::removePotionEffect);
@@ -189,17 +130,14 @@ public class NpcManager_v1_19 implements NpcManager {
         // Add custom potion effects
         PotionEffect invisibility = new PotionEffect(PotionEffectType.INVISIBILITY, 999999999, 100, false, false);
         p.addPotionEffect(invisibility);
-        PotionEffect noJump = new PotionEffect(PotionEffectType.JUMP, 999999999, 200, false, false);
-        p.addPotionEffect(noJump);
+        nmsController.addPotionEffect(p, PotionType.JUMP, 999999999, 200, false, false);
         if (plugin.getConfig().getBoolean("knockout-blindness")) {
             PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 999999999, 1, false, false);
             p.addPotionEffect(blindness);
         }
 
         // Set player health to max
-        AttributeInstance maxHealthAttribute = sp.getAttribute(Attributes.MAX_HEALTH);
-        double maxHealth = maxHealthAttribute.getValue();
-        p.setHealth(maxHealth);
+        nmsController.setMaxHealth(p);
 
         p.setWalkSpeed(0);
         p.setFlySpeed(0);
@@ -217,7 +155,7 @@ public class NpcManager_v1_19 implements NpcManager {
         //TODO
 
         // Reset nearby mobs focus on a KO player
-        List<org.bukkit.entity.Entity> nearbyMobs = p.getNearbyEntities(50, 50, 50);
+        List<Entity> nearbyMobs = p.getNearbyEntities(50, 50, 50);
         nearbyMobs.forEach(mob -> {
             if (mob instanceof Mob m) {
                 if (m.getTarget() instanceof Player targetPlayer) {
@@ -238,7 +176,7 @@ public class NpcManager_v1_19 implements NpcManager {
         if (seconds < 0) {
             seconds = 60;
         }
-        Npc npc = getNpc(p);
+        NpcModel npc = getNpc(p);
         npc.setKnockoutCooldown(seconds);
         if(seconds > 0){
             String knockoutTitle = Knockout.getPlugin().getConfig().getString("knockout-title");
@@ -269,7 +207,7 @@ public class NpcManager_v1_19 implements NpcManager {
 
         p.removePotionEffect(PotionEffectType.BLINDNESS);
         p.removePotionEffect(PotionEffectType.INVISIBILITY);
-        p.removePotionEffect(PotionEffectType.JUMP);
+        nmsController.removePotionEffect(p, PotionType.JUMP);
 
         p.setWalkSpeed(0.2f);
         p.setFlySpeed(0.2f);
@@ -286,41 +224,39 @@ public class NpcManager_v1_19 implements NpcManager {
     }
 
     private void resetCollisions(Player p) {
-        ServerPlayer sp = ((CraftPlayer) p).getHandle();
-
-        PlayerTeam team = new PlayerTeam(new Scoreboard(), "player");
-        if (sp.getTeam() != null) {
-            team.setCollisionRule(sp.getTeam().getCollisionRule());
-        } else {
-            team.setCollisionRule(Team.CollisionRule.ALWAYS);
-        }
-        team.getPlayers().add(p.getName());
-
-        broadcastPacket(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
+//        ServerPlayer sp = ((CraftPlayer) p).getHandle();
+//
+//        PlayerTeam team = new PlayerTeam(new Scoreboard(), "player");
+//        if (sp.getTeam() != null) {
+//            team.setCollisionRule(sp.getTeam().getCollisionRule());
+//        } else {
+//            team.setCollisionRule(Team.CollisionRule.ALWAYS);
+//        }
+//        team.getPlayers().add(p.getName());
+//
+//        broadcastPacket(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
+        nmsController.broadcastPacket(getNpc(p), PacketType.COLLISIONS_ON);
 
         TabAdapter.setCollisionRule(p, true);
     }
 
     // Teleporting body and hologram to the player while knocked out
-    private void teleportBody(Npc npc) {
-
-        CraftEntity craftArmorStand = (CraftEntity) npc.getArmorStand();
-        Entity armorStand = craftArmorStand.getHandle();
-        ServerPlayer deadBody = npc.getDeadBody();
+    private void teleportBody(NpcModel npc) {
         Player p = npc.getPlayer();
 
         new BukkitRunnable() {
             @Override
             public void run() {
                 if (npcExists(p)) {
-                    ClientboundTeleportEntityPacket teleportBodyPacket = new ClientboundTeleportEntityPacket(deadBody);
-                    broadcastPacket(teleportBodyPacket);
+//                    ClientboundTeleportEntityPacket teleportBodyPacket = new ClientboundTeleportEntityPacket(deadBody);
+//                    broadcastPacket(teleportBodyPacket);
+                    nmsController.broadcastPacket(npc, PacketType.TELEPORT);
                     if (p.isInsideVehicle()) {
-                        deadBody.teleportTo(p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
-                        armorStand.teleportTo(p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
+                        nmsController.teleportBody(npc, p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
+                        nmsController.teleportHologram(npc, p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
                     } else {
-                        deadBody.teleportTo(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
-                        armorStand.teleportTo(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
+                        nmsController.teleportBody(npc, p.getLocation().getX(), p.getLocation().getY() + -0.2, p.getLocation().getZ());
+                        nmsController.teleportHologram(npc, p.getLocation().getX(), p.getLocation().getY() + -0.2, p.getLocation().getZ());
                     }
                 } else {
                     this.cancel();
@@ -329,18 +265,6 @@ public class NpcManager_v1_19 implements NpcManager {
         }.runTaskTimer(Knockout.getPlugin(), 0, 1);
 
 
-    }
-
-    // Set no collisions for dead body
-    private void setNoCollisions(Npc npc) {
-
-        PlayerTeam team = new PlayerTeam(new Scoreboard(), "deadBody");
-        team.setCollisionRule(Team.CollisionRule.NEVER);
-        team.getPlayers().add(npc.getPlayer().getName());
-
-        broadcastPacket(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
-
-        TabAdapter.setCollisionRule(npc.getPlayer(), false);
     }
 
     // Start carrying a knocked out player
@@ -355,9 +279,9 @@ public class NpcManager_v1_19 implements NpcManager {
         vehicle.removePassenger(knockedOutPlayer);
 
         // Remove slowness effect only if applied by the plugin
-        int slowness_amplifier = vehicle.getPotionEffect(PotionEffectType.SLOW).getAmplifier();
+        int slowness_amplifier = nmsController.getPotionAmplifier(vehicle, PotionType.SLOW);
         if (plugin.getConfig().getInt("slowness-amplifier") == slowness_amplifier) {
-            vehicle.removePotionEffect(PotionEffectType.SLOW);
+            nmsController.removePotionEffect(vehicle, PotionType.SLOW);
         }
     }
 
@@ -372,7 +296,7 @@ public class NpcManager_v1_19 implements NpcManager {
                         if (currentVehicle.isOnline()) {
                             currentVehicle.addPassenger(knockedOutPlayer);
                             if (Knockout.getPlugin().getConfig().getBoolean(("slowness-for-carrier"))) {
-                                currentVehicle.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 2, plugin.getConfig().getInt("slowness-amplifier"), false, false));
+                                nmsController.addPotionEffect(currentVehicle, PotionType.SLOW, 20 * 2, plugin.getConfig().getInt("slowness-amplifier"), false, false);
                             }
                         } else {
                             knockedOutPlayer.leaveVehicle();
@@ -417,8 +341,7 @@ public class NpcManager_v1_19 implements NpcManager {
                 @Override
                 public void run() {
                     if (canBeRevivedBy(revivingPlayer, knockedOutPlayer, reviveLocation)) {
-                        //revivingPlayer.setExpCooldown(-1);
-                        ((CraftPlayer) revivingPlayer).getHandle().takeXpDelay = -1;
+                        nmsController.setXpDelay(revivingPlayer, -1);
 
                         // Checks if the player has enough xp to be decremented
                         if (revivingPlayer.getExp() >= expDecrement) {
@@ -455,8 +378,7 @@ public class NpcManager_v1_19 implements NpcManager {
                         if (npcExists(knockedOutPlayer)) {
                             getNpc(knockedOutPlayer).setBeingRevived(false);
                         }
-                        //revivingPlayer.setExpCooldown(0);
-                        ((CraftPlayer) revivingPlayer).getHandle().takeXpDelay = 0;
+                        nmsController.setXpDelay(revivingPlayer, 0);
                         this.cancel();
                     }
                 }
@@ -473,33 +395,37 @@ public class NpcManager_v1_19 implements NpcManager {
         resetKnockout(knockedOutPlayer);
         ChatUtils.sendMessage(revivingPlayer, "rescuer-revived-message", new HashMap<>(Map.of("%player%", knockedOutPlayer.getDisplayName())));
         ChatUtils.sendMessage(knockedOutPlayer, "rescued-revived-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
-        ((CraftPlayer) revivingPlayer).getHandle().takeXpDelay = 0;
-        //revivingPlayer.setExpCooldown(0);
+        nmsController.setXpDelay(revivingPlayer, 0);
     }
 
     public void playerJoinActions(Player p) {
-        ServerPlayer sp = ((CraftPlayer) p).getHandle();
+        //ServerPlayer sp = ((CraftPlayer) p).getHandle();
 
         // Perform actions for a new player
         getNPCs().forEach(npc -> {
 
-            ServerPlayer deadBodyPlayer = npc.getDeadBody();
+            //ServerPlayer deadBodyPlayer = npc.getDeadBody();
 
             // Show dead bodies for a new player
-            ClientboundPlayerInfoPacket infoUpdatePacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, List.of(deadBodyPlayer));
-            ClientboundAddPlayerPacket addEntityPacket = new ClientboundAddPlayerPacket(deadBodyPlayer);
-            ClientboundSetEntityDataPacket setEntityDataPacket = new ClientboundSetEntityDataPacket(deadBodyPlayer.getId(), deadBodyPlayer.getEntityData(), true);
+//            ClientboundPlayerInfoPacket infoUpdatePacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, List.of(deadBodyPlayer));
+//            ClientboundAddPlayerPacket addEntityPacket = new ClientboundAddPlayerPacket(deadBodyPlayer);
+//            ClientboundSetEntityDataPacket setEntityDataPacket = new ClientboundSetEntityDataPacket(deadBodyPlayer.getId(), deadBodyPlayer.getEntityData(), true);
+//
+//            sp.connection.send(infoUpdatePacket);
+//            sp.connection.send(addEntityPacket);
+//            sp.connection.send(setEntityDataPacket);
 
-            sp.connection.send(infoUpdatePacket);
-            sp.connection.send(addEntityPacket);
-            sp.connection.send(setEntityDataPacket);
+            nmsController.sendPacket(p, npc, PacketType.INFO_UPDATE);
+            nmsController.sendPacket(p, npc, PacketType.ADD_ENTITY);
+            nmsController.sendPacket(p, npc, PacketType.SET_ENTITY_DATA);
 
             // Set no collisions for dead bodies and a new player
-            PlayerTeam team = new PlayerTeam(new Scoreboard(), "deadBody");
-            team.setCollisionRule(Team.CollisionRule.NEVER);
-            team.getPlayers().add(npc.getDeadBody().displayName);
-
-            sp.connection.send(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
+//            PlayerTeam team = new PlayerTeam(new Scoreboard(), "deadBody");
+//            team.setCollisionRule(Team.CollisionRule.NEVER);
+//            team.getPlayers().add(npc.getDeadBody().displayName);
+//
+//            sp.connection.send(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
+            nmsController.sendPacket(p, npc, PacketType.COLLISIONS_OFF);
 
             // Hide knocked out players for a new player
             p.hidePlayer(Knockout.getPlugin(), npc.getPlayer());
@@ -510,8 +436,9 @@ public class NpcManager_v1_19 implements NpcManager {
     private void hurtAnimation(Player p) {
 
         // Damage attacked knocked out player
-        ClientboundAnimatePacket packet = new ClientboundAnimatePacket(getNpc(p).getDeadBody(), 1);
-        broadcastPacket(packet);
+//        ClientboundAnimatePacket packet = new ClientboundAnimatePacket(getNpc(p).getDeadBody(), 1);
+//        broadcastPacket(packet);
+        nmsController.broadcastPacket(getNpc(p), PacketType.ANIMATE);
 
     }
 
@@ -520,13 +447,15 @@ public class NpcManager_v1_19 implements NpcManager {
         getNPCs().forEach(npc -> {
 
             if (npc.getVehicle() != null) {
-                npc.getVehicle().removePotionEffect(PotionEffectType.SLOW);
+                nmsController.removePotionEffect(npc.getVehicle(), PotionType.SLOW);
             }
 
-            ClientboundPlayerInfoPacket removeNpcPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, npc.getDeadBody());
-            ClientboundRemoveEntitiesPacket removeEntityPacket = new ClientboundRemoveEntitiesPacket(npc.getDeadBody().getId());
-            broadcastPacket(removeNpcPacket);
-            broadcastPacket(removeEntityPacket);
+//            ClientboundPlayerInfoPacket removeNpcPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, npc.getDeadBody());
+//            ClientboundRemoveEntitiesPacket removeEntityPacket = new ClientboundRemoveEntitiesPacket(npc.getDeadBody().getId());
+//            broadcastPacket(removeNpcPacket);
+//            broadcastPacket(removeEntityPacket);
+            nmsController.broadcastPacket(npc, PacketType.INFO_REMOVE);
+            nmsController.broadcastPacket(npc, PacketType.REMOVE_ENTITY);
 
             npc.getArmorStand().remove();
             npc.getPlayer().setHealth(0);
@@ -536,8 +465,8 @@ public class NpcManager_v1_19 implements NpcManager {
         });
     }
 
-    public void damageKOPlayer(ArmorStand koArmorStand, org.bukkit.entity.Entity attacker, double value) {
-        Npc npc = getNpc(koArmorStand);
+    public void damageKOPlayer(ArmorStand koArmorStand, Entity attacker, double value) {
+        NpcModel npc = getNpc(koArmorStand);
 
         if (attacker instanceof Player p) {
             if (npc.getPlayer().equals(p)) return;
@@ -558,52 +487,37 @@ public class NpcManager_v1_19 implements NpcManager {
         return !knockedOutPlayer.isInsideVehicle() && revivingPlayer.isSneaking() && reviveLocation.getBlock().equals(revivingPlayer.getLocation().getBlock());
     }
 
-    private void broadcastPacket(Packet<?> packet) {
-        MinecraftServer server = MinecraftServer.getServer();
-        List<ServerPlayer> onlinePlayers = server.getPlayerList().players;
-        onlinePlayers.forEach(p -> p.connection.send(packet));
-    }
-
-    private List<Npc> getNPCs() {
+    private List<NpcModel> getNPCs() {
         return NPCs;
     }
 
     public boolean npcExists(Player player) {
-        Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getPlayer().equals(player)).findFirst();
+        Optional<NpcModel> matchingNpc = NPCs.stream().filter(npc -> npc.getPlayer().equals(player)).findFirst();
         return matchingNpc.isPresent();
     }
 
     public boolean npcExists(ArmorStand armorStand) {
-        Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getArmorStand().equals(armorStand)).findFirst();
+        Optional<NpcModel> matchingNpc = NPCs.stream().filter(npc -> npc.getArmorStand().equals(armorStand)).findFirst();
         return matchingNpc.isPresent();
     }
 
-    public boolean npcExists(ServerPlayer deadBody) {
-        Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getDeadBody().equals(deadBody)).findFirst();
-        return matchingNpc.isPresent();
-    }
-
-    private Npc getNpc(Player player) {
-        Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getPlayer().equals(player)).findFirst();
+    private NpcModel getNpc(Player player) {
+        Optional<NpcModel> matchingNpc = NPCs.stream().filter(npc -> npc.getPlayer().equals(player)).findFirst();
         return matchingNpc.orElse(null);
     }
 
-    private Npc getNpc(ArmorStand armorStand) {
-        Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getArmorStand().equals(armorStand)).findFirst();
+    private NpcModel getNpc(ArmorStand armorStand) {
+        Optional<NpcModel> matchingNpc = NPCs.stream().filter(npc -> npc.getArmorStand().equals(armorStand)).findFirst();
         return matchingNpc.orElse(null);
     }
 
-    private Npc getNpc(ServerPlayer deadBody) {
-        Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getDeadBody().equals(deadBody)).findFirst();
-        return matchingNpc.orElse(null);
-    }
     @Override
     public EntityDamageEvent.DamageCause getKOCause(Player p) {
         return getNpc(p).getKoCause();
     }
 
     @Override
-    public org.bukkit.entity.Entity getDamager(Player p) {
+    public Entity getDamager(Player p) {
         return getNpc(p).getDamager();
     }
 }
