@@ -13,7 +13,10 @@ public class TabAdapter {
         if (!tabPlugin.isEnabled()) return;
 
         TabPlayer tp = TabAPI.getInstance().getPlayer(p.getName());
-        TabAPI.getInstance().getNameTagManager().setCollisionRule(tp, rule);
+        try {
+            TabAPI.getInstance().getNameTagManager().setCollisionRule(tp, rule);
+        } catch (NullPointerException ignored) {
+        }
 
     }
 }

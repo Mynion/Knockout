@@ -32,9 +32,10 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
+import org.mynion.knockoutplugin.enums.PacketType;
+import org.mynion.knockoutplugin.enums.PotionType;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class NmsController_v1_19 implements NmsController {
@@ -48,6 +49,23 @@ public class NmsController_v1_19 implements NmsController {
     @Override
     public void setXpDelay(Player p, int delay) {
         ((CraftPlayer) p).getHandle().takeXpDelay = delay;
+    }
+
+    @Override
+    public void setCollisions(Player p, boolean on) {
+        ServerPlayer sp = getServerPlayer(p);
+        PlayerTeam team = new PlayerTeam(new Scoreboard(), "Body");
+        if (on) {
+            if (sp.getTeam() != null) {
+                team.setCollisionRule(sp.getTeam().getCollisionRule());
+            } else {
+                team.setCollisionRule(Team.CollisionRule.ALWAYS);
+            }
+        } else {
+            team.setCollisionRule(Team.CollisionRule.NEVER);
+        }
+        team.getPlayers().add(p.getName());
+        ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true);
     }
 
     @Override
@@ -111,26 +129,8 @@ public class NmsController_v1_19 implements NmsController {
             case SET_EQUIPMENT -> new ClientboundSetEquipmentPacket(body.getId(), getItems(sp));
             case INFO_REMOVE -> new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, body);
             case REMOVE_ENTITY -> new ClientboundRemoveEntitiesPacket(npc.getDeadBody().getId());
-            case COLLISIONS_ON -> ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(createTeam(npc, true), true);
-            case COLLISIONS_OFF -> ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(createTeam(npc, false), true);
             case TELEPORT -> new ClientboundTeleportEntityPacket(body);
         };
-    }
-
-    private PlayerTeam createTeam(Npc npc, boolean collisions) {
-        ServerPlayer sp = getServerPlayer(npc.getPlayer());
-        PlayerTeam team = new PlayerTeam(new Scoreboard(), "Body");
-        if (collisions) {
-            if (sp.getTeam() != null) {
-                team.setCollisionRule(sp.getTeam().getCollisionRule());
-            } else {
-                team.setCollisionRule(Team.CollisionRule.ALWAYS);
-            }
-        } else {
-            team.setCollisionRule(Team.CollisionRule.NEVER);
-        }
-        team.getPlayers().add(npc.getDeadBody().displayName);
-        return team;
     }
 
     private List<Pair<EquipmentSlot, ItemStack>> getItems(ServerPlayer sp) {
@@ -145,8 +145,8 @@ public class NmsController_v1_19 implements NmsController {
     }
 
     private PotionEffectType getPotionEffectType(PotionType potionType) {
-        if (potionType == PotionType.JUMP) return PotionEffectType.JUMP;
-        if (potionType == PotionType.SLOW) return PotionEffectType.SLOW;
+        if (potionType == PotionType.JUMP_BOOST) return PotionEffectType.JUMP;
+        if (potionType == PotionType.SLOWNESS) return PotionEffectType.SLOW;
         return null;
     }
 

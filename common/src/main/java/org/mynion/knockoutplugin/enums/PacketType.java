@@ -1,4 +1,4 @@
-package org.mynion.knockoutplugin.utils;
+package org.mynion.knockoutplugin.enums;
 
 public enum PacketType {
     ADD_ENTITY,
@@ -8,7 +8,5 @@ public enum PacketType {
     SET_ENTITY_DATA,
     SET_EQUIPMENT,
     ANIMATE,
-    COLLISIONS_ON,
-    COLLISIONS_OFF,
     TELEPORT
 }
