@@ -49,7 +49,7 @@ public class KnockoutCommand implements TabExecutor {
             if (NpcManager.npcExists(ko)) {
                 sender.sendMessage(ChatColor.RED + "That player is already knocked out!");
             } else if (ko != null) {
-                NpcManager.knockoutPlayer(ko);
+                NpcManager.knockoutPlayer(ko, null, null);
                 sender.sendMessage(ChatColor.GREEN + "Player knocked out.");
                 ChatUtils.sendMessage(ko, "knocked-out-message");
             } else {

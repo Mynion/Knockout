@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.datafixers.util.Pair;
+import jline.internal.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
@@ -38,6 +39,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -54,7 +56,7 @@ public class NpcManager_v1_20_R4 implements NpcManager {
     private static final List<Npc> NPCs = new ArrayList<>();
     private static final Plugin plugin = Knockout.getPlugin();
 
-    public void knockoutPlayer(Player p) {
+    public void knockoutPlayer(Player p, @Nullable EntityDamageEvent.DamageCause koCause, @Nullable org.bukkit.entity.Entity damager) {
 
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
@@ -107,7 +109,7 @@ public class NpcManager_v1_20_R4 implements NpcManager {
         applyKnockoutEffects(p);
 
         // Create npc
-        Npc npc = new Npc(p, deadBodyPlayer, armorStand, playerGameMode);
+        Npc npc = new Npc(p, deadBodyPlayer, armorStand, playerGameMode, koCause, damager);
         NPCs.add(npc);
 
         setNoCollisions(npc);
@@ -181,6 +183,9 @@ public class NpcManager_v1_20_R4 implements NpcManager {
 
     // Resets knockout and kills the player
     public void forceKill(Player p) {
+        if(getDamager(p) != null){
+            p.damage(1, getDamager(p));
+        }
         resetKnockout(p);
         p.setHealth(0);
     }
@@ -636,5 +641,14 @@ public class NpcManager_v1_20_R4 implements NpcManager {
     private Npc getNpc(ServerPlayer deadBody) {
         Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getDeadBody().equals(deadBody)).findFirst();
         return matchingNpc.orElse(null);
+    }
+    @Override
+    public EntityDamageEvent.DamageCause getKOCause(Player p) {
+        return getNpc(p).getKoCause();
+    }
+
+    @Override
+    public org.bukkit.entity.Entity getDamager(Player p) {
+        return getNpc(p).getDamager();
     }
 }

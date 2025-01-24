@@ -1,9 +1,11 @@
 package org.mynion.knockoutplugin.listeners;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.NpcManager;
@@ -19,12 +21,20 @@ public class PlayerDamageListener implements Listener {
                 if (NpcManager.npcExists(p)) {
 
                     // Reset knockout
+                    if(NpcManager.getDamager(p) != null){
+                        p.damage(1, NpcManager.getDamager(p));
+                    }
                     NpcManager.resetKnockout(p);
                 } else {
 
-                    // Knockout player
                     e.setCancelled(true);
-                    NpcManager.knockoutPlayer(p);
+                    Entity damager = null;
+                    if(e instanceof EntityDamageByEntityEvent ebyEntity){
+                        damager = ebyEntity.getDamager();
+                    }
+
+                    // Knockout player
+                    NpcManager.knockoutPlayer(p, e.getCause(), damager);
                 }
             } else if (Knockout.getPlugin().getConfig().getBoolean("drop-on-hit")) {
                 // Drop knocked out player when hit

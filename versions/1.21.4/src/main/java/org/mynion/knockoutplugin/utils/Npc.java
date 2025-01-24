@@ -1,10 +1,13 @@
 package org.mynion.knockoutplugin.utils;
 
+import jline.internal.Nullable;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.mynion.knockoutplugin.Knockout;
 
 // Npc is a class that represents a knocked out player in the game
@@ -17,15 +20,18 @@ public class Npc {
     private Player vehicle;
     private boolean isBeingRevived;
     private final GameMode previousGameMode;
-
     private int knockoutCooldown;
+    private EntityDamageEvent.DamageCause koCause;
+    private Entity damager;
 
-    public Npc(Player player, ServerPlayer deadBody, ArmorStand armorStand, GameMode previousGameMode) {
+    public Npc(Player player, ServerPlayer deadBody, ArmorStand armorStand, GameMode previousGameMode, @Nullable EntityDamageEvent.DamageCause koCause, @Nullable Entity damager) {
         this.player = player;
         this.deadBody = deadBody;
         this.armorStand = armorStand;
         this.previousGameMode = previousGameMode;
         isBeingRevived = false;
+        this.damager = damager;
+        this.koCause = koCause;
     }
 
     public Player getPlayer() {
@@ -78,5 +84,21 @@ public class Npc {
                 player.sendTitle(ChatColor.translateAlternateColorCodes('&', knockoutTitle), Integer.toString(getKnockoutCooldown()), 1, 20 * 3600, 1);
             }
         }
+    }
+
+    public EntityDamageEvent.DamageCause getKoCause() {
+        return koCause;
+    }
+
+    public void setKoCause(EntityDamageEvent.DamageCause koCause) {
+        this.koCause = koCause;
+    }
+
+    public Entity getDamager() {
+        return damager;
+    }
+
+    public void setDamager(Entity damager) {
+        this.damager = damager;
     }
 }
