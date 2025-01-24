@@ -12,8 +12,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
@@ -38,7 +38,7 @@ import org.mynion.knockoutplugin.enums.PotionType;
 import java.util.List;
 import java.util.UUID;
 
-public class VersionController_v1_19 implements VersionController {
+public class VersionController_v1_19_1 implements VersionController {
     @Override
     public void setMaxHealth(Player p) {
         AttributeInstance maxHealthAttribute = getServerPlayer(p).getAttribute(Attributes.MAX_HEALTH);
@@ -72,6 +72,7 @@ public class VersionController_v1_19 implements VersionController {
         onlinePlayers.forEach(player -> player.connection.send(packet));
     }
 
+    @Override
     public void teleportMannequin(NpcModel npc, double x, double y, double z) {
         ServerPlayer mannequin = ((Npc) npc).getMannequin();
         mannequin.teleportTo(x, y, z);

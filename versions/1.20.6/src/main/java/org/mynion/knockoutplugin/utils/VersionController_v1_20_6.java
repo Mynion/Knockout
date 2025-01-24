@@ -4,41 +4,49 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
 import jline.internal.Nullable;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.ChatVisiblity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team;
 import org.bukkit.GameMode;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R4.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_20_R4.entity.CraftPlayer;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.enums.PacketType;
 import org.mynion.knockoutplugin.enums.PotionType;
 
 import java.util.List;
 import java.util.UUID;
 
-public class VersionController_v1_19 implements VersionController {
+public class VersionController_v1_20_6 implements VersionController {
     @Override
     public void setMaxHealth(Player p) {
         AttributeInstance maxHealthAttribute = getServerPlayer(p).getAttribute(Attributes.MAX_HEALTH);
@@ -48,7 +56,7 @@ public class VersionController_v1_19 implements VersionController {
 
     @Override
     public void setXpDelay(Player p, int delay) {
-        ((CraftPlayer) p).getHandle().takeXpDelay = delay;
+        p.setExpCooldown(delay);
     }
 
     @Override
@@ -72,6 +80,7 @@ public class VersionController_v1_19 implements VersionController {
         onlinePlayers.forEach(player -> player.connection.send(packet));
     }
 
+    @Override
     public void teleportMannequin(NpcModel npc, double x, double y, double z) {
         ServerPlayer mannequin = ((Npc) npc).getMannequin();
         mannequin.teleportTo(x, y, z);
@@ -114,16 +123,47 @@ public class VersionController_v1_19 implements VersionController {
 
     @Override
     public void setAbleToJump(Player p, boolean able) {
+        ServerPlayer sp = getServerPlayer(p);
         if(able){
-            removePotionEffect(p, PotionType.JUMP_BOOST);
-        } else {
-            addPotionEffect(p, PotionType.JUMP_BOOST, 999999999, 200, false, false);
+            AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
+            jumpAttribute.setBaseValue(0.42);
+        }else{
+            AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
+            jumpAttribute.setBaseValue(0);
         }
     }
 
     @Override
     public void removeParrotsFromShoulders(Player p) {
-        //TODO
+        ServerPlayer sp = getServerPlayer(p);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!Knockout.getNpcManager().npcExists(p)) this.cancel();
+
+                if (!sp.getShoulderEntityLeft().isEmpty()) {
+                    net.minecraft.world.entity.EntityType.create(sp.getShoulderEntityLeft(), sp.level()).map((entity) -> {
+                        if (entity instanceof TamableAnimal) {
+                            ((TamableAnimal) entity).setOwnerUUID(p.getUniqueId());
+                        }
+                        entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
+                        return ((ServerLevel) sp.level()).addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
+                    });
+                    sp.setShoulderEntityLeft(new CompoundTag());
+                }
+
+                if (!sp.getShoulderEntityRight().isEmpty()) {
+                    net.minecraft.world.entity.EntityType.create(sp.getShoulderEntityRight(), sp.level()).map((entity) -> {
+                        if (entity instanceof TamableAnimal) {
+                            ((TamableAnimal) entity).setOwnerUUID(p.getUniqueId());
+                        }
+                        entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
+                        return ((ServerLevel) sp.level()).addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
+                    });
+                    sp.setShoulderEntityRight(new CompoundTag());
+                }
+            }
+        }.runTaskTimer(Knockout.getPlugin(), 0, 2);
     }
 
     @Override
@@ -138,13 +178,15 @@ public class VersionController_v1_19 implements VersionController {
         ServerPlayer sp = getServerPlayer(npc.getPlayer());
         ServerPlayer mannequin = npc.getMannequin();
         return switch (packetType) {
-            case ANIMATE -> new ClientboundAnimatePacket(mannequin, 1);
-            case ADD_ENTITY -> new ClientboundAddPlayerPacket(mannequin);
+            case ANIMATE -> new ClientboundHurtAnimationPacket(mannequin.getId(), 0);
+            case ADD_ENTITY -> new ClientboundAddEntityPacket(mannequin);
             case INFO_UPDATE ->
-                    new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, List.of(mannequin));
-            case SET_ENTITY_DATA -> new ClientboundSetEntityDataPacket(mannequin.getId(), mannequin.getEntityData(), true);
+                    new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, mannequin);
+            case SET_ENTITY_DATA ->
+                    new ClientboundSetEntityDataPacket(mannequin.getId(), mannequin.getEntityData().getNonDefaultValues());
             case SET_EQUIPMENT -> new ClientboundSetEquipmentPacket(mannequin.getId(), getItems(sp));
-            case INFO_REMOVE -> new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, mannequin);
+            case INFO_REMOVE ->
+                    new ClientboundPlayerInfoRemovePacket(List.of(mannequin.getGameProfile().getId()));
             case REMOVE_ENTITY -> new ClientboundRemoveEntitiesPacket(mannequin.getId());
             case TELEPORT -> new ClientboundTeleportEntityPacket(mannequin);
         };
@@ -162,8 +204,8 @@ public class VersionController_v1_19 implements VersionController {
     }
 
     private PotionEffectType getPotionEffectType(PotionType potionType) {
-        if (potionType == PotionType.JUMP_BOOST) return PotionEffectType.JUMP;
-        if (potionType == PotionType.SLOWNESS) return PotionEffectType.SLOW;
+        if (potionType == PotionType.JUMP_BOOST) return PotionEffectType.JUMP_BOOST;
+        if (potionType == PotionType.SLOWNESS) return PotionEffectType.SLOWNESS;
         return null;
     }
 
@@ -172,13 +214,13 @@ public class VersionController_v1_19 implements VersionController {
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
         MinecraftServer server = sp.getServer();
-        ServerLevel level = sp.getLevel();
+        ServerLevel level = sp.serverLevel();
 
         UUID mannequinUUID = UUID.randomUUID();
         String mannequinName = p.getName();
         GameProfile mannequinProfile = new GameProfile(mannequinUUID, mannequinName);
 
-        ServerPlayer mannequin = new ServerPlayer(server, level, mannequinProfile, null);
+        ServerPlayer mannequin = new ServerPlayer(server, level, mannequinProfile, new ClientInformation("en_us", 10, ChatVisiblity.FULL, true, sp.clientInformation().modelCustomisation(), net.minecraft.world.entity.player.Player.DEFAULT_MAIN_HAND, false, false));
 
         mannequin.setPos(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
         mannequin.setXRot(sp.getXRot());
@@ -192,15 +234,16 @@ public class VersionController_v1_19 implements VersionController {
         // Set mannequin skin
         try {
             Property skin = (Property) sp.getGameProfile().getProperties().get("textures").toArray()[0];
-            String textures = skin.getValue();
-            String signature = skin.getSignature();
+            String textures = skin.value();
+            String signature = skin.signature();
             mannequin.getGameProfile().getProperties().put("textures", new Property("textures", textures, signature));
         } catch (ArrayIndexOutOfBoundsException ignored) {
         }
 
         // Create mannequin server connection
-        new ServerGamePacketListenerImpl(server, new Connection(PacketFlow.CLIENTBOUND), mannequin);
+        new ServerGamePacketListenerImpl(server, new Connection(PacketFlow.CLIENTBOUND), mannequin, CommonListenerCookie.createInitial(mannequin.getGameProfile(), false));
 
+        //TODO
         // Set mannequin model customization
         mannequin.restoreFrom(sp, false);
         mannequin.setGameMode(GameType.SURVIVAL);

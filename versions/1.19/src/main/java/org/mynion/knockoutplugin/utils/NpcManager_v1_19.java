@@ -52,15 +52,23 @@ public class NpcManager_v1_19 implements NpcManager {
 
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
+        MinecraftServer server = sp.getServer();
         GameMode playerGameMode = p.getGameMode();
 
-        // Create dead body
-        ServerPlayer deadBodyPlayer = createDeadBody(p);
+        // Create mannequin
+        ServerPlayer mannequin = createMannequin(p);
 
-        // Broadcast dead body info packets
-        ClientboundPlayerInfoPacket infoUpdatePacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, List.of(deadBodyPlayer));
-        ClientboundAddPlayerPacket addEntityPacket = new ClientboundAddPlayerPacket(deadBodyPlayer);
-        ClientboundSetEntityDataPacket setEntityDataPacket = new ClientboundSetEntityDataPacket(deadBodyPlayer.getId(), deadBodyPlayer.getEntityData(), true);
+        // Create mannequin server connection
+        new ServerGamePacketListenerImpl(server, new Connection(PacketFlow.CLIENTBOUND), mannequin);
+
+        // Set mannequin model customization
+        mannequin.restoreFrom(sp, false);
+        mannequin.setGameMode(GameType.SURVIVAL);
+
+        // Broadcast mannequin info packets
+        ClientboundPlayerInfoPacket infoUpdatePacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, List.of(mannequin));
+        ClientboundAddPlayerPacket addEntityPacket = new ClientboundAddPlayerPacket(mannequin);
+        ClientboundSetEntityDataPacket setEntityDataPacket = new ClientboundSetEntityDataPacket(mannequin.getId(), mannequin.getEntityData(), true);
         broadcastPacket(infoUpdatePacket);
         broadcastPacket(addEntityPacket);
         broadcastPacket(setEntityDataPacket);
@@ -72,7 +80,7 @@ public class NpcManager_v1_19 implements NpcManager {
                 Pair.of(EquipmentSlot.MAINHAND, sp.getItemBySlot(EquipmentSlot.MAINHAND)),
                 Pair.of(EquipmentSlot.OFFHAND, sp.getItemBySlot(EquipmentSlot.OFFHAND))
         );
-        ClientboundSetEquipmentPacket packet = new ClientboundSetEquipmentPacket(deadBodyPlayer.getId(), items);
+        ClientboundSetEquipmentPacket packet = new ClientboundSetEquipmentPacket(mannequin.getId(), items);
         broadcastPacket(packet);
 
         // Create hologram
@@ -91,56 +99,49 @@ public class NpcManager_v1_19 implements NpcManager {
         applyKnockoutEffects(p);
 
         // Create npc
-        Npc npc = new Npc(p, deadBodyPlayer, armorStand, playerGameMode, koCause, damager);
+        Npc npc = new Npc(p, mannequin, armorStand, playerGameMode, koCause, damager);
         NPCs.add(npc);
 
         setNoCollisions(npc);
-        teleportBody(npc);
+        teleportMannequin(npc);
         startTimer(p);
 
         ChatUtils.sendMessage(p, "knockout-message");
-        deadBodyPlayer.setInvisible(false);
+        mannequin.setInvisible(false);
     }
 
-    private ServerPlayer createDeadBody(Player p) {
+    private ServerPlayer createMannequin(Player p) {
 
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
         MinecraftServer server = sp.getServer();
         ServerLevel level = sp.getLevel();
 
-        UUID deadBodyUUID = UUID.randomUUID();
-        String deadBodyName = p.getName();
-        GameProfile deadBodyProfile = new GameProfile(deadBodyUUID, deadBodyName);
+        UUID mannequinUUID = UUID.randomUUID();
+        String mannequinName = p.getName();
+        GameProfile mannequinProfile = new GameProfile(mannequinUUID, mannequinName);
 
-        ServerPlayer deadBodyPlayer = new ServerPlayer(server, level, deadBodyProfile, null);
+        ServerPlayer mannequin = new ServerPlayer(server, level, mannequinProfile, null);
 
-        deadBodyPlayer.setPos(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
-        deadBodyPlayer.setXRot(sp.getXRot());
-        deadBodyPlayer.setYRot(sp.getYRot());
-        deadBodyPlayer.setYHeadRot(sp.getYHeadRot());
-        deadBodyPlayer.setShoulderEntityLeft(sp.getShoulderEntityLeft());
-        deadBodyPlayer.setPose(Pose.SWIMMING);
-        deadBodyPlayer.setUUID(deadBodyUUID);
-        deadBodyPlayer.setGameMode(GameType.SURVIVAL);
+        mannequin.setPos(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
+        mannequin.setXRot(sp.getXRot());
+        mannequin.setYRot(sp.getYRot());
+        mannequin.setYHeadRot(sp.getYHeadRot());
+        mannequin.setShoulderEntityLeft(sp.getShoulderEntityLeft());
+        mannequin.setPose(Pose.SWIMMING);
+        mannequin.setUUID(mannequinUUID);
+        mannequin.setGameMode(GameType.SURVIVAL);
 
-        // Set dead body skin
+        // Set mannequin skin
         try {
             Property skin = (Property) sp.getGameProfile().getProperties().get("textures").toArray()[0];
             String textures = skin.getValue();
             String signature = skin.getSignature();
-            deadBodyPlayer.getGameProfile().getProperties().put("textures", new Property("textures", textures, signature));
+            mannequin.getGameProfile().getProperties().put("textures", new Property("textures", textures, signature));
         } catch (ArrayIndexOutOfBoundsException ignored) {
         }
 
-        // Create dead body server connection
-        new ServerGamePacketListenerImpl(server, new Connection(PacketFlow.CLIENTBOUND), deadBodyPlayer);
-
-        // Set dead body model customization
-        deadBodyPlayer.restoreFrom(sp, false);
-        deadBodyPlayer.setGameMode(GameType.SURVIVAL);
-
-        return deadBodyPlayer;
+        return mannequin;
     }
 
     // Resets knockout but does not kill the player
@@ -151,9 +152,9 @@ public class NpcManager_v1_19 implements NpcManager {
         // Reset knockout effects
         resetKnockoutEffects(p);
 
-        // Remove dead body
-        ClientboundPlayerInfoPacket removeNpcPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, getNpc(p).getDeadBody());
-        ClientboundRemoveEntitiesPacket removeEntityPacket = new ClientboundRemoveEntitiesPacket(npc.getDeadBody().getId());
+        // Remove mannequin
+        ClientboundPlayerInfoPacket removeNpcPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, getNpc(p).getMannequin());
+        ClientboundRemoveEntitiesPacket removeEntityPacket = new ClientboundRemoveEntitiesPacket(npc.getMannequin().getId());
         broadcastPacket(removeNpcPacket);
         broadcastPacket(removeEntityPacket);
 
@@ -301,25 +302,25 @@ public class NpcManager_v1_19 implements NpcManager {
         TabAdapter.setCollisionRule(p, true);
     }
 
-    // Teleporting body and hologram to the player while knocked out
-    private void teleportBody(Npc npc) {
+    // Teleporting mannequin and hologram to the player while knocked out
+    private void teleportMannequin(Npc npc) {
 
         CraftEntity craftArmorStand = (CraftEntity) npc.getArmorStand();
         Entity armorStand = craftArmorStand.getHandle();
-        ServerPlayer deadBody = npc.getDeadBody();
+        ServerPlayer mannequin = npc.getMannequin();
         Player p = npc.getPlayer();
 
         new BukkitRunnable() {
             @Override
             public void run() {
                 if (npcExists(p)) {
-                    ClientboundTeleportEntityPacket teleportBodyPacket = new ClientboundTeleportEntityPacket(deadBody);
-                    broadcastPacket(teleportBodyPacket);
+                    ClientboundTeleportEntityPacket teleportMannequinPacket = new ClientboundTeleportEntityPacket(mannequin);
+                    broadcastPacket(teleportMannequinPacket);
                     if (p.isInsideVehicle()) {
-                        deadBody.teleportTo(p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
+                        mannequin.teleportTo(p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
                         armorStand.teleportTo(p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
                     } else {
-                        deadBody.teleportTo(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
+                        mannequin.teleportTo(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
                         armorStand.teleportTo(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
                     }
                 } else {
@@ -331,10 +332,10 @@ public class NpcManager_v1_19 implements NpcManager {
 
     }
 
-    // Set no collisions for dead body
+    // Set no collisions for mannequin
     private void setNoCollisions(Npc npc) {
 
-        PlayerTeam team = new PlayerTeam(new Scoreboard(), "deadBody");
+        PlayerTeam team = new PlayerTeam(new Scoreboard(), "mannequin");
         team.setCollisionRule(Team.CollisionRule.NEVER);
         team.getPlayers().add(npc.getPlayer().getName());
 
@@ -483,7 +484,7 @@ public class NpcManager_v1_19 implements NpcManager {
         // Perform actions for a new player
         getNPCs().forEach(npc -> {
 
-            ServerPlayer deadBodyPlayer = npc.getDeadBody();
+            ServerPlayer deadBodyPlayer = npc.getMannequin();
 
             // Show dead bodies for a new player
             ClientboundPlayerInfoPacket infoUpdatePacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, List.of(deadBodyPlayer));
@@ -495,9 +496,9 @@ public class NpcManager_v1_19 implements NpcManager {
             sp.connection.send(setEntityDataPacket);
 
             // Set no collisions for dead bodies and a new player
-            PlayerTeam team = new PlayerTeam(new Scoreboard(), "deadBody");
+            PlayerTeam team = new PlayerTeam(new Scoreboard(), "mannequin");
             team.setCollisionRule(Team.CollisionRule.NEVER);
-            team.getPlayers().add(npc.getDeadBody().displayName);
+            team.getPlayers().add(npc.getMannequin().displayName);
 
             sp.connection.send(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true));
 
@@ -510,7 +511,7 @@ public class NpcManager_v1_19 implements NpcManager {
     private void hurtAnimation(Player p) {
 
         // Damage attacked knocked out player
-        ClientboundAnimatePacket packet = new ClientboundAnimatePacket(getNpc(p).getDeadBody(), 1);
+        ClientboundAnimatePacket packet = new ClientboundAnimatePacket(getNpc(p).getMannequin(), 1);
         broadcastPacket(packet);
 
     }
@@ -523,8 +524,8 @@ public class NpcManager_v1_19 implements NpcManager {
                 npc.getVehicle().removePotionEffect(PotionEffectType.SLOW);
             }
 
-            ClientboundPlayerInfoPacket removeNpcPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, npc.getDeadBody());
-            ClientboundRemoveEntitiesPacket removeEntityPacket = new ClientboundRemoveEntitiesPacket(npc.getDeadBody().getId());
+            ClientboundPlayerInfoPacket removeNpcPacket = new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, npc.getMannequin());
+            ClientboundRemoveEntitiesPacket removeEntityPacket = new ClientboundRemoveEntitiesPacket(npc.getMannequin().getId());
             broadcastPacket(removeNpcPacket);
             broadcastPacket(removeEntityPacket);
 
@@ -579,7 +580,7 @@ public class NpcManager_v1_19 implements NpcManager {
     }
 
     public boolean npcExists(ServerPlayer deadBody) {
-        Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getDeadBody().equals(deadBody)).findFirst();
+        Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getMannequin().equals(deadBody)).findFirst();
         return matchingNpc.isPresent();
     }
 
@@ -594,7 +595,7 @@ public class NpcManager_v1_19 implements NpcManager {
     }
 
     private Npc getNpc(ServerPlayer deadBody) {
-        Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getDeadBody().equals(deadBody)).findFirst();
+        Optional<Npc> matchingNpc = NPCs.stream().filter(npc -> npc.getMannequin().equals(deadBody)).findFirst();
         return matchingNpc.orElse(null);
     }
     @Override

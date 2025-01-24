@@ -108,7 +108,7 @@ public class KnockoutLogic implements NpcManager {
         // Add custom potion effects
         PotionEffect invisibility = new PotionEffect(PotionEffectType.INVISIBILITY, 999999999, 100, false, false);
         p.addPotionEffect(invisibility);
-        versionController.addPotionEffect(p, PotionType.JUMP_BOOST, 999999999, 200, false, false);
+        versionController.setAbleToJump(p, false);
         if (plugin.getConfig().getBoolean("knockout-blindness")) {
             PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 999999999, 1, false, false);
             p.addPotionEffect(blindness);
@@ -130,7 +130,7 @@ public class KnockoutLogic implements NpcManager {
         p.getPassengers().forEach(p::removePassenger);
 
         // Remove parrots from shoulders
-        //TODO
+        versionController.removeParrotsFromShoulders(p);
 
         // Reset nearby mobs focus on a KO player
         List<Entity> nearbyMobs = p.getNearbyEntities(50, 50, 50);
@@ -185,7 +185,7 @@ public class KnockoutLogic implements NpcManager {
 
         p.removePotionEffect(PotionEffectType.BLINDNESS);
         p.removePotionEffect(PotionEffectType.INVISIBILITY);
-        versionController.removePotionEffect(p, PotionType.JUMP_BOOST);
+        versionController.setAbleToJump(p, true);
 
         p.setWalkSpeed(0.2f);
         p.setFlySpeed(0.2f);
@@ -216,10 +216,10 @@ public class KnockoutLogic implements NpcManager {
                 if (npcExists(p)) {
                     versionController.broadcastPacket(npc, PacketType.TELEPORT);
                     if (p.isInsideVehicle()) {
-                        versionController.teleportBody(npc, p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
+                        versionController.teleportMannequin(npc, p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
                         versionController.teleportHologram(npc, p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
                     } else {
-                        versionController.teleportBody(npc, p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
+                        versionController.teleportMannequin(npc, p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
                         versionController.teleportHologram(npc, p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
                     }
                 } else {

@@ -19,8 +19,10 @@ public interface VersionController {
     void addPotionEffect(LivingEntity p, @NotNull PotionType type, int duration, int amplifier, boolean ambient, boolean particles);
     void removePotionEffect(LivingEntity p, @NotNull PotionType type);
     int getPotionAmplifier(LivingEntity p, @NotNull PotionType type);
-    void teleportBody(NpcModel npc, double x, double y, double z);
+    void teleportMannequin(NpcModel npc, double x, double y, double z);
     void teleportHologram(NpcModel npc, double x, double y, double z);
     void broadcastPacket(NpcModel npc, PacketType packetType);
     void sendPacket(Player receiver, NpcModel npc, PacketType packetType);
+    void setAbleToJump(Player p, boolean able);
+    void removeParrotsFromShoulders(Player p);
 }

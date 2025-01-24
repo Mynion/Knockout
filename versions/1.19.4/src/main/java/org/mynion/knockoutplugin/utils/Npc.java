@@ -12,13 +12,13 @@ import org.bukkit.event.entity.EntityDamageEvent;
 // It contains the player that is knocked out, the dead body of the player and the armor stand that displays text above the dead body
 
 public class Npc extends NpcModel{
-    private final ServerPlayer deadBody;
+    private final ServerPlayer mannequin;
 
-    public Npc(Player player, ServerPlayer deadBody, ArmorStand armorStand, GameMode previousGameMode, @Nullable EntityDamageEvent.DamageCause koCause, @Nullable Entity damager) {
+    public Npc(Player player, ServerPlayer mannequin, ArmorStand armorStand, GameMode previousGameMode, @Nullable EntityDamageEvent.DamageCause koCause, @Nullable Entity damager) {
         super(player, armorStand, previousGameMode, koCause, damager);
-        this.deadBody = deadBody;
+        this.mannequin = mannequin;
     }
-    public ServerPlayer getDeadBody() {
-        return deadBody;
+    public ServerPlayer getMannequin() {
+        return mannequin;
     }
 }

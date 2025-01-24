@@ -12,8 +12,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
@@ -22,8 +22,8 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team;
 import org.bukkit.GameMode;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -38,7 +38,7 @@ import org.mynion.knockoutplugin.enums.PotionType;
 import java.util.List;
 import java.util.UUID;
 
-public class VersionController_v1_19 implements VersionController {
+public class VersionController_v1_19_3 implements VersionController {
     @Override
     public void setMaxHealth(Player p) {
         AttributeInstance maxHealthAttribute = getServerPlayer(p).getAttribute(Attributes.MAX_HEALTH);
@@ -72,6 +72,7 @@ public class VersionController_v1_19 implements VersionController {
         onlinePlayers.forEach(player -> player.connection.send(packet));
     }
 
+    @Override
     public void teleportMannequin(NpcModel npc, double x, double y, double z) {
         ServerPlayer mannequin = ((Npc) npc).getMannequin();
         mannequin.teleportTo(x, y, z);
@@ -141,10 +142,10 @@ public class VersionController_v1_19 implements VersionController {
             case ANIMATE -> new ClientboundAnimatePacket(mannequin, 1);
             case ADD_ENTITY -> new ClientboundAddPlayerPacket(mannequin);
             case INFO_UPDATE ->
-                    new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, List.of(mannequin));
-            case SET_ENTITY_DATA -> new ClientboundSetEntityDataPacket(mannequin.getId(), mannequin.getEntityData(), true);
+                    new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, (ServerPlayer) List.of(mannequin));
+            case SET_ENTITY_DATA -> new ClientboundSetEntityDataPacket(mannequin.getId(), mannequin.getEntityData().getNonDefaultValues());
             case SET_EQUIPMENT -> new ClientboundSetEquipmentPacket(mannequin.getId(), getItems(sp));
-            case INFO_REMOVE -> new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, mannequin);
+            case INFO_REMOVE -> new ClientboundPlayerInfoRemovePacket(List.of(mannequin.getUUID()));
             case REMOVE_ENTITY -> new ClientboundRemoveEntitiesPacket(mannequin.getId());
             case TELEPORT -> new ClientboundTeleportEntityPacket(mannequin);
         };
@@ -178,7 +179,7 @@ public class VersionController_v1_19 implements VersionController {
         String mannequinName = p.getName();
         GameProfile mannequinProfile = new GameProfile(mannequinUUID, mannequinName);
 
-        ServerPlayer mannequin = new ServerPlayer(server, level, mannequinProfile, null);
+        ServerPlayer mannequin = new ServerPlayer(server, level, mannequinProfile);
 
         mannequin.setPos(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
         mannequin.setXRot(sp.getXRot());

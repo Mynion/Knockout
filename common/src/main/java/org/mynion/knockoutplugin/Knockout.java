@@ -32,7 +32,7 @@ public final class Knockout extends JavaPlugin {
             return;
         }
         try {
-            NpcManager = NpcManagerFactory.getNpcManager(version);
+            NpcManager = new KnockoutLogic();
         } catch (IllegalArgumentException e) {
             getServer().getPluginManager().disablePlugin(this);
             e.printStackTrace();
