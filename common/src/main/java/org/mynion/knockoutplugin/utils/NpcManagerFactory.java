@@ -24,8 +24,7 @@ public class NpcManagerFactory {
                     className = "org.mynion.knockoutplugin.utils.NpcManager_v1_20_R4";
                     break;
                 case "1.19-R0.1-SNAPSHOT":
-                    className = "org.mynion.knockoutplugin.utils.NpcManager_v1_19";
-                    break;
+                    return new KnockoutLogic();
                 case "1.19.1-R0.1-SNAPSHOT":
                 case "1.19.2-R0.1-SNAPSHOT":
                     className = "org.mynion.knockoutplugin.utils.NpcManager_v1_19_1";
