@@ -28,7 +28,7 @@ public class NpcManager {
     private static final List<NpcModel> NPCs = new ArrayList<>();
     private static final Plugin plugin = Knockout.getPlugin();
 
-    public void knockoutPlayer(Player p, @Nullable EntityDamageEvent.DamageCause koCause, @Nullable Entity damager) {
+    public void knockoutPlayer(Player p, @Nullable Entity damager) {
 
         GameMode playerGameMode = p.getGameMode();
 
@@ -48,7 +48,7 @@ public class NpcManager {
         armorStand.setGravity(false);
 
         // Create npc
-        NpcModel npc = versionController.createNpc(p, armorStand, playerGameMode, koCause, damager);
+        NpcModel npc = versionController.createNpc(p, armorStand, playerGameMode, damager);
         NPCs.add(npc);
 
         // Broadcast body info packets
@@ -454,10 +454,6 @@ public class NpcManager {
     private NpcModel getNpc(ArmorStand armorStand) {
         Optional<NpcModel> matchingNpc = NPCs.stream().filter(npc -> npc.getArmorStand().equals(armorStand)).findFirst();
         return matchingNpc.orElse(null);
-    }
-
-    public EntityDamageEvent.DamageCause getKOCause(Player p) {
-        return getNpc(p).getKoCause();
     }
 
     public Entity getDamager(Player p) {

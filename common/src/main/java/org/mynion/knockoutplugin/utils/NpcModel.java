@@ -18,16 +18,14 @@ public abstract class NpcModel {
     private boolean isBeingRevived;
     private final GameMode previousGameMode;
     private int knockoutCooldown;
-    private EntityDamageEvent.DamageCause koCause;
     private Entity damager;
 
-    public NpcModel(Player player, ArmorStand armorStand, GameMode previousGameMode, @Nullable EntityDamageEvent.DamageCause koCause, @Nullable Entity damager) {
+    public NpcModel(Player player, ArmorStand armorStand, GameMode previousGameMode, @Nullable Entity damager) {
         this.player = player;
         this.armorStand = armorStand;
         this.previousGameMode = previousGameMode;
         isBeingRevived = false;
         this.damager = damager;
-        this.koCause = koCause;
     }
 
     public Player getPlayer() {
@@ -76,14 +74,6 @@ public abstract class NpcModel {
                 player.sendTitle(ChatColor.translateAlternateColorCodes('&', knockoutTitle), Integer.toString(getKnockoutCooldown()), 1, 20 * 3600, 1);
             }
         }
-    }
-
-    public EntityDamageEvent.DamageCause getKoCause() {
-        return koCause;
-    }
-
-    public void setKoCause(EntityDamageEvent.DamageCause koCause) {
-        this.koCause = koCause;
     }
 
     public Entity getDamager() {

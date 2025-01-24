@@ -6,7 +6,6 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 // Npc is a class that represents a knocked out player in the game
 // It contains the player that is knocked out, the dead body of the player and the armor stand that displays text above the dead body
@@ -14,8 +13,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 public class Npc extends NpcModel{
     private final ServerPlayer mannequin;
 
-    public Npc(Player player, ServerPlayer mannequin, ArmorStand armorStand, GameMode previousGameMode, @Nullable EntityDamageEvent.DamageCause koCause, @Nullable Entity damager) {
-        super(player, armorStand, previousGameMode, koCause, damager);
+    public Npc(Player player, ServerPlayer mannequin, ArmorStand armorStand, GameMode previousGameMode, @Nullable Entity damager) {
+        super(player, armorStand, previousGameMode, damager);
         this.mannequin = mannequin;
     }
     public ServerPlayer getMannequin() {

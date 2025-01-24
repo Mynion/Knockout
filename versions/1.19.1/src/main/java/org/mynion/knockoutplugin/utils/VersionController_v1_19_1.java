@@ -86,9 +86,9 @@ public class VersionController_v1_19_1 implements VersionController {
     }
 
     @Override
-    public NpcModel createNpc(Player player, ArmorStand armorStand, GameMode previousGameMode, @Nullable EntityDamageEvent.DamageCause damageCause, @Nullable Entity damager) {
+    public NpcModel createNpc(Player player, ArmorStand armorStand, GameMode previousGameMode, @Nullable Entity damager) {
         ServerPlayer mannequin = createMannequin(player);
-        return new Npc(player, mannequin, armorStand, previousGameMode, damageCause, damager);
+        return new Npc(player, mannequin, armorStand, previousGameMode, damager);
     }
 
     @Override

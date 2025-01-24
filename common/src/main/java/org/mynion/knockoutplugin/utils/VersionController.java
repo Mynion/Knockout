@@ -12,7 +12,7 @@ import org.mynion.knockoutplugin.enums.PacketType;
 import org.mynion.knockoutplugin.enums.PotionType;
 
 public interface VersionController {
-    NpcModel createNpc(Player player, ArmorStand armorStand, GameMode previousGameMode, @Nullable EntityDamageEvent.DamageCause damageCause, @Nullable Entity damager);
+    NpcModel createNpc(Player player, ArmorStand armorStand, GameMode previousGameMode, @Nullable Entity damager);
     void setMaxHealth(Player p);
     void setXpDelay(Player p, int delay);
     void setCollisions(Player p, boolean on);
