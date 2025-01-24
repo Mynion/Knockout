@@ -112,7 +112,7 @@ public class NpcManager {
         p.addPotionEffect(invisibility);
         versionController.setAbleToJump(p, false);
         if (plugin.getConfig().getBoolean("knockout-blindness")) {
-            PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 999999999, 1, false, false);
+            PotionEffect blindness = new PotionEffect(PotionEffectType.BLINDNESS, 999999999, plugin.getConfig().getInt("blindness-amplifier"), false, false);
             p.addPotionEffect(blindness);
         }
 

@@ -22,6 +22,9 @@ death-on-end: true
 # When true: player will have blindness effect when knocked out
 knockout-blindness: true
 
+# Blindness amplifier for the knocked out player; Blindness level is equal to amplifier + 1
+blindness-amplifier: 0
+
 # When true: it will be possible to attack knocked out players
 knockout-vulnerable: true
 
