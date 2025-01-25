@@ -16,6 +16,12 @@ public class PlayerDamageListener implements Listener {
         NpcManager NpcManager = Knockout.getNpcManager();
         if (e.getEntity() instanceof Player p) {
 
+            if(e instanceof EntityDamageByEntityEvent ebyEntity) {
+                if(NpcManager.npcExists(p) && ebyEntity.getDamager() instanceof Player) {
+                    e.setCancelled(true);
+                }
+            }
+
             // Check if the player would die
             if (e.getFinalDamage() >= p.getHealth() && !hasDamageCooldown(p) && !hasTotemOfUndying(p)) {
                 // Check if the player is knocked out

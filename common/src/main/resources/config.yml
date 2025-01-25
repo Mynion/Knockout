@@ -26,13 +26,13 @@ knockout-blindness: true
 blindness-amplifier: 0
 
 # When true: player will be able to move when knocked out
-move-when-knocked-out: true
+move-when-knocked-out: false
 
 # When true: player will be able to swim when knocked out
-swim-when-knocked-out: true
+swim-when-knocked-out: false
 
 # When true: player will be able to jump when knocked out
-jump-when-knocked-out: true
+jump-when-knocked-out: false
 
 # When true: it will be possible to attack knocked out players
 knockout-vulnerable: true
