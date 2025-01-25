@@ -70,7 +70,7 @@ public class NpcManager {
         TabAdapter.setCollisionRule(npc.getPlayer(), false);
 
         teleportBody(npc);
-        startTimer(p);
+        startTimer(npc);
 
         ChatUtils.sendMessage(p, "knockout-message");
     }
@@ -167,7 +167,8 @@ public class NpcManager {
 
     }
 
-    private void startTimer(Player p) {
+    private void startTimer(NpcModel npc) {
+        Player p = npc.getPlayer();
         int seconds = plugin.getConfig().getInt("knockout-time");
         if (seconds < 0) {
             seconds = 60;
@@ -178,7 +179,6 @@ public class NpcManager {
                 seconds < 3600 ? DateTimeFormatter.ofPattern("m:ss") : DateTimeFormatter.ofPattern("H:mm:ss")
         );
 
-        NpcModel npc = getNpc(p);
         npc.setKnockoutCooldown(seconds);
         if (seconds > 0) {
             String knockoutTitle = Knockout.getPlugin().getConfig().getString("knockout-title");
