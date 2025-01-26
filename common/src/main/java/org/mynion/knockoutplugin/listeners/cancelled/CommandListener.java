@@ -8,6 +8,8 @@ import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.ChatUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
+import java.util.List;
+
 public class CommandListener implements Listener {
     @EventHandler
     public void onCommandSend(PlayerCommandPreprocessEvent e) {
@@ -25,6 +27,13 @@ public class CommandListener implements Listener {
 
         if (e.getMessage().startsWith("/die")) {
             return;
+        }
+
+        List<String> alliases = Knockout.getPlugin().getConfig().getStringList("aliases.die");
+        for (String alias : alliases) {
+            if (e.getMessage().startsWith("/" + alias)) {
+                return;
+            }
         }
 
         // Cancel the command

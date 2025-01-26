@@ -15,7 +15,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <output.version>1.19</output.version>
+        <output.version>1.19.1</output.version>
     </properties>
 
     <profiles>
@@ -71,13 +71,13 @@
                 </dependency>
                 <dependency>
                     <groupId>org.mynion</groupId>
-                    <artifactId>v1_19_3</artifactId>
+                    <artifactId>1.19.3</artifactId>
                     <version>${project.version}</version>
                     <scope>compile</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.mynion</groupId>
-                    <artifactId>v1_19_4</artifactId>
+                    <artifactId>1.19.4</artifactId>
                     <version>${project.version}</version>
                     <scope>compile</scope>
                 </dependency>

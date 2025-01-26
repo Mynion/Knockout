@@ -102,6 +102,7 @@ already-carrying-message: "&cYou are already carrying a knocked out player!"
 no-permission-message: "&4You don't have permission to do that!"
 
 # Aliases for the commands
+# Restart the server after changing the aliases
 aliases:
   carry:
     - podnies
