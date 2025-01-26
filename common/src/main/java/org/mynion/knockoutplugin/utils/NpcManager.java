@@ -6,7 +6,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -81,7 +80,7 @@ public class NpcManager {
         NpcModel npc = getNpc(p);
         GameMode previousGameMode = npc.getPreviousGameMode();
 
-        if(p.isInsideVehicle()){
+        if (p.isInsideVehicle()) {
             p.leaveVehicle();
         }
 
@@ -121,7 +120,7 @@ public class NpcManager {
         // Add custom potion effects
         PotionEffect invisibility = new PotionEffect(PotionEffectType.INVISIBILITY, 999999999, 100, false, false);
         p.addPotionEffect(invisibility);
-        if(!plugin.getConfig().getBoolean("jump-when-knocked-out")) {
+        if (!plugin.getConfig().getBoolean("jump-when-knocked-out")) {
             versionController.setAbleToJump(p, false);
         }
         if (plugin.getConfig().getBoolean("knockout-blindness")) {
@@ -133,7 +132,7 @@ public class NpcManager {
         versionController.setMaxHealth(p);
 
         p.setWalkSpeed(0);
-        if(plugin.getConfig().getBoolean(("move-when-knocked-out"))) {
+        if (plugin.getConfig().getBoolean(("move-when-knocked-out"))) {
             p.setWalkSpeed(0.05f);
         }
         p.setFlySpeed(0);
@@ -175,9 +174,14 @@ public class NpcManager {
         }
 
         LocalTime time = LocalTime.ofSecondOfDay(seconds);
-        String formattedTime = time.format(
-                seconds < 3600 ? DateTimeFormatter.ofPattern("m:ss") : DateTimeFormatter.ofPattern("H:mm:ss")
-        );
+        String formattedTime;
+        if (seconds < 60) {
+            formattedTime = time.format(DateTimeFormatter.ofPattern("s"));
+        } else if (seconds < 3600) {
+            formattedTime = time.format(DateTimeFormatter.ofPattern("m:ss"));
+        } else {
+            formattedTime = time.format(DateTimeFormatter.ofPattern("H:mm:ss"));
+        }
 
         npc.setKnockoutCooldown(seconds);
         if (seconds > 0) {

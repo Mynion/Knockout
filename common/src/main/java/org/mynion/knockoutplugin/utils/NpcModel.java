@@ -75,10 +75,16 @@ public abstract class NpcModel {
             String knockoutTitle = Knockout.getPlugin().getConfig().getString("knockout-title");
 
             if (knockoutTitle != null) {
-                LocalTime time = LocalTime.ofSecondOfDay(knockoutCooldown);
-                String formattedTime = time.format(
-                        knockoutCooldown < 3600 ? DateTimeFormatter.ofPattern("m:ss") : DateTimeFormatter.ofPattern("H:mm:ss")
-                );
+                int seconds = knockoutCooldown;
+                LocalTime time = LocalTime.ofSecondOfDay(seconds);
+                String formattedTime;
+                if (seconds < 60) {
+                    formattedTime = time.format(DateTimeFormatter.ofPattern("s"));
+                } else if (seconds < 3600) {
+                    formattedTime = time.format(DateTimeFormatter.ofPattern("m:ss"));
+                } else {
+                    formattedTime = time.format(DateTimeFormatter.ofPattern("H:mm:ss"));
+                }
 
                 player.sendTitle(ChatColor.translateAlternateColorCodes('&', knockoutTitle), formattedTime, 1, 20 * 3600, 1);
             }
