@@ -83,21 +83,25 @@ no-levels-message: "&cYou don't have enough levels (%levels%) to revive that pla
 # Title message for the rescuer when reviving
 # Use variable %percent% to show the progress of reviving
 # Use variable %loadingIcon% to show the loading icon
+# Use variable %player% to show the rescued player name
 rescuer-reviving-title: '&aReviving...'
 
 # Subtitle message for the rescuer when reviving
 # Use variable %percent% to show the progress of reviving
 # Use variable %loadingIcon% to show the loading icon
+# Use variable %player% to show the rescued player name
 rescuer-reviving-subtitle: '%percent%%'
 
 # Title message for the rescued when reviving
 # Use variable %percent% to show the progress of reviving
 # Use variable %loadingIcon% to show the loading icon
+# Use variable %player% to show the rescuer player name
 rescued-reviving-title: '&aYou are being revived...'
 
 # Subtitle message for the rescued when reviving
 # Use variable %percent% to show the progress of reviving
 # Use variable %loadingIcon% to show the loading icon
+# Use variable %player% to show the rescuer player name
 rescued-reviving-subtitle: '%percent%%'
 
 # Successful revive message for the rescuer

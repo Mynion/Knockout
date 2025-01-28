@@ -350,8 +350,10 @@ public class NpcManager {
                         timer += period;
                         percent = (int) (((float) timer / (float) timeInTicks) * 100);
 
-                        MessageUtils.sendTitle(revivingPlayer, "rescuer-reviving-title", "rescuer-reviving-subtitle", new HashMap<>(Map.of("%percent%", String.valueOf(percent), "%loadingIcon%", loadingIcon)), new HashMap<>(Map.of("%percent%", String.valueOf(percent), "%loadingIcon%", loadingIcon)), 1, period, 1);
-                        MessageUtils.sendTitle(knockedOutPlayer, "rescued-reviving-title", "rescued-reviving-subtitle", new HashMap<>(Map.of("%percent%", String.valueOf(percent), "%loadingIcon%", loadingIcon)), new HashMap<>(Map.of("%percent%", String.valueOf(percent), "%loadingIcon%", loadingIcon)), 1, period, 1);
+                        HashMap<String, String> rescuerReplacements = new HashMap<>(Map.of("%percent%", String.valueOf(percent), "%loadingIcon%", loadingIcon, "%player%", knockedOutPlayer.getName()));
+                        HashMap<String, String> rescuedReplacements = new HashMap<>(Map.of("%percent%", String.valueOf(percent), "%loadingIcon%", loadingIcon, "%player%", revivingPlayer.getName()));
+                        MessageUtils.sendTitle(revivingPlayer, "rescuer-reviving-title", "rescuer-reviving-subtitle", rescuerReplacements, rescuerReplacements, 1, period, 1);
+                        MessageUtils.sendTitle(knockedOutPlayer, "rescued-reviving-title", "rescued-reviving-subtitle", rescuedReplacements, rescuedReplacements, 1, period, 1);
 
                         switch (loadingIcon) {
                             case "\\" -> loadingIcon = "|";
