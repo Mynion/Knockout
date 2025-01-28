@@ -73,6 +73,14 @@ knockout-hologram: '&cKnockout'
 # Use variable %player% to show the knocked out player name
 knockout-attacker-message: '&aYou knocked out &f%player%'
 
+# Title message for the player who knocked out another player
+# Use variable %player% to show the knocked out player name
+knockout-attacker-title: ''
+
+# Subtitle message for the player who knocked out another player
+# Use variable %player% to show the knocked out player name
+knockout-attacker-subtitle: ''
+
 # Message for not allowed actions when knocked out
 not-allowed-message: "&cYou can't do that when knocked out!"
 
