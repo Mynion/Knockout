@@ -104,13 +104,29 @@ rescued-reviving-title: '&aYou are being revived...'
 # Use variable %player% to show the rescuer player name
 rescued-reviving-subtitle: '%percent%%'
 
+# Title message for the rescuer when revived
+# Use variable %player% to show the rescued player name
+rescuer-revived-title: '&aYou revived &f%player%'
+
+# Subtitle message for the rescuer when revived
+# Use variable %player% to show the rescued player name
+rescuer-revived-subtitle: ''
+
+# Title message for the rescued when revived
+# Use variable %player% to show the rescuer player name
+rescued-revived-title: '&aYou live again!'
+
+# Subtitle message for the rescued when revived
+# Use variable %player% to show the rescuer player name
+rescued-revived-subtitle: '&aYou have been revived by &f%player%'
+
 # Successful revive message for the rescuer
 # Use variable %player% to show the rescued player name
-rescuer-revived-message: '&aYou revived &a%player%'
+rescuer-revived-message: ''
 
 # Successful revive message for the rescued
 # Use variable %player% to show the rescuer player name
-rescued-revived-message: '&aYou have been revived by &a%player%'
+rescued-revived-message: ''
 
 # Message when the player uses /die command and is not knocked out
 invalid-die-message: "&cYou can use that command only when knocked out!"

@@ -390,6 +390,8 @@ public class NpcManager {
         resetKnockout(knockedOutPlayer);
         MessageUtils.sendMessage(revivingPlayer, "rescuer-revived-message", new HashMap<>(Map.of("%player%", knockedOutPlayer.getDisplayName())));
         MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
+        MessageUtils.sendTitle(revivingPlayer, "rescuer-revived-title", "rescuer-revived-subtitle", new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), 10, 20 * 3, 10);
+        MessageUtils.sendTitle(knockedOutPlayer, "rescued-revived-title", "rescued-revived-subtitle", new HashMap<>(Map.of("%player%", revivingPlayer.getName())), new HashMap<>(Map.of("%player%", revivingPlayer.getName())), 10, 20 * 3, 10);
         versionController.setXpDelay(revivingPlayer, 0);
     }
 
