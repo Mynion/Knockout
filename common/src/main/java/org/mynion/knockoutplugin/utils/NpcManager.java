@@ -109,7 +109,8 @@ public class NpcManager {
     // Ends knockout and kills the player
     public void forceKill(Player p) {
         if (getDamager(p) != null) {
-            p.damage(1, getDamager(p));
+            getNpc(p).setVulnerableByPlayerWhenCarried(true);
+            p.damage(p.getHealth(), getDamager(p));
         }
         resetKnockout(p);
         p.setHealth(0);

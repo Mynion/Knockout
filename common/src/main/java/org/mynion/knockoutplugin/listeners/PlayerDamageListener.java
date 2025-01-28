@@ -16,21 +16,34 @@ public class PlayerDamageListener implements Listener {
         NpcManager NpcManager = Knockout.getNpcManager();
         if (e.getEntity() instanceof Player p) {
 
-            if(e instanceof EntityDamageByEntityEvent ebyEntity) {
-                if(NpcManager.npcExists(p) && ebyEntity.getDamager() instanceof Player) {
+            // Cancel damage for carried players
+            if (e instanceof EntityDamageByEntityEvent ebyEntity) {
+                if (NpcManager.npcExists(p) && ebyEntity.getDamager() instanceof Player && !NpcManager.getNpc(p).isVulnerableByPlayerWhenCarried()) {
                     e.setCancelled(true);
                 }
             }
+
 
             // Check if the player would die
             if (e.getFinalDamage() >= p.getHealth() && !hasDamageCooldown(p) && !hasTotemOfUndying(p)) {
                 // Check if the player is knocked out
                 if (NpcManager.npcExists(p)) {
 
-                    // Reset knockout
-                    if (NpcManager.getDamager(p) != null) {
-                        p.damage(1, NpcManager.getDamager(p));
+                    // Replace normal damage event with attacker damage event
+                    if (!(e instanceof EntityDamageByEntityEvent ebyEntity && ebyEntity.getDamager().equals(NpcManager.getDamager(p)))) {
+                        if (NpcManager.getDamager(p) != null) {
+                            e.setCancelled(true);
+
+                            // Damage by attacker
+                            NpcManager.getNpc(p).setVulnerableByPlayerWhenCarried(true);
+                            p.damage(e.getFinalDamage(), NpcManager.getDamager(p));
+
+                            // p.damage() calls EntityDamageEvent, so we return to prevent ending knockout two times
+                            return;
+                        }
                     }
+
+                    // Reset knockout
                     NpcManager.resetKnockout(p);
                 } else {
 
@@ -44,6 +57,8 @@ public class PlayerDamageListener implements Listener {
                     NpcManager.knockoutPlayer(p, damager);
                 }
             } else if (Knockout.getPlugin().getConfig().getBoolean("drop-on-hit")) {
+                p.sendMessage(String.valueOf(p.getNoDamageTicks()));
+
                 // Drop knocked out player when hit
                 p.getPassengers().stream()
                         .filter(passenger -> passenger instanceof Player)

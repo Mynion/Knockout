@@ -6,7 +6,6 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.mynion.knockoutplugin.Knockout;
 
 import java.time.LocalTime;
@@ -22,6 +21,7 @@ public abstract class NpcModel {
     private final GameMode previousGameMode;
     private int knockoutCooldown;
     private Entity damager;
+    private boolean isVulnerableByPlayerWhenCarried;
 
     public NpcModel(Player player, ArmorStand armorStand, GameMode previousGameMode, @Nullable Entity damager) {
         this.player = player;
@@ -97,5 +97,12 @@ public abstract class NpcModel {
 
     public void setDamager(Entity damager) {
         this.damager = damager;
+    }
+
+    public boolean isVulnerableByPlayerWhenCarried() {
+        return isVulnerableByPlayerWhenCarried;
+    }
+    public void setVulnerableByPlayerWhenCarried(boolean vulnerableByPlayerWhenCarried) {
+        isVulnerableByPlayerWhenCarried = vulnerableByPlayerWhenCarried;
     }
 }
