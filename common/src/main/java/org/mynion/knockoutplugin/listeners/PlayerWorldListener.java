@@ -13,6 +13,5 @@ public class PlayerWorldListener implements Listener {
         Player p = e.getPlayer();
         NpcManager NpcManager = Knockout.getNpcManager();
         NpcManager.playerJoinActions(p);
-        p.sendMessage("lookosad");
     }
 }
