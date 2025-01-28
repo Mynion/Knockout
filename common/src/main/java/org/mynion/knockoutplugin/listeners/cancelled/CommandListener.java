@@ -5,7 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.mynion.knockoutplugin.Knockout;
-import org.mynion.knockoutplugin.utils.ChatUtils;
+import org.mynion.knockoutplugin.utils.MessageUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
 import java.util.List;
@@ -38,6 +38,6 @@ public class CommandListener implements Listener {
 
         // Cancel the command
         e.setCancelled(true);
-        ChatUtils.sendMessage(p, "not-allowed-message");
+        MessageUtils.sendMessage(p, "not-allowed-message");
     }
 }

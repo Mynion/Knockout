@@ -6,7 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.mynion.knockoutplugin.Knockout;
-import org.mynion.knockoutplugin.utils.ChatUtils;
+import org.mynion.knockoutplugin.utils.MessageUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
 public class EntityDamageListener implements Listener {
@@ -16,7 +16,7 @@ public class EntityDamageListener implements Listener {
         if (e.getDamager() instanceof Player p) {
             if (NpcManager.npcExists(p)) {
                 e.setCancelled(true);
-                ChatUtils.sendMessage(p, "not-allowed-message");
+                MessageUtils.sendMessage(p, "not-allowed-message");
             }
         }
         if (e.getEntity() instanceof ArmorStand armorStand) {

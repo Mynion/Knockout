@@ -62,8 +62,16 @@ knockout-message: '&cYou have been knocked out! Ask someone to revive you or use
 # Title message for the player when knocked out
 knockout-title: '&cKnockout'
 
+# Subtitle message for the player when knocked out
+# Use variable %timer% to show the remaining knockout time
+knockout-subtitle: '%timer%'
+
 # Hologram title above the player when knocked out
 knockout-hologram: '&cKnockout'
+
+# Message for the player who knocked out another player
+# Use variable %player% to show the knocked out player name
+knockout-attacker-message: '&aYou knocked out &f%player%'
 
 # Message for not allowed actions when knocked out
 not-allowed-message: "&cYou can't do that when knocked out!"
@@ -73,18 +81,32 @@ not-allowed-message: "&cYou can't do that when knocked out!"
 no-levels-message: "&cYou don't have enough levels (%levels%) to revive that player"
 
 # Title message for the rescuer when reviving
+# Use variable %percent% to show the progress of reviving
+# Use variable %loadingIcon% to show the loading icon
 rescuer-reviving-title: '&aReviving...'
 
+# Subtitle message for the rescuer when reviving
+# Use variable %percent% to show the progress of reviving
+# Use variable %loadingIcon% to show the loading icon
+rescuer-reviving-subtitle: '%percent%%'
+
 # Title message for the rescued when reviving
+# Use variable %percent% to show the progress of reviving
+# Use variable %loadingIcon% to show the loading icon
 rescued-reviving-title: '&aYou are being revived...'
+
+# Subtitle message for the rescued when reviving
+# Use variable %percent% to show the progress of reviving
+# Use variable %loadingIcon% to show the loading icon
+rescued-reviving-subtitle: '%percent%%'
 
 # Successful revive message for the rescuer
 # Use variable %player% to show the rescued player name
-rescuer-revived-message: '&aYou revived %player%'
+rescuer-revived-message: '&aYou revived &a%player%'
 
 # Successful revive message for the rescued
 # Use variable %player% to show the rescuer player name
-rescued-revived-message: '&aYou have been revived by %player%'
+rescued-revived-message: '&aYou have been revived by &a%player%'
 
 # Message when the player uses /die command and is not knocked out
 invalid-die-message: "&cYou can use that command only when knocked out!"

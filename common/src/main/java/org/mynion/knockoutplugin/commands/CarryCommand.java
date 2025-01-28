@@ -5,7 +5,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.mynion.knockoutplugin.Knockout;
-import org.mynion.knockoutplugin.utils.ChatUtils;
+import org.mynion.knockoutplugin.utils.MessageUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
 import java.util.Optional;
@@ -18,7 +18,7 @@ public class CarryCommand implements CommandExecutor {
             NpcManager NpcManager = Knockout.getNpcManager();
 
             if (!p.hasPermission("knockout.carry")) {
-                ChatUtils.sendMessage(p, "no-permission-message");
+                MessageUtils.sendMessage(p, "no-permission-message");
                 return true;
             }
 
@@ -27,7 +27,7 @@ public class CarryCommand implements CommandExecutor {
                     .filter(passenger -> passenger instanceof Player)
                     .map(passenger -> (Player) passenger)
                     .anyMatch(NpcManager::npcExists)) {
-                ChatUtils.sendMessage(p, "already-carrying-message");
+                MessageUtils.sendMessage(p, "already-carrying-message");
                 return true;
             }
 
@@ -39,7 +39,7 @@ public class CarryCommand implements CommandExecutor {
                     .findFirst();
 
             // Carry a knocked out player
-            knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.startCarrying(ko, p), () -> ChatUtils.sendMessage(p, "invalid-carry-message"));
+            knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.startCarrying(ko, p), () -> MessageUtils.sendMessage(p, "invalid-carry-message"));
 
         }
         return true;

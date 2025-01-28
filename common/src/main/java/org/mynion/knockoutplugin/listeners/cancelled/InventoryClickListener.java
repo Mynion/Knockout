@@ -5,7 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.mynion.knockoutplugin.Knockout;
-import org.mynion.knockoutplugin.utils.ChatUtils;
+import org.mynion.knockoutplugin.utils.MessageUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
 public class InventoryClickListener implements Listener {
@@ -15,7 +15,7 @@ public class InventoryClickListener implements Listener {
         Player p = (Player) e.getWhoClicked();
         if (NpcManager.npcExists(p)) {
             e.setCancelled(true);
-            ChatUtils.sendMessage(p, "not-allowed-message");
+            MessageUtils.sendMessage(p, "not-allowed-message");
         }
     }
 }

@@ -71,7 +71,10 @@ public class NpcManager {
         teleportBody(npc);
         startTimer(npc);
 
-        ChatUtils.sendMessage(p, "knockout-message");
+        MessageUtils.sendMessage(p, "knockout-message");
+        if (damager instanceof Player) {
+            MessageUtils.sendMessage(damager, "knockout-attacker-message", new HashMap<>(Map.of("%player%", p.getName())));
+        }
     }
 
 
@@ -185,10 +188,7 @@ public class NpcManager {
 
         npc.setKnockoutCooldown(seconds);
         if (seconds > 0) {
-            String knockoutTitle = Knockout.getPlugin().getConfig().getString("knockout-title");
-            if (knockoutTitle != null) {
-                npc.getPlayer().sendTitle(ChatColor.translateAlternateColorCodes('&', knockoutTitle), formattedTime, 1, 20 * 3600, 1);
-            }
+            MessageUtils.sendTitle(p, "knockout-title", "knockout-subtitle", new HashMap<>(Map.of("%timer%", formattedTime)), new HashMap<>(Map.of("%timer%", formattedTime)), 1, 20 * 3600, 1);
         }
         new BukkitRunnable() {
             @Override
@@ -308,7 +308,7 @@ public class NpcManager {
     public void startReviving(Player revivingPlayer, Player knockedOutPlayer) {
 
         if (!revivingPlayer.hasPermission("knockout.revive")) {
-            ChatUtils.sendMessage(revivingPlayer, "no-permission-message");
+            MessageUtils.sendMessage(revivingPlayer, "no-permission-message");
             return;
         }
 
@@ -320,7 +320,7 @@ public class NpcManager {
 
         int timeInTicks = reviveTime * 20;
         int requiredLevels = plugin.getConfig().getInt("revive-levels");
-        int period = 1;
+        int period = 2;
         float expDecrement = (float) requiredLevels / ((float) timeInTicks / period);
         Location reviveLocation = revivingPlayer.getLocation();
 
@@ -329,6 +329,7 @@ public class NpcManager {
             new BukkitRunnable() {
                 int timer = 0;
                 int percent = 0;
+                String loadingIcon = "\\";
 
                 @Override
                 public void run() {
@@ -349,14 +350,14 @@ public class NpcManager {
                         timer += period;
                         percent = (int) (((float) timer / (float) timeInTicks) * 100);
 
-                        String revivingTitle = plugin.getConfig().getString("rescuer-reviving-title");
-                        if (revivingTitle != null) {
-                            revivingPlayer.sendTitle(ChatColor.translateAlternateColorCodes('&', revivingTitle), percent + "%", 1, period, 1);
-                        }
+                        MessageUtils.sendTitle(revivingPlayer, "rescuer-reviving-title", "rescuer-reviving-subtitle", new HashMap<>(Map.of("%percent%", String.valueOf(percent), "%loadingIcon%", loadingIcon)), new HashMap<>(Map.of("%percent%", String.valueOf(percent), "%loadingIcon%", loadingIcon)), 1, period, 1);
+                        MessageUtils.sendTitle(knockedOutPlayer, "rescued-reviving-title", "rescued-reviving-subtitle", new HashMap<>(Map.of("%percent%", String.valueOf(percent), "%loadingIcon%", loadingIcon)), new HashMap<>(Map.of("%percent%", String.valueOf(percent), "%loadingIcon%", loadingIcon)), 1, period, 1);
 
-                        String revivedTitle = plugin.getConfig().getString("rescued-reviving-title");
-                        if (revivedTitle != null) {
-                            knockedOutPlayer.sendTitle(ChatColor.translateAlternateColorCodes('&', revivedTitle), percent + "%", 1, period, 1);
+                        switch (loadingIcon) {
+                            case "\\" -> loadingIcon = "|";
+                            case "|" -> loadingIcon = "/";
+                            case "/" -> loadingIcon = "-";
+                            default -> loadingIcon = "\\";
                         }
 
                         // Check if the revive process is complete
@@ -377,7 +378,7 @@ public class NpcManager {
             }.runTaskTimer(Knockout.getPlugin(), 0, period);
         } else {
             if (!revivingPlayer.isSneaking() && !knockedOutPlayer.isInsideVehicle()) {
-                ChatUtils.sendMessage(revivingPlayer, "no-levels-message", new HashMap<>(Map.of("%levels%", String.valueOf(requiredLevels))));
+                MessageUtils.sendMessage(revivingPlayer, "no-levels-message", new HashMap<>(Map.of("%levels%", String.valueOf(requiredLevels))));
             }
         }
     }
@@ -385,8 +386,8 @@ public class NpcManager {
     private void reviveNow(Player revivingPlayer, Player knockedOutPlayer) {
         getNpc(knockedOutPlayer).setBeingRevived(false);
         resetKnockout(knockedOutPlayer);
-        ChatUtils.sendMessage(revivingPlayer, "rescuer-revived-message", new HashMap<>(Map.of("%player%", knockedOutPlayer.getDisplayName())));
-        ChatUtils.sendMessage(knockedOutPlayer, "rescued-revived-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
+        MessageUtils.sendMessage(revivingPlayer, "rescuer-revived-message", new HashMap<>(Map.of("%player%", knockedOutPlayer.getDisplayName())));
+        MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
         versionController.setXpDelay(revivingPlayer, 0);
     }
 

@@ -5,7 +5,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.mynion.knockoutplugin.Knockout;
-import org.mynion.knockoutplugin.utils.ChatUtils;
+import org.mynion.knockoutplugin.utils.MessageUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
 import java.util.Optional;
@@ -18,7 +18,7 @@ public class DropCommand implements CommandExecutor {
             NpcManager NpcManager = Knockout.getNpcManager();
 
             if (!p.hasPermission("knockout.drop")) {
-                ChatUtils.sendMessage(p, "no-permission-message");
+                MessageUtils.sendMessage(p, "no-permission-message");
                 return true;
             }
 
@@ -30,7 +30,7 @@ public class DropCommand implements CommandExecutor {
                     .findFirst();
 
             // Stop carrying a player
-            knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.stopCarrying(ko, p), () -> ChatUtils.sendMessage(p, "invalid-drop-message"));
+            knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.stopCarrying(ko, p), () -> MessageUtils.sendMessage(p, "invalid-drop-message"));
 
         }
         return true;
