@@ -68,7 +68,7 @@ public class KnockoutCommand implements TabExecutor {
                     }
                 }
                 NpcManager.knockoutPlayer(ko, null, time);
-                sender.sendMessage(ChatColor.GREEN + "Player knocked out.");
+                sender.sendMessage(ChatColor.GREEN + "Player knocked out for " + time + " seconds.");
             } else {
                 sender.sendMessage(ChatColor.RED + "Player not found.");
             }
@@ -84,6 +84,9 @@ public class KnockoutCommand implements TabExecutor {
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("revive") && sender.hasPermission("knockout.admin")) {
             return Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("knockout") && sender.hasPermission("knockout.admin")) {
+            return List.of("60");
         }
         return null;
     }
