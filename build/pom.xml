@@ -109,6 +109,12 @@
                                     <include>org.mynion:*</include>
                                 </includes>
                             </artifactSet>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.bstats</pattern>
+                                    <shadedPattern>org.mynion</shadedPattern>
+                                </relocation>
+                            </relocations>
                             <outputFile>${plugin.output.directory}${output.version}/plugins/${project.parent.artifactId}-${project.parent.version}.jar</outputFile>
                         </configuration>
                     </execution>

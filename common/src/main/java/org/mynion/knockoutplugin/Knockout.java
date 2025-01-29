@@ -1,5 +1,6 @@
 package org.mynion.knockoutplugin;
 
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.plugin.Plugin;
@@ -24,6 +25,8 @@ public final class Knockout extends JavaPlugin {
         plugin = this;
         version = getServer().getBukkitVersion();
         VersionController versionController;
+        int pluginId = 24588;
+        Metrics metrics = new Metrics(this, pluginId);
         try {
             versionController = VersionControllerFactory.getNmsController(version);
         } catch (IllegalArgumentException e) {
@@ -94,6 +97,7 @@ public final class Knockout extends JavaPlugin {
     public static NpcManager getNpcManager() {
         return NpcManager;
     }
+
     public static String getVersion() {
         return version;
     }
