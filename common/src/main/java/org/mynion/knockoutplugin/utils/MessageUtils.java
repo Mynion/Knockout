@@ -10,14 +10,14 @@ import java.util.HashMap;
 public class MessageUtils {
     public static void sendMessage(CommandSender recipient, String configPath) {
         String message = Knockout.getPlugin().getConfig().getString(configPath);
-        if (message != null) {
+        if (message != null && !message.isEmpty()) {
             recipient.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
         }
     }
 
     public static void sendMessage(CommandSender recipient, String configPath, HashMap<String, String> replacements) {
         String message = Knockout.getPlugin().getConfig().getString(configPath);
-        if (message != null) {
+        if (message != null && !message.isEmpty()) {
             for (String key : replacements.keySet()) {
                 message = message.replace(key, replacements.get(key));
             }
