@@ -77,7 +77,13 @@ public class NpcManager {
             MessageUtils.sendTitle(damagerPlayer, "knockout-attacker-title", "knockout-attacker-subtitle", new HashMap<>(Map.of("%player%", p.getName())), new HashMap<>(Map.of("%player%", p.getName())), 10, 20, 10);
         }
 
-        List<?> commands = plugin.getConfig().getList("ConsoleCommands");
+        runConfigCommands("ConsoleCommands", p, false);
+        runConfigCommands("ConsoleLoopedCommands", p, true);
+
+    }
+
+    private void runConfigCommands(String configPath, Player knockedOutPlayer, boolean isLooped) {
+        List<?> commands = plugin.getConfig().getList(configPath);
 
         if (commands == null) {
             return;
@@ -86,21 +92,30 @@ public class NpcManager {
         int delay = 0;
         for (Object e : commands) {
             if (e instanceof String task) {
+                if (isLooped && !npcExists(knockedOutPlayer)) return;
                 if (task.startsWith("DELAY")) {
                     String[] split = task.split(" ");
                     delay += Integer.parseInt(split[1]);
                 } else {
-                    String command = task.replace("%player%", p.getName());
+                    String command = ChatColor.translateAlternateColorCodes('&', task.replace("%player%", knockedOutPlayer.getName()));
                     new BukkitRunnable() {
                         @Override
                         public void run() {
+                            if (isLooped && !npcExists(knockedOutPlayer)) return;
                             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+                        }
+                    }.runTaskLater(plugin, delay);
+                }
+                if (isLooped && commands.getLast().equals(e)) {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            runConfigCommands(configPath, knockedOutPlayer, true);
                         }
                     }.runTaskLater(plugin, delay);
                 }
             }
         }
-
     }
 
 
@@ -128,6 +143,8 @@ public class NpcManager {
 
         // Set previous gamemode
         p.setGameMode(previousGameMode);
+
+        runConfigCommands("ConsoleAfterCommands", p, false);
 
     }
 
