@@ -22,7 +22,7 @@ public class PlayerDamageListener implements Listener {
                     e.setCancelled(true);
                 }
             }
-            
+
 
             // Check if the player would die
             if (e.getFinalDamage() >= p.getHealth() && !hasDamageCooldown(p, e) && !hasTotemOfUndying(p)) {
@@ -57,7 +57,6 @@ public class PlayerDamageListener implements Listener {
                     NpcManager.knockoutPlayer(p, damager);
                 }
             } else if (Knockout.getPlugin().getConfig().getBoolean("drop-on-hit")) {
-                p.sendMessage(String.valueOf(p.getNoDamageTicks()));
 
                 // Drop knocked out player when hit
                 p.getPassengers().stream()

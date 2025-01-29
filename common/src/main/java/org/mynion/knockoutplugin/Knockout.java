@@ -58,6 +58,7 @@ public final class Knockout extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new CommandListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerWorldListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerPortalListener(), this);
         getCommand("carry").setExecutor(new CarryCommand());
         getCommand("drop").setExecutor(new DropCommand());
         getCommand("die").setExecutor(new DieCommand());
