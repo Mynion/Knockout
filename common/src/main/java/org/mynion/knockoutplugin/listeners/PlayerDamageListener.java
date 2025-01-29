@@ -54,7 +54,11 @@ public class PlayerDamageListener implements Listener {
                     }
 
                     // Knockout player
-                    NpcManager.knockoutPlayer(p, damager);
+                    int seconds = Knockout.getPlugin().getConfig().getInt("knockout-time");
+                    if (seconds < 0) {
+                        seconds = 60;
+                    }
+                    NpcManager.knockoutPlayer(p, damager, seconds);
                 }
             } else if (Knockout.getPlugin().getConfig().getBoolean("drop-on-hit")) {
 

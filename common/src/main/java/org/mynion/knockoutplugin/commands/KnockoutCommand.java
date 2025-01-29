@@ -51,7 +51,23 @@ public class KnockoutCommand implements TabExecutor {
             if (NpcManager.npcExists(ko)) {
                 sender.sendMessage(ChatColor.RED + "That player is already knocked out!");
             } else if (ko != null) {
-                NpcManager.knockoutPlayer(ko, null);
+                int time = Knockout.getPlugin().getConfig().getInt("knockout-time");
+                if (time < 0) {
+                    time = 60;
+                }
+                if (args.length >= 3) {
+                    try {
+                        time = Integer.parseInt(args[2]);
+                    } catch (Exception e) {
+                        sender.sendMessage(ChatColor.RED + "Invalid time.");
+                        return true;
+                    }
+                    if (time < 0 || time > 86399) {
+                        sender.sendMessage(ChatColor.RED + "Invalid time.");
+                        return true;
+                    }
+                }
+                NpcManager.knockoutPlayer(ko, null, time);
                 sender.sendMessage(ChatColor.GREEN + "Player knocked out.");
             } else {
                 sender.sendMessage(ChatColor.RED + "Player not found.");

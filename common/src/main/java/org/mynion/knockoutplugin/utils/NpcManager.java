@@ -29,7 +29,7 @@ public class NpcManager {
     private static final List<NpcModel> NPCs = new ArrayList<>();
     private static final Plugin plugin = Knockout.getPlugin();
 
-    public void knockoutPlayer(Player p, @Nullable Entity damager) {
+    public void knockoutPlayer(Player p, @Nullable Entity damager, int time) {
 
         // Drop all carried knocked out players
         p.getPassengers().stream()
@@ -69,7 +69,7 @@ public class NpcManager {
         TabAdapter.setCollisionRule(npc.getPlayer(), false);
 
         teleportBody(npc);
-        startTimer(npc);
+        startTimer(npc, time);
 
         MessageUtils.sendMessage(p, "knockout-message");
         if (damager instanceof Player damagerPlayer) {
@@ -211,12 +211,8 @@ public class NpcManager {
 
     }
 
-    private void startTimer(NpcModel npc) {
+    private void startTimer(NpcModel npc, int seconds) {
         Player p = npc.getPlayer();
-        int seconds = plugin.getConfig().getInt("knockout-time");
-        if (seconds < 0) {
-            seconds = 60;
-        }
 
         LocalTime time = LocalTime.ofSecondOfDay(seconds);
         String formattedTime;

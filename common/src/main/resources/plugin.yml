@@ -15,7 +15,7 @@ commands:
     usage: /die
   knockout:
     description: Admin commands for Knockout plugin
-    usage: /knockout reload, /knockout revive <player>, /knockout knockout <player>
+    usage: /knockout reload, /knockout revive <player> <seconds>, /knockout knockout <player>
 
 permissions:
   knockout.carry:
