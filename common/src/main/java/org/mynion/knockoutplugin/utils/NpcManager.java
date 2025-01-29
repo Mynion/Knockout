@@ -76,6 +76,31 @@ public class NpcManager {
             MessageUtils.sendMessage(damager, "knockout-attacker-message", new HashMap<>(Map.of("%player%", p.getName())));
             MessageUtils.sendTitle(damagerPlayer, "knockout-attacker-title", "knockout-attacker-subtitle", new HashMap<>(Map.of("%player%", p.getName())), new HashMap<>(Map.of("%player%", p.getName())), 10, 20, 10);
         }
+
+        List<?> commands = plugin.getConfig().getList("ConsoleCommands");
+
+        if (commands == null) {
+            return;
+        }
+
+        int delay = 0;
+        for (Object e : commands) {
+            if (e instanceof String task) {
+                if (task.startsWith("DELAY")) {
+                    String[] split = task.split(" ");
+                    delay += Integer.parseInt(split[1]);
+                } else {
+                    String command = task.replace("%player%", p.getName());
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+                        }
+                    }.runTaskLater(plugin, delay);
+                }
+            }
+        }
+
     }
 
 
