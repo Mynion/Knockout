@@ -22,10 +22,10 @@ public class PlayerDamageListener implements Listener {
                     e.setCancelled(true);
                 }
             }
-
+            
 
             // Check if the player would die
-            if (e.getFinalDamage() >= p.getHealth() && !hasDamageCooldown(p) && !hasTotemOfUndying(p)) {
+            if (e.getFinalDamage() >= p.getHealth() && !hasDamageCooldown(p, e) && !hasTotemOfUndying(p)) {
                 // Check if the player is knocked out
                 if (NpcManager.npcExists(p)) {
 
@@ -70,7 +70,18 @@ public class PlayerDamageListener implements Listener {
     }
 
     // Check if the player has damage cooldown to prevent false event calls
-    private boolean hasDamageCooldown(Player p) {
+    private boolean hasDamageCooldown(Player p, EntityDamageEvent e) {
+        EntityDamageEvent.DamageCause CAUSE = e.getCause();
+        if (e instanceof EntityDamageByEntityEvent ebyEntity && p.getLastDamageCause() instanceof EntityDamageByEntityEvent lastEbyEntity) {
+            if (!ebyEntity.getDamager().equals(lastEbyEntity.getDamager())) {
+                return false;
+            }
+        }
+        if (p.getLastDamageCause() != null) {
+            if (p.getLastDamageCause().getCause() != CAUSE) {
+                return false;
+            }
+        }
         return p.getNoDamageTicks() > 10;
     }
 
