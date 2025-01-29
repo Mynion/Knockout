@@ -168,24 +168,29 @@ aliases:
 
 # Run console commands when a knockout happens.
 ConsoleCommands:
-  - Say player fainted from breaking his legs
-  - playsound minecraft:entity.zombie.death
-  - DELAY 400 #400 tics is 20 seocnds
-  - say will anyone help %player%? Poor fella is unconcious!
+  - playsound minecraft:entity.zombie.death player %player% ~ ~ ~ 10 1 1
+  - Say &cPlayer fainted from breaking his legs
+  - DELAY 40 #40 tics is 2 seocnds
+  - say &eWill anyone help &f%player%&e? Poor fella is unconcious!
 
 # Run console commands during knockout on a loop
 ConsoleLoopedCommands:
-  - Playsound
-  - DELAY 20 #20 tics is 1 second in minecraft
-  - say test
+  - DELAY 200 #200 tics is 10 second in minecraft
+  - ko revive %player%
 
 # Run console commands after knockout death.
 ConsoleAfterCommands:
   - tempban %player% "You have died and can only rejoin in 30 minutes"
-  - say Funeral for %player% will be hosted soon at the church...
+  - say &8Funeral for &f%player%&8 will be hosted soon at the church...
   - DELAY 200 #400 tics is 20 seocnds
-  - say Well awkward... nobody came to %player%'s funeral...
+  - say &eWell awkward... &cnobody&e came to &f%player%'s&e funeral...
   - DELAY 200 #200 tics is 10 seconds
-  - say Well here's a flower for you guys...
-  - DELAY 20
+  - say &eWell here's a &dflower &efor you guys...
+  - DELAY 5
   - give @a poppy 1
+
+# Run console commands after revive.
+ConsoleAfterReviveCommands:
+  - say %player%&a is alive again!
+  - DELAY 5
+  - give %player% golden_apple 1

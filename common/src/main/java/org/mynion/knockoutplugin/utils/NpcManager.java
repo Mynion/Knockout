@@ -82,7 +82,7 @@ public class NpcManager {
 
     }
 
-    private void runConfigCommands(String configPath, Player knockedOutPlayer, boolean isLooped) {
+    public void runConfigCommands(String configPath, Player knockedOutPlayer, boolean isLooped) {
         List<?> commands = plugin.getConfig().getList(configPath);
 
         if (commands == null) {
@@ -143,8 +143,6 @@ public class NpcManager {
 
         // Set previous gamemode
         p.setGameMode(previousGameMode);
-
-        runConfigCommands("ConsoleAfterCommands", p, false);
 
     }
 
@@ -437,6 +435,7 @@ public class NpcManager {
         MessageUtils.sendTitle(revivingPlayer, "rescuer-revived-title", "rescuer-revived-subtitle", new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), 10, 20 * 3, 10);
         MessageUtils.sendTitle(knockedOutPlayer, "rescued-revived-title", "rescued-revived-subtitle", new HashMap<>(Map.of("%player%", revivingPlayer.getName())), new HashMap<>(Map.of("%player%", revivingPlayer.getName())), 10, 20 * 3, 10);
         versionController.setXpDelay(revivingPlayer, 0);
+        runConfigCommands("ConsoleAfterReviveCommands", knockedOutPlayer, false);
     }
 
     public void playerJoinActions(Player p) {
