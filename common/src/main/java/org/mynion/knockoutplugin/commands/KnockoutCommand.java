@@ -41,6 +41,7 @@ public class KnockoutCommand implements TabExecutor {
                 NpcManager.resetKnockout(ko);
                 MessageUtils.sendMessage(sender, "rescuer-revived-message", new HashMap<>(Map.of("%player%", ko.getName())));
                 MessageUtils.sendMessage(ko, "rescued-revived-message", new HashMap<>(Map.of("%player%", sender.getName())));
+                NpcManager.runConfigCommands("ConsoleAfterReviveCommands", ko, false);
             } else {
                 sender.sendMessage(ChatColor.RED + "That player is not knocked out!");
             }

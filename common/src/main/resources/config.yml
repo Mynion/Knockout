@@ -166,6 +166,9 @@ aliases:
   knockout:
     - ko
 
+# BETA
+# Variable %player% is the knocked out player
+
 # Run console commands when a knockout happens.
 ConsoleCommands:
   - playsound minecraft:entity.zombie.death player %player% ~ ~ ~ 10 1 1
@@ -173,12 +176,12 @@ ConsoleCommands:
   - DELAY 40 #40 tics is 2 seocnds
   - say &eWill anyone help &f%player%&e? Poor fella is unconcious!
 
-# Run console commands during knockout on a loop
+# Run console commands during knockout on a loop.
 ConsoleLoopedCommands:
   - DELAY 200 #200 tics is 10 second in minecraft
   - ko revive %player%
 
-# Run console commands after knockout death.
+# Run console commands after knockout.
 ConsoleAfterCommands:
   - tempban %player% "You have died and can only rejoin in 30 minutes"
   - say &8Funeral for &f%player%&8 will be hosted soon at the church...
@@ -191,6 +194,6 @@ ConsoleAfterCommands:
 
 # Run console commands after revive.
 ConsoleAfterReviveCommands:
-  - say %player%&a is alive again!
+  - say %player%&a was resuscitated!
   - DELAY 5
   - give %player% golden_apple 1

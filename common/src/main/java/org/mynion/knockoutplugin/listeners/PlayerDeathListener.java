@@ -46,6 +46,6 @@ public class PlayerDeathListener implements Listener {
             }
         }
 
-        NpcManager.runConfigCommands("ConsoleAfterDeathCommands", p, false);
+        NpcManager.runConfigCommands("ConsoleAfterCommands", p, false);
     }
 }
