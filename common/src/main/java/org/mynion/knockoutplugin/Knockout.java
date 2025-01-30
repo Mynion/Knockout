@@ -70,7 +70,7 @@ public final class Knockout extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        NpcManager.removeNPCs();
+        NpcManager.endAllKnockouts();
     }
 
     private void loadAliases() {

@@ -29,6 +29,7 @@ public class NpcManager {
     private static final List<NpcModel> NPCs = new ArrayList<>();
     private static final Plugin plugin = Knockout.getPlugin();
 
+    // Knockout a player
     public void knockoutPlayer(Player p, @Nullable Entity damager, int time) {
 
         // Drop all carried knocked out players
@@ -82,6 +83,7 @@ public class NpcManager {
 
     }
 
+    // Run commands from the config
     public void runConfigCommands(String configPath, Player knockedOutPlayer, boolean isLooped) {
         List<?> commands = plugin.getConfig().getList(configPath);
 
@@ -119,15 +121,27 @@ public class NpcManager {
     }
 
 
-    // Resets knockout but does not kill the player
+    // End knockout for a player
     public void endKnockout(Player p, boolean killPlayer) {
+        NpcModel npc = getNpc(p);
+
+        endKO(p, killPlayer);
+
+        // Remove npc from npc list
+        NPCs.remove(npc);
+
+    }
+
+    private void endKO(Player p, boolean killPlayer) {
         NpcModel npc = getNpc(p);
         GameMode previousGameMode = npc.getPreviousGameMode();
 
+        // Leave vehicle
         if (p.isInsideVehicle()) {
             p.leaveVehicle();
         }
 
+        // Kill player if needed
         if (killPlayer) {
             // Sets a player killer
             if (getKiller(p) != null) {
@@ -146,9 +160,6 @@ public class NpcManager {
 
         // Remove hologram
         npc.getArmorStand().remove();
-
-        // Remove npc from npc list
-        NPCs.remove(npc);
 
         // Set previous gamemode
         p.setGameMode(previousGameMode);
@@ -250,6 +261,7 @@ public class NpcManager {
 
     }
 
+    // End knockout effects given to a player
     public void endKnockoutEffects(Player p) {
 
         p.removePotionEffect(PotionEffectType.BLINDNESS);
@@ -343,6 +355,7 @@ public class NpcManager {
         }
     }
 
+    // Start reviving a knocked out player by another player
     public void startReviving(Player revivingPlayer, Player knockedOutPlayer) {
 
         if (!revivingPlayer.hasPermission("knockout.revive")) {
@@ -435,6 +448,7 @@ public class NpcManager {
         runConfigCommands("ConsoleAfterReviveCommands", knockedOutPlayer, false);
     }
 
+    // Refresh all NPCs for a player
     public void refreshNPCsForPlayer(Player p) {
 
         // Perform actions for a new player
@@ -455,27 +469,18 @@ public class NpcManager {
     }
 
     // Remove all NPCs
-    public void removeNPCs() {
+    public void endAllKnockouts() {
 
         getNPCs().forEach(npc -> {
             Player p = npc.getPlayer();
 
-            if (npc.getVehicle() != null) {
-                versionController.removePotionEffect(npc.getVehicle(), PotionType.SLOWNESS);
-            }
-
-            versionController.broadcastPacket(npc, PacketType.INFO_REMOVE);
-            versionController.broadcastPacket(npc, PacketType.REMOVE_ENTITY);
-
-            npc.getArmorStand().remove();
-            p.setHealth(0);
-            p.setGameMode(npc.getPreviousGameMode());
-            endKnockoutEffects(p);
+            endKO(p, plugin.getConfig().getBoolean("death-on-end"));
 
         });
 
     }
 
+    // Damage a knocked out player
     public void damagePlayerByEntity(NpcModel npc, Entity attacker, double value) {
         Player ko = npc.getPlayer();
         if (attacker instanceof Player p) {
