@@ -66,11 +66,8 @@ public abstract class NpcModel {
     public void setKnockoutCooldown(int knockoutCooldown) {
         this.knockoutCooldown = knockoutCooldown;
         if (knockoutCooldown <= 0) {
-            if (Knockout.getPlugin().getConfig().getBoolean("death-on-end")) {
-                Knockout.getNpcManager().killPlayer(player);
-            } else {
-                Knockout.getNpcManager().endKnockout(player);
-            }
+            Knockout.getNpcManager().endKnockout(player, Knockout.getPlugin().getConfig().getBoolean("death-on-end"));
+
         } else {
             String knockoutTitle = Knockout.getPlugin().getConfig().getString("knockout-title");
 

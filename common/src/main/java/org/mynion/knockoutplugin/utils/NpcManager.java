@@ -120,12 +120,21 @@ public class NpcManager {
 
 
     // Resets knockout but does not kill the player
-    public void endKnockout(Player p) {
+    public void endKnockout(Player p, boolean killPlayer) {
         NpcModel npc = getNpc(p);
         GameMode previousGameMode = npc.getPreviousGameMode();
 
         if (p.isInsideVehicle()) {
             p.leaveVehicle();
+        }
+
+        if (killPlayer) {
+            // Sets a player killer
+            if (getKiller(p) != null) {
+                getNpc(p).setVulnerableByPlayerWhenCarried(true);
+                p.damage(p.getHealth(), getKiller(p));
+            }
+            p.setHealth(0);
         }
 
         // Reset knockout effects
@@ -144,16 +153,6 @@ public class NpcManager {
         // Set previous gamemode
         p.setGameMode(previousGameMode);
 
-    }
-
-    // Ends knockout and kills the player
-    public void killPlayer(Player p) {
-        if (getKiller(p) != null) {
-            getNpc(p).setVulnerableByPlayerWhenCarried(true);
-            p.damage(p.getHealth(), getKiller(p));
-        }
-        endKnockout(p);
-        p.setHealth(0); // just to make sure the player is dead
     }
 
     private void applyKnockoutEffects(Player p) {
@@ -428,7 +427,7 @@ public class NpcManager {
     // Revive a knocked out player
     public void revivePlayer(Player knockedOutPlayer, Player revivingPlayer) {
         getNpc(knockedOutPlayer).setBeingRevived(false);
-        endKnockout(knockedOutPlayer);
+        endKnockout(knockedOutPlayer, false);
         MessageUtils.sendMessage(revivingPlayer, "rescuer-revived-message", new HashMap<>(Map.of("%player%", knockedOutPlayer.getDisplayName())));
         MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
         MessageUtils.sendTitle(revivingPlayer, "rescuer-revived-title", "rescuer-revived-subtitle", new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), 10, 20 * 3, 10);

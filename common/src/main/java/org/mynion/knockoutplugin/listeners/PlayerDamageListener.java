@@ -43,8 +43,8 @@ public class PlayerDamageListener implements Listener {
                         }
                     }
 
-                    // Reset knockout
-                    NpcManager.endKnockout(p);
+                    // End knockout
+                    NpcManager.endKnockout(p, false);
                 } else {
 
                     e.setCancelled(true);

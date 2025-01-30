@@ -22,8 +22,8 @@ public class PlayerDeathListener implements Listener {
         // Check if the player is knocked out
         if (NpcManager.npcExists(p)) {
 
-            // Reset knockout
-            NpcManager.endKnockout(p);
+            // End knockout
+            NpcManager.endKnockout(p, false);
 
             // Custom spawn location for 1.20.6+ versions
         } else if (Knockout.getVersion().startsWith("1.2")) {
