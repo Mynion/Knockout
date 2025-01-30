@@ -39,7 +39,7 @@ public class CarryCommand implements CommandExecutor {
                     .findFirst();
 
             // Carry a knocked out player
-            knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.startCarrying(ko, p), () -> MessageUtils.sendMessage(p, "invalid-carry-message"));
+            knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.carryPlayer(ko, p), () -> MessageUtils.sendMessage(p, "invalid-carry-message"));
 
         }
         return true;

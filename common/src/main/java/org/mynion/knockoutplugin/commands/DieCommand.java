@@ -21,7 +21,7 @@ public class DieCommand implements CommandExecutor {
             }
 
             if (NpcManager.npcExists(p)) {
-                NpcManager.forceKill(p);
+                NpcManager.killPlayer(p);
             } else {
                 MessageUtils.sendMessage(p, "invalid-die-message");
             }

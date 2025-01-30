@@ -12,7 +12,7 @@ public class PlayerWorldListener implements Listener {
     public void onPlayerChangeWorld(PlayerChangedWorldEvent e) {
         Player p = e.getPlayer();
         NpcManager NpcManager = Knockout.getNpcManager();
-        NpcManager.playerJoinActions(p);
+        NpcManager.refreshNPCsForPlayer(p);
         if (NpcManager.npcExists(p)) {
             NpcManager.getNpc(p).getArmorStand().teleport(p.getLocation());
         }

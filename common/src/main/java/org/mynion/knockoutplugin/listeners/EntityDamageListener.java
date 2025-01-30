@@ -8,6 +8,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.MessageUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
+import org.mynion.knockoutplugin.utils.NpcModel;
 
 public class EntityDamageListener implements Listener {
     @EventHandler
@@ -25,6 +26,8 @@ public class EntityDamageListener implements Listener {
                 return;
             }
 
+            NpcModel npc = NpcManager.getNpc(armorStand);
+
             // Cancel damage for the armor stand of knocked out player
             e.setCancelled(true);
 
@@ -34,7 +37,7 @@ public class EntityDamageListener implements Listener {
 
             if(armorStand.getNoDamageTicks() > 0) return;
 
-            NpcManager.damageKOPlayer(armorStand, e.getDamager(), e.getFinalDamage());
+            NpcManager.damagePlayerByEntity(npc, e.getDamager(), e.getFinalDamage());
 
             armorStand.setNoDamageTicks(10);
 

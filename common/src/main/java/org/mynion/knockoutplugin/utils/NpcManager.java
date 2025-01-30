@@ -36,7 +36,7 @@ public class NpcManager {
                 .filter(passenger -> passenger instanceof Player)
                 .map(passenger -> (Player) passenger)
                 .filter(this::npcExists)
-                .forEach(knockedOutPlayer -> stopCarrying(knockedOutPlayer, p));
+                .forEach(knockedOutPlayer -> dropPlayer(knockedOutPlayer, p));
 
         GameMode playerGameMode = p.getGameMode();
 
@@ -120,7 +120,7 @@ public class NpcManager {
 
 
     // Resets knockout but does not kill the player
-    public void resetKnockout(Player p) {
+    public void endKnockout(Player p) {
         NpcModel npc = getNpc(p);
         GameMode previousGameMode = npc.getPreviousGameMode();
 
@@ -129,7 +129,7 @@ public class NpcManager {
         }
 
         // Reset knockout effects
-        resetKnockoutEffects(p);
+        endKnockoutEffects(p);
 
         // Remove body
         versionController.broadcastPacket(npc, PacketType.INFO_REMOVE);
@@ -147,13 +147,13 @@ public class NpcManager {
     }
 
     // Ends knockout and kills the player
-    public void forceKill(Player p) {
-        if (getDamager(p) != null) {
+    public void killPlayer(Player p) {
+        if (getKiller(p) != null) {
             getNpc(p).setVulnerableByPlayerWhenCarried(true);
-            p.damage(p.getHealth(), getDamager(p));
+            p.damage(p.getHealth(), getKiller(p));
         }
-        resetKnockout(p);
-        p.setHealth(0);
+        endKnockout(p);
+        p.setHealth(0); // just to make sure the player is dead
     }
 
     private void applyKnockoutEffects(Player p) {
@@ -231,23 +231,27 @@ public class NpcManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (npcExists(p)) {
-                    if (!p.isInsideVehicle() && !getNpc(p).isBeingRevived()) {
-                        if (npc.getKnockoutCooldown() > 0) {
-                            npc.setKnockoutCooldown(npc.getKnockoutCooldown() - 1);
-                        } else {
-                            this.cancel();
-                        }
-                    }
-                } else {
+
+                if (!npcExists(p)) {
                     this.cancel();
+                    return;
+                }
+
+                if (!p.isInsideVehicle() && !getNpc(p).isBeingRevived()) {
+
+                    if (npc.getKnockoutCooldown() <= 0) {
+                        this.cancel();
+                        return;
+                    }
+
+                    npc.setKnockoutCooldown(npc.getKnockoutCooldown() - 1);
                 }
             }
         }.runTaskTimer(Knockout.getPlugin(), 20, 20);
 
     }
 
-    public void resetKnockoutEffects(Player p) {
+    public void endKnockoutEffects(Player p) {
 
         p.removePotionEffect(PotionEffectType.BLINDNESS);
         p.removePotionEffect(PotionEffectType.INVISIBILITY);
@@ -259,17 +263,13 @@ public class NpcManager {
         p.setCollidable(true);
 
         // Reset collisions
-        resetCollisions(p);
+        versionController.setCollisions(p, true);
+        TabAdapter.setCollisionRule(p, true);
 
         Bukkit.getServer().getOnlinePlayers().forEach(player -> player.showPlayer(Knockout.getPlugin(), p));
 
         p.resetTitle();
 
-    }
-
-    private void resetCollisions(Player p) {
-        versionController.setCollisions(p, true);
-        TabAdapter.setCollisionRule(p, true);
     }
 
     // Teleporting body and hologram to the player while knocked out
@@ -279,32 +279,61 @@ public class NpcManager {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (npcExists(p)) {
-                    versionController.broadcastPacket(npc, PacketType.TELEPORT);
-                    if (p.isInsideVehicle()) {
-                        versionController.teleportMannequin(npc, p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
-                        versionController.teleportHologram(npc, p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
-                    } else {
-                        versionController.teleportMannequin(npc, p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
-                        versionController.teleportHologram(npc, p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
-                    }
-                } else {
+                if (!npcExists(p)) {
                     this.cancel();
+                    return;
+                }
+                versionController.broadcastPacket(npc, PacketType.TELEPORT);
+                if (p.isInsideVehicle()) {
+                    versionController.teleportMannequin(npc, p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
+                    versionController.teleportHologram(npc, p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
+                } else {
+                    versionController.teleportMannequin(npc, p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
+                    versionController.teleportHologram(npc, p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
                 }
             }
         }.runTaskTimer(Knockout.getPlugin(), 0, 1);
 
-
     }
 
     // Start carrying a knocked out player
-    public void startCarrying(Player knockedOutPlayer, Player vehicle) {
+    public void carryPlayer(Player knockedOutPlayer, Player vehicle) {
         getNpc(knockedOutPlayer).setVehicle(vehicle);
-        trackVehicle(knockedOutPlayer);
+
+        // Checking if knocked out player is riding a vehicle
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!npcExists(knockedOutPlayer)) {
+                    this.cancel();
+                    return;
+                }
+
+                Player currentVehicle = getNpc(knockedOutPlayer).getVehicle();
+
+                if (currentVehicle == null) {
+                    this.cancel();
+                    return;
+                }
+
+                if (currentVehicle.isOnline()) {
+                    currentVehicle.addPassenger(knockedOutPlayer);
+                    if (Knockout.getPlugin().getConfig().getBoolean(("slowness-for-carrier"))) {
+                        versionController.addPotionEffect(currentVehicle, PotionType.SLOWNESS, 20 * 2, plugin.getConfig().getInt("slowness-amplifier"), false, false);
+                    }
+                } else {
+                    knockedOutPlayer.leaveVehicle();
+                    getNpc(knockedOutPlayer).setVehicle(null);
+                    this.cancel();
+                }
+
+            }
+        }.runTaskTimer(Knockout.getPlugin(), 0, 2);
+
     }
 
     // Stop carrying a knocked out player
-    public void stopCarrying(Player knockedOutPlayer, Player vehicle) {
+    public void dropPlayer(Player knockedOutPlayer, Player vehicle) {
         getNpc(knockedOutPlayer).setVehicle(null);
         vehicle.removePassenger(knockedOutPlayer);
 
@@ -313,34 +342,6 @@ public class NpcManager {
         if (plugin.getConfig().getInt("slowness-amplifier") == slowness_amplifier) {
             versionController.removePotionEffect(vehicle, PotionType.SLOWNESS);
         }
-    }
-
-    // Tracking a knocked out player vehicle to prevent dismount
-    private void trackVehicle(Player knockedOutPlayer) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (npcExists(knockedOutPlayer)) {
-                    Player currentVehicle = getNpc(knockedOutPlayer).getVehicle();
-                    if (currentVehicle != null) {
-                        if (currentVehicle.isOnline()) {
-                            currentVehicle.addPassenger(knockedOutPlayer);
-                            if (Knockout.getPlugin().getConfig().getBoolean(("slowness-for-carrier"))) {
-                                versionController.addPotionEffect(currentVehicle, PotionType.SLOWNESS, 20 * 2, plugin.getConfig().getInt("slowness-amplifier"), false, false);
-                            }
-                        } else {
-                            knockedOutPlayer.leaveVehicle();
-                            getNpc(knockedOutPlayer).setVehicle(null);
-                            this.cancel();
-                        }
-                    } else {
-                        this.cancel();
-                    }
-                } else {
-                    this.cancel();
-                }
-            }
-        }.runTaskTimer(Knockout.getPlugin(), 0, 2);
     }
 
     public void startReviving(Player revivingPlayer, Player knockedOutPlayer) {
@@ -352,7 +353,7 @@ public class NpcManager {
 
         int reviveTime = Knockout.getPlugin().getConfig().getInt("revive-time");
         if (reviveTime <= 0) {
-            reviveNow(revivingPlayer, knockedOutPlayer);
+            revivePlayer(knockedOutPlayer, revivingPlayer);
             return;
         }
 
@@ -404,7 +405,8 @@ public class NpcManager {
                         if (percent == 100) {
 
                             // Revive a KO player
-                            reviveNow(revivingPlayer, knockedOutPlayer);
+                            revivePlayer(knockedOutPlayer, revivingPlayer);
+                            versionController.setXpDelay(revivingPlayer, 0);
                             this.cancel();
                         }
                     } else {
@@ -423,24 +425,21 @@ public class NpcManager {
         }
     }
 
-    private void reviveNow(Player revivingPlayer, Player knockedOutPlayer) {
+    // Revive a knocked out player
+    public void revivePlayer(Player knockedOutPlayer, Player revivingPlayer) {
         getNpc(knockedOutPlayer).setBeingRevived(false);
-        resetKnockout(knockedOutPlayer);
+        endKnockout(knockedOutPlayer);
         MessageUtils.sendMessage(revivingPlayer, "rescuer-revived-message", new HashMap<>(Map.of("%player%", knockedOutPlayer.getDisplayName())));
         MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
         MessageUtils.sendTitle(revivingPlayer, "rescuer-revived-title", "rescuer-revived-subtitle", new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), 10, 20 * 3, 10);
         MessageUtils.sendTitle(knockedOutPlayer, "rescued-revived-title", "rescued-revived-subtitle", new HashMap<>(Map.of("%player%", revivingPlayer.getName())), new HashMap<>(Map.of("%player%", revivingPlayer.getName())), 10, 20 * 3, 10);
-        versionController.setXpDelay(revivingPlayer, 0);
         runConfigCommands("ConsoleAfterReviveCommands", knockedOutPlayer, false);
     }
 
-    public void playerJoinActions(Player p) {
-        //ServerPlayer sp = ((CraftPlayer) p).getHandle();
+    public void refreshNPCsForPlayer(Player p) {
 
         // Perform actions for a new player
         getNPCs().forEach(npc -> {
-
-            //ServerPlayer deadBodyPlayer = npc.getDeadBody();
 
             // Show bodies for a new player
             versionController.sendPacket(p, npc, PacketType.INFO_UPDATE);
@@ -456,16 +455,11 @@ public class NpcManager {
         });
     }
 
-    private void hurtAnimation(Player p) {
+    // Remove all NPCs
+    public void removeNPCs() {
 
-        // Play damage animation attacked knocked out player
-        versionController.broadcastPacket(getNpc(p), PacketType.ANIMATE);
-
-    }
-
-    public void removeKOPlayers() {
-        // Remove all NPCs
         getNPCs().forEach(npc -> {
+            Player p = npc.getPlayer();
 
             if (npc.getVehicle() != null) {
                 versionController.removePotionEffect(npc.getVehicle(), PotionType.SLOWNESS);
@@ -475,23 +469,25 @@ public class NpcManager {
             versionController.broadcastPacket(npc, PacketType.REMOVE_ENTITY);
 
             npc.getArmorStand().remove();
-            npc.getPlayer().setHealth(0);
-            npc.getPlayer().setGameMode(npc.getPreviousGameMode());
-            resetKnockoutEffects(npc.getPlayer());
+            p.setHealth(0);
+            p.setGameMode(npc.getPreviousGameMode());
+            endKnockoutEffects(p);
 
         });
+
     }
 
-    public void damageKOPlayer(ArmorStand koArmorStand, Entity attacker, double value) {
-        NpcModel npc = getNpc(koArmorStand);
-
+    public void damagePlayerByEntity(NpcModel npc, Entity attacker, double value) {
+        Player ko = npc.getPlayer();
         if (attacker instanceof Player p) {
-            if (npc.getPlayer().equals(p)) return;
+            if (ko.equals(p)) return;
         }
-        hurtAnimation(npc.getPlayer());
+
+        // Play damage animation attacked knocked out player
+        versionController.broadcastPacket(getNpc(ko), PacketType.ANIMATE);
 
         if (Knockout.getPlugin().getConfig().getBoolean("damage-on-hit")) {
-            npc.getPlayer().damage(value);
+            ko.damage(value);
 
         } else {
             int timeDecrease = Knockout.getPlugin().getConfig().getInt("time-decrease-on-hit");
@@ -504,7 +500,7 @@ public class NpcManager {
         return !knockedOutPlayer.isInsideVehicle() && revivingPlayer.isSneaking() && reviveLocation.getBlock().equals(revivingPlayer.getLocation().getBlock());
     }
 
-    private List<NpcModel> getNPCs() {
+    public List<NpcModel> getNPCs() {
         return NPCs;
     }
 
@@ -523,12 +519,12 @@ public class NpcManager {
         return matchingNpc.orElse(null);
     }
 
-    private NpcModel getNpc(ArmorStand armorStand) {
+    public NpcModel getNpc(ArmorStand armorStand) {
         Optional<NpcModel> matchingNpc = NPCs.stream().filter(npc -> npc.getArmorStand().equals(armorStand)).findFirst();
         return matchingNpc.orElse(null);
     }
 
-    public Entity getDamager(Player p) {
-        return getNpc(p).getDamager();
+    public Entity getKiller(Player p) {
+        return getNpc(p).getKiller();
     }
 }

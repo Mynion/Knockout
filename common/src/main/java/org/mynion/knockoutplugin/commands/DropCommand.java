@@ -30,7 +30,7 @@ public class DropCommand implements CommandExecutor {
                     .findFirst();
 
             // Stop carrying a player
-            knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.stopCarrying(ko, p), () -> MessageUtils.sendMessage(p, "invalid-drop-message"));
+            knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.dropPlayer(ko, p), () -> MessageUtils.sendMessage(p, "invalid-drop-message"));
 
         }
         return true;

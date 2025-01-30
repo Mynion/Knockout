@@ -30,13 +30,13 @@ public class PlayerDamageListener implements Listener {
                 if (NpcManager.npcExists(p)) {
 
                     // Replace normal damage event with attacker damage event
-                    if (!(e instanceof EntityDamageByEntityEvent ebyEntity && ebyEntity.getDamager().equals(NpcManager.getDamager(p)))) {
-                        if (NpcManager.getDamager(p) != null) {
+                    if (!(e instanceof EntityDamageByEntityEvent ebyEntity && ebyEntity.getDamager().equals(NpcManager.getKiller(p)))) {
+                        if (NpcManager.getKiller(p) != null) {
                             e.setCancelled(true);
 
                             // Damage by attacker
                             NpcManager.getNpc(p).setVulnerableByPlayerWhenCarried(true);
-                            p.damage(e.getFinalDamage(), NpcManager.getDamager(p));
+                            p.damage(e.getFinalDamage(), NpcManager.getKiller(p));
 
                             // p.damage() calls EntityDamageEvent, so we return to prevent ending knockout two times
                             return;
@@ -44,7 +44,7 @@ public class PlayerDamageListener implements Listener {
                     }
 
                     // Reset knockout
-                    NpcManager.resetKnockout(p);
+                    NpcManager.endKnockout(p);
                 } else {
 
                     e.setCancelled(true);
@@ -67,7 +67,7 @@ public class PlayerDamageListener implements Listener {
                         .filter(passenger -> passenger instanceof Player)
                         .map(passenger -> (Player) passenger)
                         .filter(NpcManager::npcExists)
-                        .forEach(knockedOutPlayer -> NpcManager.stopCarrying(knockedOutPlayer, p));
+                        .forEach(knockedOutPlayer -> NpcManager.dropPlayer(knockedOutPlayer, p));
             }
         }
     }

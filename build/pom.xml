@@ -96,7 +96,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -109,12 +109,6 @@
                                     <include>org.mynion:*</include>
                                 </includes>
                             </artifactSet>
-                            <relocations>
-                                <relocation>
-                                    <pattern>org.bstats</pattern>
-                                    <shadedPattern>org.mynion</shadedPattern>
-                                </relocation>
-                            </relocations>
                             <outputFile>${plugin.output.directory}${output.version}/plugins/${project.parent.artifactId}-${project.parent.version}.jar</outputFile>
                         </configuration>
                     </execution>

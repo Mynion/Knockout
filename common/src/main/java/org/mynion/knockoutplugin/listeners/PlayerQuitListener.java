@@ -15,7 +15,7 @@ public class PlayerQuitListener implements Listener {
 
         // Kill the player if knocked out
         if (NpcManager.npcExists(p)) {
-            NpcManager.forceKill(p);
+            NpcManager.killPlayer(p);
         }
 
     }

@@ -23,7 +23,7 @@ public class PlayerDeathListener implements Listener {
         if (NpcManager.npcExists(p)) {
 
             // Reset knockout
-            NpcManager.resetKnockout(p);
+            NpcManager.endKnockout(p);
 
             // Custom spawn location for 1.20.6+ versions
         } else if (Knockout.getVersion().startsWith("1.2")) {

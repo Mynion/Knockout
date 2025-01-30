@@ -13,8 +13,8 @@ public class PlayerJoinListener implements Listener {
         Player p = e.getPlayer();
 
         NpcManager NpcManager = Knockout.getNpcManager();
-        NpcManager.resetKnockoutEffects(p);
+        NpcManager.endKnockoutEffects(p);
 
-        NpcManager.playerJoinActions(p);
+        NpcManager.refreshNPCsForPlayer(p);
     }
 }

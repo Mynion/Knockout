@@ -20,15 +20,15 @@ public abstract class NpcModel {
     private boolean isBeingRevived;
     private final GameMode previousGameMode;
     private int knockoutCooldown;
-    private Entity damager;
+    private Entity killer;
     private boolean isVulnerableByPlayerWhenCarried;
 
-    public NpcModel(Player player, ArmorStand armorStand, GameMode previousGameMode, @Nullable Entity damager) {
+    public NpcModel(Player player, ArmorStand armorStand, GameMode previousGameMode, @Nullable Entity killer) {
         this.player = player;
         this.armorStand = armorStand;
         this.previousGameMode = previousGameMode;
         isBeingRevived = false;
-        this.damager = damager;
+        this.killer = killer;
     }
 
     public Player getPlayer() {
@@ -67,9 +67,9 @@ public abstract class NpcModel {
         this.knockoutCooldown = knockoutCooldown;
         if (knockoutCooldown <= 0) {
             if (Knockout.getPlugin().getConfig().getBoolean("death-on-end")) {
-                Knockout.getNpcManager().forceKill(player);
+                Knockout.getNpcManager().killPlayer(player);
             } else {
-                Knockout.getNpcManager().resetKnockout(player);
+                Knockout.getNpcManager().endKnockout(player);
             }
         } else {
             String knockoutTitle = Knockout.getPlugin().getConfig().getString("knockout-title");
@@ -91,12 +91,12 @@ public abstract class NpcModel {
         }
     }
 
-    public Entity getDamager() {
-        return damager;
+    public Entity getKiller() {
+        return killer;
     }
 
-    public void setDamager(Entity damager) {
-        this.damager = damager;
+    public void setKiller(Entity killer) {
+        this.killer = killer;
     }
 
     public boolean isVulnerableByPlayerWhenCarried() {
