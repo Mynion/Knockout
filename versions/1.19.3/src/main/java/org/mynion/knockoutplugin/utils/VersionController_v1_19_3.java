@@ -142,7 +142,7 @@ public class VersionController_v1_19_3 implements VersionController {
             case ANIMATE -> new ClientboundAnimatePacket(mannequin, 1);
             case ADD_ENTITY -> new ClientboundAddPlayerPacket(mannequin);
             case INFO_UPDATE ->
-                    new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, (ServerPlayer) List.of(mannequin));
+                    new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, mannequin);
             case SET_ENTITY_DATA -> new ClientboundSetEntityDataPacket(mannequin.getId(), mannequin.getEntityData().getNonDefaultValues());
             case SET_EQUIPMENT -> new ClientboundSetEquipmentPacket(mannequin.getId(), getItems(sp));
             case INFO_REMOVE -> new ClientboundPlayerInfoRemovePacket(List.of(mannequin.getUUID()));
