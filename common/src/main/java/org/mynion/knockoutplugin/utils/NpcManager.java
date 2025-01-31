@@ -202,7 +202,16 @@ public class NpcManager {
         p.getPassengers().forEach(p::removePassenger);
 
         // Remove parrots from shoulders
-        versionController.removeParrotsFromShoulders(p);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!Knockout.getNpcManager().npcExists(p)) this.cancel();
+
+                versionController.removeParrotFromShoulder(p, true);
+                versionController.removeParrotFromShoulder(p, false);
+            }
+        }.runTaskTimer(Knockout.getPlugin(), 0, 2);
+
 
         // Reset nearby mobs focus on a KO player
         List<Entity> nearbyMobs = p.getNearbyEntities(50, 50, 50);

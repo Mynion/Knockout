@@ -6,7 +6,6 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.jetbrains.annotations.NotNull;
 import org.mynion.knockoutplugin.enums.PacketType;
 import org.mynion.knockoutplugin.enums.PotionType;
@@ -24,5 +23,5 @@ public interface VersionController {
     void broadcastPacket(NpcModel npc, PacketType packetType);
     void sendPacket(Player receiver, NpcModel npc, PacketType packetType);
     void setAbleToJump(Player p, boolean able);
-    void removeParrotsFromShoulders(Player p);
+    void removeParrotFromShoulder(Player p, boolean rightShoulder);
 }

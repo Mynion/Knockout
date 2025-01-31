@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
 import jline.internal.Nullable;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
@@ -12,10 +13,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.*;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.PositionMoveRotation;
-import net.minecraft.world.entity.Relative;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.ChatVisiblity;
@@ -32,7 +30,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +38,7 @@ import org.mynion.knockoutplugin.enums.PacketType;
 import org.mynion.knockoutplugin.enums.PotionType;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class VersionController_v1_21_4 implements VersionController {
@@ -130,8 +129,35 @@ public class VersionController_v1_21_4 implements VersionController {
     }
 
     @Override
-    public void removeParrotsFromShoulders(Player p) {
-        //TODO
+    public void removeParrotFromShoulder(Player p, boolean rightShoulder) {
+        ServerPlayer sp = getServerPlayer(p);
+
+        CompoundTag parrot;
+        if (rightShoulder) {
+            parrot = sp.getShoulderEntityRight();
+        } else {
+            parrot = sp.getShoulderEntityLeft();
+        }
+
+        if (parrot.isEmpty()) return;
+
+        Optional<net.minecraft.world.entity.Entity> left = EntityType.create(parrot, sp.level(), EntitySpawnReason.NATURAL);
+
+        if (left.isEmpty()) return;
+
+        net.minecraft.world.entity.Entity entity = left.get();
+        if (entity instanceof TamableAnimal tamableAnimal) {
+            tamableAnimal.setOwnerUUID(p.getUniqueId());
+        }
+        entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
+        ((ServerLevel) sp.level()).addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
+
+        if (rightShoulder) {
+            sp.setShoulderEntityRight(new CompoundTag());
+        } else {
+            sp.setShoulderEntityLeft(new CompoundTag());
+        }
+
     }
 
     @Override
@@ -161,7 +187,8 @@ public class VersionController_v1_21_4 implements VersionController {
             case SET_EQUIPMENT -> new ClientboundSetEquipmentPacket(mannequin.getId(), getItems(sp));
             case INFO_REMOVE -> new ClientboundPlayerInfoRemovePacket(List.of(mannequin.getGameProfile().getId()));
             case REMOVE_ENTITY -> new ClientboundRemoveEntitiesPacket(mannequin.getId());
-            case TELEPORT -> new ClientboundTeleportEntityPacket(mannequin.getId(), new PositionMoveRotation(new Vec3(sp.getX() - mannequin.getX(), sp.getY() + yDiff - mannequin.getY(), sp.getZ() - mannequin.getZ()), new Vec3(0, 0, 0), 0, 0), Relative.ALL, mannequin.onGround());
+            case TELEPORT ->
+                    new ClientboundTeleportEntityPacket(mannequin.getId(), new PositionMoveRotation(new Vec3(sp.getX() - mannequin.getX(), sp.getY() + yDiff - mannequin.getY(), sp.getZ() - mannequin.getZ()), new Vec3(0, 0, 0), 0, 0), Relative.ALL, mannequin.onGround());
 
         };
     }
@@ -200,7 +227,6 @@ public class VersionController_v1_21_4 implements VersionController {
         mannequin.setXRot(sp.getXRot());
         mannequin.setYRot(sp.getYRot());
         mannequin.setYHeadRot(sp.getYHeadRot());
-        mannequin.setShoulderEntityLeft(sp.getShoulderEntityLeft());
         mannequin.setPose(Pose.SWIMMING);
         mannequin.setUUID(mannequinUUID);
         mannequin.setGameMode(GameType.SURVIVAL);

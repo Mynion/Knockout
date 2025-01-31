@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
 import jline.internal.Nullable;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
@@ -12,8 +13,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
@@ -28,7 +31,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +39,7 @@ import org.mynion.knockoutplugin.enums.PacketType;
 import org.mynion.knockoutplugin.enums.PotionType;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class VersionController_v1_19_4 implements VersionController {
@@ -123,8 +127,34 @@ public class VersionController_v1_19_4 implements VersionController {
     }
 
     @Override
-    public void removeParrotsFromShoulders(Player p) {
-        //TODO
+    public void removeParrotFromShoulder(Player p, boolean rightShoulder) {
+        ServerPlayer sp = getServerPlayer(p);
+
+        CompoundTag parrot;
+        if (rightShoulder) {
+            parrot = sp.getShoulderEntityRight();
+        } else {
+            parrot = sp.getShoulderEntityLeft();
+        }
+
+        if (parrot.isEmpty()) return;
+
+        Optional<net.minecraft.world.entity.Entity> left = EntityType.create(parrot, sp.getLevel());
+
+        if (left.isEmpty()) return;
+
+        net.minecraft.world.entity.Entity entity = left.get();
+        if (entity instanceof TamableAnimal tamableAnimal) {
+            tamableAnimal.setOwnerUUID(p.getUniqueId());
+        }
+        entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
+        sp.getLevel().addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
+
+        if (rightShoulder) {
+            sp.setShoulderEntityRight(new CompoundTag());
+        } else {
+            sp.setShoulderEntityLeft(new CompoundTag());
+        }
     }
 
     @Override
@@ -185,7 +215,6 @@ public class VersionController_v1_19_4 implements VersionController {
         mannequin.setXRot(sp.getXRot());
         mannequin.setYRot(sp.getYRot());
         mannequin.setYHeadRot(sp.getYHeadRot());
-        mannequin.setShoulderEntityLeft(sp.getShoulderEntityLeft());
         mannequin.setPose(Pose.SWIMMING);
         mannequin.setUUID(mannequinUUID);
         mannequin.setGameMode(GameType.SURVIVAL);
@@ -204,6 +233,8 @@ public class VersionController_v1_19_4 implements VersionController {
 
         // Set mannequin model customization
         mannequin.restoreFrom(sp, false);
+        mannequin.setShoulderEntityLeft(new CompoundTag());
+        mannequin.setShoulderEntityRight(new CompoundTag());
         mannequin.setGameMode(GameType.SURVIVAL);
 
         return mannequin;

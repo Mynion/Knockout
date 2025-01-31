@@ -31,16 +31,14 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
-import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.enums.PacketType;
 import org.mynion.knockoutplugin.enums.PotionType;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class VersionController_v1_21_3 implements VersionController {
@@ -131,8 +129,34 @@ public class VersionController_v1_21_3 implements VersionController {
     }
 
     @Override
-    public void removeParrotsFromShoulders(Player p) {
-        //TODO
+    public void removeParrotFromShoulder(Player p, boolean rightShoulder) {
+        ServerPlayer sp = getServerPlayer(p);
+
+        CompoundTag parrot;
+        if (rightShoulder) {
+            parrot = sp.getShoulderEntityRight();
+        } else {
+            parrot = sp.getShoulderEntityLeft();
+        }
+
+        if (parrot.isEmpty()) return;
+
+        Optional<net.minecraft.world.entity.Entity> left = EntityType.create(parrot, sp.level(), EntitySpawnReason.NATURAL);
+
+        if (left.isEmpty()) return;
+
+        net.minecraft.world.entity.Entity entity = left.get();
+        if (entity instanceof TamableAnimal tamableAnimal) {
+            tamableAnimal.setOwnerUUID(p.getUniqueId());
+        }
+        entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
+        ((ServerLevel) sp.level()).addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
+
+        if (rightShoulder) {
+            sp.setShoulderEntityRight(new CompoundTag());
+        } else {
+            sp.setShoulderEntityLeft(new CompoundTag());
+        }
     }
 
     @Override
@@ -162,7 +186,8 @@ public class VersionController_v1_21_3 implements VersionController {
             case SET_EQUIPMENT -> new ClientboundSetEquipmentPacket(mannequin.getId(), getItems(sp));
             case INFO_REMOVE -> new ClientboundPlayerInfoRemovePacket(List.of(mannequin.getGameProfile().getId()));
             case REMOVE_ENTITY -> new ClientboundRemoveEntitiesPacket(mannequin.getId());
-            case TELEPORT -> new ClientboundTeleportEntityPacket(mannequin.getId(), new PositionMoveRotation(new Vec3(sp.getX() - mannequin.getX(), sp.getY() + yDiff - mannequin.getY(), sp.getZ() - mannequin.getZ()), new Vec3(0, 0, 0), 0, 0), Relative.ALL, mannequin.onGround());
+            case TELEPORT ->
+                    new ClientboundTeleportEntityPacket(mannequin.getId(), new PositionMoveRotation(new Vec3(sp.getX() - mannequin.getX(), sp.getY() + yDiff - mannequin.getY(), sp.getZ() - mannequin.getZ()), new Vec3(0, 0, 0), 0, 0), Relative.ALL, mannequin.onGround());
 
         };
     }
@@ -201,7 +226,6 @@ public class VersionController_v1_21_3 implements VersionController {
         mannequin.setXRot(sp.getXRot());
         mannequin.setYRot(sp.getYRot());
         mannequin.setYHeadRot(sp.getYHeadRot());
-        mannequin.setShoulderEntityLeft(sp.getShoulderEntityLeft());
         mannequin.setPose(Pose.SWIMMING);
         mannequin.setUUID(mannequinUUID);
         mannequin.setGameMode(GameType.SURVIVAL);

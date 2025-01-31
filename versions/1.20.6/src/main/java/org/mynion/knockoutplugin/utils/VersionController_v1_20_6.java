@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.TamableAnimal;
@@ -34,7 +35,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -44,6 +44,7 @@ import org.mynion.knockoutplugin.enums.PacketType;
 import org.mynion.knockoutplugin.enums.PotionType;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class VersionController_v1_20_6 implements VersionController {
@@ -124,46 +125,44 @@ public class VersionController_v1_20_6 implements VersionController {
     @Override
     public void setAbleToJump(Player p, boolean able) {
         ServerPlayer sp = getServerPlayer(p);
-        if(able){
+        if (able) {
             AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
             jumpAttribute.setBaseValue(0.42);
-        }else{
+        } else {
             AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
             jumpAttribute.setBaseValue(0);
         }
     }
 
     @Override
-    public void removeParrotsFromShoulders(Player p) {
+    public void removeParrotFromShoulder(Player p, boolean rightShoulder) {
         ServerPlayer sp = getServerPlayer(p);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!Knockout.getNpcManager().npcExists(p)) this.cancel();
 
-                if (!sp.getShoulderEntityLeft().isEmpty()) {
-                    net.minecraft.world.entity.EntityType.create(sp.getShoulderEntityLeft(), sp.level()).map((entity) -> {
-                        if (entity instanceof TamableAnimal) {
-                            ((TamableAnimal) entity).setOwnerUUID(p.getUniqueId());
-                        }
-                        entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
-                        return ((ServerLevel) sp.level()).addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
-                    });
-                    sp.setShoulderEntityLeft(new CompoundTag());
-                }
+        CompoundTag parrot;
+        if (rightShoulder) {
+            parrot = sp.getShoulderEntityRight();
+        } else {
+            parrot = sp.getShoulderEntityLeft();
+        }
 
-                if (!sp.getShoulderEntityRight().isEmpty()) {
-                    net.minecraft.world.entity.EntityType.create(sp.getShoulderEntityRight(), sp.level()).map((entity) -> {
-                        if (entity instanceof TamableAnimal) {
-                            ((TamableAnimal) entity).setOwnerUUID(p.getUniqueId());
-                        }
-                        entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
-                        return ((ServerLevel) sp.level()).addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
-                    });
-                    sp.setShoulderEntityRight(new CompoundTag());
-                }
-            }
-        }.runTaskTimer(Knockout.getPlugin(), 0, 2);
+        if (parrot.isEmpty()) return;
+
+        Optional<net.minecraft.world.entity.Entity> left = EntityType.create(parrot, sp.level());
+
+        if (left.isEmpty()) return;
+
+        net.minecraft.world.entity.Entity entity = left.get();
+        if (entity instanceof TamableAnimal tamableAnimal) {
+            tamableAnimal.setOwnerUUID(p.getUniqueId());
+        }
+        entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
+        ((ServerLevel) sp.level()).addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
+
+        if (rightShoulder) {
+            sp.setShoulderEntityRight(new CompoundTag());
+        } else {
+            sp.setShoulderEntityLeft(new CompoundTag());
+        }
     }
 
     @Override
@@ -185,8 +184,7 @@ public class VersionController_v1_20_6 implements VersionController {
             case SET_ENTITY_DATA ->
                     new ClientboundSetEntityDataPacket(mannequin.getId(), mannequin.getEntityData().getNonDefaultValues());
             case SET_EQUIPMENT -> new ClientboundSetEquipmentPacket(mannequin.getId(), getItems(sp));
-            case INFO_REMOVE ->
-                    new ClientboundPlayerInfoRemovePacket(List.of(mannequin.getGameProfile().getId()));
+            case INFO_REMOVE -> new ClientboundPlayerInfoRemovePacket(List.of(mannequin.getGameProfile().getId()));
             case REMOVE_ENTITY -> new ClientboundRemoveEntitiesPacket(mannequin.getId());
             case TELEPORT -> new ClientboundTeleportEntityPacket(mannequin);
         };
@@ -226,7 +224,6 @@ public class VersionController_v1_20_6 implements VersionController {
         mannequin.setXRot(sp.getXRot());
         mannequin.setYRot(sp.getYRot());
         mannequin.setYHeadRot(sp.getYHeadRot());
-        mannequin.setShoulderEntityLeft(sp.getShoulderEntityLeft());
         mannequin.setPose(Pose.SWIMMING);
         mannequin.setUUID(mannequinUUID);
         mannequin.setGameMode(GameType.SURVIVAL);
@@ -246,6 +243,8 @@ public class VersionController_v1_20_6 implements VersionController {
         //TODO
         // Set mannequin model customization
         mannequin.restoreFrom(sp, false);
+        mannequin.setShoulderEntityLeft(new CompoundTag());
+        mannequin.setShoulderEntityRight(new CompoundTag());
         mannequin.setGameMode(GameType.SURVIVAL);
 
         return mannequin;
