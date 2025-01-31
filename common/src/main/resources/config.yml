@@ -168,7 +168,7 @@ aliases:
 
 # BETA
 
-# Commands
+# Commands to run from console.
 # Variable %player% is the knocked out player
 # Use DELAY <ticks> to delay the command execution
 # 20 ticks = 1 second
@@ -177,7 +177,6 @@ aliases:
 #   - say &cPlayer fainted from breaking his legs
 #   - DELAY 40
 #   - say &eWill anyone help &f%player%&e?
-
 
 # Run console commands when a knockout happens.
 ConsoleCommands:
