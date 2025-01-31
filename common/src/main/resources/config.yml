@@ -167,33 +167,30 @@ aliases:
     - ko
 
 # BETA
+
+# Commands
 # Variable %player% is the knocked out player
+# Use DELAY <ticks> to delay the command execution
+# 20 ticks = 1 second
+# Example:
+#   - playsound minecraft:entity.zombie.death player %player% ~ ~ ~ 10 1 1
+#   - say &cPlayer fainted from breaking his legs
+#   - DELAY 40
+#   - say &eWill anyone help &f%player%&e?
+
 
 # Run console commands when a knockout happens.
 ConsoleCommands:
-  - playsound minecraft:entity.zombie.death player %player% ~ ~ ~ 10 1 1
-  - Say &cPlayer fainted from breaking his legs
-  - DELAY 40 #40 tics is 2 seocnds
-  - say &eWill anyone help &f%player%&e? Poor fella is unconcious!
+  -
 
 # Run console commands during knockout on a loop.
 ConsoleLoopedCommands:
-  - DELAY 200 #200 tics is 10 second in minecraft
-  - ko revive %player%
+  -
 
 # Run console commands after knockout.
 ConsoleAfterCommands:
-  - tempban %player% "You have died and can only rejoin in 30 minutes"
-  - say &8Funeral for &f%player%&8 will be hosted soon at the church...
-  - DELAY 200 #400 tics is 20 seocnds
-  - say &eWell awkward... &cnobody&e came to &f%player%'s&e funeral...
-  - DELAY 200 #200 tics is 10 seconds
-  - say &eWell here's a &dflower &efor you guys...
-  - DELAY 5
-  - give @a poppy 1
+  -
 
 # Run console commands after revive.
 ConsoleAfterReviveCommands:
-  - say %player%&a was resuscitated!
-  - DELAY 5
-  - give %player% golden_apple 1
+  -

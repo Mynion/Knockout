@@ -108,7 +108,7 @@ public class NpcManager {
                         }
                     }.runTaskLater(plugin, delay);
                 }
-                if (isLooped && commands.getLast().equals(e)) {
+                if (isLooped && commands.get(commands.size() - 1).equals(e)) {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
