@@ -60,7 +60,7 @@ public class NpcManager {
         NpcModel npc = versionController.createNpc(p, armorStand, playerGameMode, damager);
         NPCs.add(npc);
 
-        // Broadcast body info packets
+        // Broadcast mannequin info packets
         versionController.broadcastPacket(npc, PacketType.INFO_UPDATE);
         versionController.broadcastPacket(npc, PacketType.ADD_ENTITY);
         versionController.broadcastPacket(npc, PacketType.SET_ENTITY_DATA);
@@ -69,7 +69,7 @@ public class NpcManager {
         versionController.setCollisions(p, false);
         TabAdapter.setCollisionRule(npc.getPlayer(), false);
 
-        teleportBody(npc);
+        teleportMannequin(npc);
         startTimer(npc, time);
 
         MessageUtils.sendMessage(p, "knockout-message");
@@ -154,7 +154,7 @@ public class NpcManager {
         // Reset knockout effects
         endKnockoutEffects(p);
 
-        // Remove body
+        // Remove mannequin
         versionController.broadcastPacket(npc, PacketType.INFO_REMOVE);
         versionController.broadcastPacket(npc, PacketType.REMOVE_ENTITY);
 
@@ -292,8 +292,8 @@ public class NpcManager {
 
     }
 
-    // Teleporting body and hologram to the player while knocked out
-    private void teleportBody(NpcModel npc) {
+    // Teleporting mannequin and hologram to the player while knocked out
+    private void teleportMannequin(NpcModel npc) {
         Player p = npc.getPlayer();
 
         new BukkitRunnable() {

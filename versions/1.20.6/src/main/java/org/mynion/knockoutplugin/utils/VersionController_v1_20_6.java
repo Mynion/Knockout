@@ -240,8 +240,6 @@ public class VersionController_v1_20_6 implements VersionController {
         // Create mannequin server connection
         new ServerGamePacketListenerImpl(server, new Connection(PacketFlow.CLIENTBOUND), mannequin, CommonListenerCookie.createInitial(mannequin.getGameProfile(), false));
 
-        //TODO
-        // Set mannequin model customization
         mannequin.restoreFrom(sp, false);
         mannequin.setShoulderEntityLeft(new CompoundTag());
         mannequin.setShoulderEntityRight(new CompoundTag());
