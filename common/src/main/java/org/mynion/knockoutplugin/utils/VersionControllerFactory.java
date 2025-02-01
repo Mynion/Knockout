@@ -20,6 +20,9 @@ public class VersionControllerFactory {
                 case "1.21.4-R0.1-SNAPSHOT":
                     className = "org.mynion.knockoutplugin.utils.VersionController_v1_21_4";
                     break;
+                case "1.20.1-R0.1-SNAPSHOT":
+                    className = "org.mynion.knockoutplugin.utils.VersionController_v1_20_1";
+                    break;
                 case "1.20.6-R0.1-SNAPSHOT":
                     className = "org.mynion.knockoutplugin.utils.VersionController_v1_20_6";
                     break;
