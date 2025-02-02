@@ -78,13 +78,17 @@ public class NpcManager {
             MessageUtils.sendTitle(damagerPlayer, "knockout-attacker-title", "knockout-attacker-subtitle", new HashMap<>(Map.of("%player%", p.getName())), new HashMap<>(Map.of("%player%", p.getName())), 10, 20, 10);
         }
 
-        runConfigCommands("ConsoleCommands", p, false);
-        runConfigCommands("ConsoleLoopedCommands", p, true);
+        runConfigCommands("console-knockout-commands", p, false);
+        runConfigCommands("console-knockout-loop-commands", p, true);
 
     }
 
     // Run commands from the config
     public void runConfigCommands(String configPath, Player knockedOutPlayer, boolean isLooped) {
+        if (!plugin.getConfig().getBoolean("enable-console-commands")) {
+            return;
+        }
+
         List<?> commands = plugin.getConfig().getList(configPath);
 
         if (commands == null) {
@@ -454,7 +458,7 @@ public class NpcManager {
         MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
         MessageUtils.sendTitle(revivingPlayer, "rescuer-revived-title", "rescuer-revived-subtitle", new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), 10, 20 * 3, 10);
         MessageUtils.sendTitle(knockedOutPlayer, "rescued-revived-title", "rescued-revived-subtitle", new HashMap<>(Map.of("%player%", revivingPlayer.getName())), new HashMap<>(Map.of("%player%", revivingPlayer.getName())), 10, 20 * 3, 10);
-        runConfigCommands("ConsoleAfterReviveCommands", knockedOutPlayer, false);
+        runConfigCommands("console-after-revive-commands", knockedOutPlayer, false);
     }
 
     // Refresh all NPCs for a player

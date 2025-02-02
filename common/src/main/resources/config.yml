@@ -178,18 +178,21 @@ aliases:
 #   - DELAY 40
 #   - say &eWill anyone help &f%player%&e?
 
+# Enable console commands.
+enable-console-commands: false
+
 # Run console commands when a knockout happens.
-ConsoleCommands:
+console-knockout-commands:
   -
 
 # Run console commands during knockout on a loop.
-ConsoleLoopedCommands:
+console-knockout-loop-commands:
   -
 
 # Run console commands after knockout.
-ConsoleAfterCommands:
+console-after-knockout-commands:
   -
 
 # Run console commands after revive.
-ConsoleAfterReviveCommands:
+console-after-revive-commands:
   -
