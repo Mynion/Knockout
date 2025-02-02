@@ -10,8 +10,11 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -19,14 +22,15 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.ChatVisiblity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team;
 import org.bukkit.GameMode;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -42,7 +46,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class VersionController_v1_19_1 implements VersionController {
+public class VersionController_v1_21_1 implements VersionController {
     @Override
     public void setMaxHealth(Player p) {
         AttributeInstance maxHealthAttribute = getServerPlayer(p).getAttribute(Attributes.MAX_HEALTH);
@@ -52,7 +56,7 @@ public class VersionController_v1_19_1 implements VersionController {
 
     @Override
     public void setXpDelay(Player p, int delay) {
-        ((CraftPlayer) p).getHandle().takeXpDelay = delay;
+        p.setExpCooldown(delay);
     }
 
     @Override
@@ -119,10 +123,12 @@ public class VersionController_v1_19_1 implements VersionController {
 
     @Override
     public void setAbleToJump(Player p, boolean able) {
-        if(able){
-            removePotionEffect(p, PotionType.JUMP_BOOST);
+        ServerPlayer sp = getServerPlayer(p);
+        AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
+        if (able) {
+            jumpAttribute.setBaseValue(0.42);
         } else {
-            addPotionEffect(p, PotionType.JUMP_BOOST, 999999999, 200, false, false);
+            jumpAttribute.setBaseValue(0);
         }
     }
 
@@ -139,7 +145,7 @@ public class VersionController_v1_19_1 implements VersionController {
 
         if (parrot.isEmpty()) return;
 
-        Optional<net.minecraft.world.entity.Entity> left = EntityType.create(parrot, sp.getLevel());
+        Optional<net.minecraft.world.entity.Entity> left = EntityType.create(parrot, sp.level());
 
         if (left.isEmpty()) return;
 
@@ -148,7 +154,7 @@ public class VersionController_v1_19_1 implements VersionController {
             tamableAnimal.setOwnerUUID(p.getUniqueId());
         }
         entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
-        sp.getLevel().addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
+        ((ServerLevel) sp.level()).addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
 
         if (rightShoulder) {
             sp.setShoulderEntityRight(new CompoundTag());
@@ -168,14 +174,17 @@ public class VersionController_v1_19_1 implements VersionController {
     private Packet<?> createPacket(Npc npc, PacketType packetType) {
         ServerPlayer sp = getServerPlayer(npc.getPlayer());
         ServerPlayer mannequin = npc.getMannequin();
+        ServerLevel level = sp.serverLevel();
         return switch (packetType) {
-            case ANIMATE -> new ClientboundAnimatePacket(mannequin, 1);
-            case ADD_ENTITY -> new ClientboundAddPlayerPacket(mannequin);
+            case ANIMATE -> new ClientboundHurtAnimationPacket(mannequin.getId(), 0);
+            case ADD_ENTITY ->
+                    new ClientboundAddEntityPacket(mannequin, new ServerEntity(level, mannequin, 20, false, null, null));
             case INFO_UPDATE ->
-                    new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.ADD_PLAYER, List.of(mannequin));
-            case SET_ENTITY_DATA -> new ClientboundSetEntityDataPacket(mannequin.getId(), mannequin.getEntityData(), true);
+                    new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, mannequin);
+            case SET_ENTITY_DATA ->
+                    new ClientboundSetEntityDataPacket(mannequin.getId(), mannequin.getEntityData().getNonDefaultValues());
             case SET_EQUIPMENT -> new ClientboundSetEquipmentPacket(mannequin.getId(), getItems(sp));
-            case INFO_REMOVE -> new ClientboundPlayerInfoPacket(ClientboundPlayerInfoPacket.Action.REMOVE_PLAYER, mannequin);
+            case INFO_REMOVE -> new ClientboundPlayerInfoRemovePacket(List.of(mannequin.getGameProfile().getId()));
             case REMOVE_ENTITY -> new ClientboundRemoveEntitiesPacket(mannequin.getId());
             case TELEPORT -> new ClientboundTeleportEntityPacket(mannequin);
         };
@@ -193,8 +202,8 @@ public class VersionController_v1_19_1 implements VersionController {
     }
 
     private PotionEffectType getPotionEffectType(PotionType potionType) {
-        if (potionType == PotionType.JUMP_BOOST) return PotionEffectType.JUMP;
-        if (potionType == PotionType.SLOWNESS) return PotionEffectType.SLOW;
+        if (potionType == PotionType.JUMP_BOOST) return PotionEffectType.JUMP_BOOST;
+        if (potionType == PotionType.SLOWNESS) return PotionEffectType.SLOWNESS;
         return null;
     }
 
@@ -203,13 +212,13 @@ public class VersionController_v1_19_1 implements VersionController {
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
         MinecraftServer server = sp.getServer();
-        ServerLevel level = sp.getLevel();
+        ServerLevel level = sp.serverLevel();
 
         UUID mannequinUUID = UUID.randomUUID();
         String mannequinName = p.getName();
         GameProfile mannequinProfile = new GameProfile(mannequinUUID, mannequinName);
 
-        ServerPlayer mannequin = new ServerPlayer(server, level, mannequinProfile, null);
+        ServerPlayer mannequin = new ServerPlayer(server, level, mannequinProfile, new ClientInformation("en_us", 10, ChatVisiblity.FULL, true, sp.clientInformation().modelCustomisation(), net.minecraft.world.entity.player.Player.DEFAULT_MAIN_HAND, false, false));
 
         mannequin.setPos(p.getLocation().getX(), p.getLocation().getY() - 0.2, p.getLocation().getZ());
         mannequin.setXRot(sp.getXRot());
@@ -222,20 +231,14 @@ public class VersionController_v1_19_1 implements VersionController {
         // Set mannequin skin
         try {
             Property skin = (Property) sp.getGameProfile().getProperties().get("textures").toArray()[0];
-            String textures = skin.getValue();
-            String signature = skin.getSignature();
+            String textures = skin.value();
+            String signature = skin.signature();
             mannequin.getGameProfile().getProperties().put("textures", new Property("textures", textures, signature));
         } catch (ArrayIndexOutOfBoundsException ignored) {
         }
 
         // Create mannequin server connection
-        new ServerGamePacketListenerImpl(server, new Connection(PacketFlow.CLIENTBOUND), mannequin);
-
-        // Set mannequin model customization
-        mannequin.restoreFrom(sp, false);
-        mannequin.setShoulderEntityLeft(new CompoundTag());
-        mannequin.setShoulderEntityRight(new CompoundTag());
-        mannequin.setGameMode(GameType.SURVIVAL);
+        new ServerGamePacketListenerImpl(server, new Connection(PacketFlow.CLIENTBOUND), mannequin, CommonListenerCookie.createInitial(mannequin.getGameProfile(), false));
 
         return mannequin;
     }

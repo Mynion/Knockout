@@ -37,9 +37,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
-import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.enums.PacketType;
 import org.mynion.knockoutplugin.enums.PotionType;
 
@@ -125,11 +123,10 @@ public class VersionController_v1_20_6 implements VersionController {
     @Override
     public void setAbleToJump(Player p, boolean able) {
         ServerPlayer sp = getServerPlayer(p);
+        AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
         if (able) {
-            AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
             jumpAttribute.setBaseValue(0.42);
         } else {
-            AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
             jumpAttribute.setBaseValue(0);
         }
     }

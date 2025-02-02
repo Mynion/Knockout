@@ -119,11 +119,10 @@ public class VersionController_v1_21_4 implements VersionController {
     @Override
     public void setAbleToJump(Player p, boolean able) {
         ServerPlayer sp = getServerPlayer(p);
+        AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
         if (able) {
-            AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
             jumpAttribute.setBaseValue(0.42);
         } else {
-            AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
             jumpAttribute.setBaseValue(0);
         }
     }

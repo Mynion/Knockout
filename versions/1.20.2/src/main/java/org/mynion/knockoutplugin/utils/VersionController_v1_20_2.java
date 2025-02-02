@@ -41,7 +41,6 @@ import org.jetbrains.annotations.NotNull;
 import org.mynion.knockoutplugin.enums.PacketType;
 import org.mynion.knockoutplugin.enums.PotionType;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
