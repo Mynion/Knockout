@@ -167,7 +167,6 @@ aliases:
     - ko
 
 # BETA - Use with caution
-
 # Commands to run from console.
 # Variable %player% is the knocked out player
 # Use DELAY <ticks> to delay the command execution
