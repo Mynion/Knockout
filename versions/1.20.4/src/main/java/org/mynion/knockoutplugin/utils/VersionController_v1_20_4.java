@@ -3,9 +3,11 @@ package org.mynion.knockoutplugin.utils;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
+import io.netty.channel.ChannelHandlerContext;
 import jline.internal.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
+import net.minecraft.network.PacketListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.game.*;
@@ -28,8 +30,8 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team;
 import org.bukkit.GameMode;
-import org.bukkit.craftbukkit.v1_20_R4.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_20_R4.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -37,17 +39,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
-import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.enums.PacketType;
 import org.mynion.knockoutplugin.enums.PotionType;
 
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class VersionController_v1_20_6 implements VersionController {
+public class VersionController_v1_20_4 implements VersionController {
     @Override
     public void setMaxHealth(Player p) {
         AttributeInstance maxHealthAttribute = getServerPlayer(p).getAttribute(Attributes.MAX_HEALTH);
@@ -124,13 +127,10 @@ public class VersionController_v1_20_6 implements VersionController {
 
     @Override
     public void setAbleToJump(Player p, boolean able) {
-        ServerPlayer sp = getServerPlayer(p);
         if (able) {
-            AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
-            jumpAttribute.setBaseValue(0.42);
+            removePotionEffect(p, PotionType.JUMP_BOOST);
         } else {
-            AttributeInstance jumpAttribute = sp.getAttribute(Attributes.JUMP_STRENGTH);
-            jumpAttribute.setBaseValue(0);
+            addPotionEffect(p, PotionType.JUMP_BOOST, 999999999, 200, false, false);
         }
     }
 
@@ -202,8 +202,8 @@ public class VersionController_v1_20_6 implements VersionController {
     }
 
     private PotionEffectType getPotionEffectType(PotionType potionType) {
-        if (potionType == PotionType.JUMP_BOOST) return PotionEffectType.JUMP_BOOST;
-        if (potionType == PotionType.SLOWNESS) return PotionEffectType.SLOWNESS;
+        if (potionType == PotionType.JUMP_BOOST) return PotionEffectType.JUMP;
+        if (potionType == PotionType.SLOWNESS) return PotionEffectType.SLOW;
         return null;
     }
 
@@ -238,7 +238,15 @@ public class VersionController_v1_20_6 implements VersionController {
         }
 
         // Create mannequin server connection
-        new ServerGamePacketListenerImpl(server, new Connection(PacketFlow.CLIENTBOUND), mannequin, CommonListenerCookie.createInitial(mannequin.getGameProfile(), false));
+        Connection connection = new Connection(PacketFlow.SERVERBOUND);
+        Optional<Connection> spConnection = server.getConnection().getConnections().stream().filter(c -> c.getRemoteAddress().equals(sp.connection.getRemoteAddress())).findFirst();
+        if (spConnection.isPresent()) {
+            connection.channel = spConnection.get().channel;
+        } else {
+            connection.channel = server.getConnection().getConnections().get(0).channel;
+        }
+        new ServerGamePacketListenerImpl(server, connection, mannequin, CommonListenerCookie.createInitial(mannequin.getGameProfile()));
+        connection.channel = null;
 
         return mannequin;
     }
