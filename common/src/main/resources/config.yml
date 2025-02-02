@@ -166,7 +166,7 @@ aliases:
   knockout:
     - ko
 
-# BETA
+# BETA - Use with caution
 
 # Commands to run from console.
 # Variable %player% is the knocked out player
@@ -186,6 +186,7 @@ console-knockout-commands:
   -
 
 # Run console commands during knockout on a loop.
+# Use DELAY <ticks> to delay commands execution or the server will crash
 console-knockout-loop-commands:
   -
 
