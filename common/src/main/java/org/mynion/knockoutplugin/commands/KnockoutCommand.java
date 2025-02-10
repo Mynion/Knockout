@@ -39,7 +39,11 @@ public class KnockoutCommand implements TabExecutor {
             Player ko = Bukkit.getPlayer(args[1]);
             if (NpcManager.npcExists(ko)) {
                 NpcManager.endKnockout(ko, false);
-                MessageUtils.sendMessage(sender, "rescuer-revived-message", new HashMap<>(Map.of("%player%", ko.getName())));
+                if (sender instanceof Player playerSender) {
+                    MessageUtils.sendMessage(playerSender, "rescuer-revived-message", new HashMap<>(Map.of("%player%", ko.getName())));
+                } else {
+                    sender.sendMessage(ChatColor.GREEN + ko.getName() + " revived.");
+                }
                 MessageUtils.sendMessage(ko, "rescued-revived-message", new HashMap<>(Map.of("%player%", sender.getName())));
                 NpcManager.runConfigCommands("console-after-revive-commands", ko, false);
             } else {

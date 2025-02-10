@@ -4,23 +4,26 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.mynion.knockoutplugin.Knockout;
+import org.mynion.knockoutplugin.compatibility.PapiAdapter;
 
 import java.util.HashMap;
 
 public class MessageUtils {
-    public static void sendMessage(CommandSender recipient, String configPath) {
+    public static void sendMessage(Player recipient, String configPath) {
         String message = Knockout.getPlugin().getConfig().getString(configPath);
         if (message != null && !message.isEmpty()) {
+            message = PapiAdapter.setPlaceholders(recipient, message);
             recipient.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
         }
     }
 
-    public static void sendMessage(CommandSender recipient, String configPath, HashMap<String, String> replacements) {
+    public static void sendMessage(Player recipient, String configPath, HashMap<String, String> replacements) {
         String message = Knockout.getPlugin().getConfig().getString(configPath);
         if (message != null && !message.isEmpty()) {
             for (String key : replacements.keySet()) {
                 message = message.replace(key, replacements.get(key));
             }
+            message = PapiAdapter.setPlaceholders(recipient, message);
             recipient.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
         }
     }
@@ -34,6 +37,7 @@ public class MessageUtils {
                     title = title.replace(key, titleReplacements.get(key));
                 }
             }
+            title = PapiAdapter.setPlaceholders(p, title);
             title = ChatColor.translateAlternateColorCodes('&', title);
         }
         if (subtitle != null) {
@@ -42,6 +46,7 @@ public class MessageUtils {
                     subtitle = subtitle.replace(key, subtitleReplacements.get(key));
                 }
             }
+            subtitle = PapiAdapter.setPlaceholders(p, subtitle);
             subtitle = ChatColor.translateAlternateColorCodes('&', subtitle);
         }
         p.sendTitle(title, subtitle, fadeIn, stay, fadeOut);

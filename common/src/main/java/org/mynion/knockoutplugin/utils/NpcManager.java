@@ -74,7 +74,7 @@ public class NpcManager {
 
         MessageUtils.sendMessage(p, "knockout-message");
         if (damager instanceof Player damagerPlayer) {
-            MessageUtils.sendMessage(damager, "knockout-attacker-message", new HashMap<>(Map.of("%player%", p.getName())));
+            MessageUtils.sendMessage(damagerPlayer, "knockout-attacker-message", new HashMap<>(Map.of("%player%", p.getName())));
             MessageUtils.sendTitle(damagerPlayer, "knockout-attacker-title", "knockout-attacker-subtitle", new HashMap<>(Map.of("%player%", p.getName())), new HashMap<>(Map.of("%player%", p.getName())), 10, 20, 10);
         }
 
