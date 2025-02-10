@@ -152,7 +152,7 @@ public class NpcManager {
                 getNpc(p).setVulnerableByPlayerWhenCarried(true);
                 p.damage(p.getHealth(), getKiller(p));
             }
-            p.setHealth(0);
+            if (p.getHealth() > 0) p.setHealth(0);
         }
 
         // Reset knockout effects
