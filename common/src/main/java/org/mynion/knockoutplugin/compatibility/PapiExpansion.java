@@ -39,7 +39,7 @@ public class PapiExpansion extends PlaceholderExpansion {
             return "false";
         }
 
-        if (params.equals("cooldown")) {
+        if (params.equals("time_left")) {
             if (player instanceof Player p && npcManager.npcExists(p)) {
                 return String.valueOf(npcManager.getNpc(p).getKnockoutCooldown());
             }
