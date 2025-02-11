@@ -1,3 +1,7 @@
+# This plugin is compatible with PlaceholderAPI
+# However, there are some placeholders available in the config itself
+# There is also a few custom placeholders for PlaceholderAPI described on the plugin's page
+
 # Time of knockout in seconds
 knockout-time: 60
 
