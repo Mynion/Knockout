@@ -9,6 +9,7 @@ import org.mynion.knockoutplugin.commands.DieCommand;
 import org.mynion.knockoutplugin.commands.CarryCommand;
 import org.mynion.knockoutplugin.commands.DropCommand;
 import org.mynion.knockoutplugin.commands.KnockoutCommand;
+import org.mynion.knockoutplugin.compatibility.PapiExpansion;
 import org.mynion.knockoutplugin.listeners.*;
 import org.mynion.knockoutplugin.listeners.cancelled.*;
 import org.mynion.knockoutplugin.utils.*;
@@ -66,6 +67,10 @@ public final class Knockout extends JavaPlugin {
         getCommand("drop").setExecutor(new DropCommand());
         getCommand("die").setExecutor(new DieCommand());
         getCommand("knockout").setExecutor(new KnockoutCommand());
+
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) { //
+            new PapiExpansion().register();
+        }
     }
 
     @Override
