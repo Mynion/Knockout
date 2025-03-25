@@ -68,11 +68,12 @@ public class VersionController_v1_21_4 implements VersionController {
             team.setCollisionRule(Team.CollisionRule.NEVER);
         }
         team.getPlayers().add(p.getName());
-
-        ClientboundSetPlayerTeamPacket packet = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true);
+        ClientboundSetPlayerTeamPacket removePacket = ClientboundSetPlayerTeamPacket.createRemovePacket(team);
+        ClientboundSetPlayerTeamPacket createPacket = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true);
         MinecraftServer server = MinecraftServer.getServer();
         List<ServerPlayer> onlinePlayers = server.getPlayerList().players;
-        onlinePlayers.forEach(player -> player.connection.send(packet));
+        onlinePlayers.forEach(player -> player.connection.send(removePacket));
+        onlinePlayers.forEach(player -> player.connection.send(createPacket));
     }
 
     @Override

@@ -74,8 +74,10 @@ public class VersionController_v1_20_6 implements VersionController {
         team.getPlayers().add(p.getName());
 
         ClientboundSetPlayerTeamPacket packet = ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(team, true);
+        ClientboundSetPlayerTeamPacket removePacket = ClientboundSetPlayerTeamPacket.createRemovePacket(team);
         MinecraftServer server = MinecraftServer.getServer();
         List<ServerPlayer> onlinePlayers = server.getPlayerList().players;
+        onlinePlayers.forEach(player -> player.connection.send(removePacket));
         onlinePlayers.forEach(player -> player.connection.send(packet));
     }
 
