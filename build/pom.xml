@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.mynion</groupId>
         <artifactId>Knockout</artifactId>
-        <version>1.4.1</version>
+        <version>1.4.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -15,7 +15,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <output.version>1.21.4</output.version>
+        <output.version>1.21.5</output.version>
     </properties>
 
     <profiles>
@@ -54,6 +54,12 @@
                 <dependency>
                     <groupId>org.mynion</groupId>
                     <artifactId>1.21.4</artifactId>
+                    <version>${project.version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.mynion</groupId>
+                    <artifactId>1.21.5</artifactId>
                     <version>${project.version}</version>
                     <scope>compile</scope>
                 </dependency>

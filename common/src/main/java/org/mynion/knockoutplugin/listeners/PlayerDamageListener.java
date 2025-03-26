@@ -60,14 +60,18 @@ public class PlayerDamageListener implements Listener {
                     }
                     NpcManager.knockoutPlayer(p, damager, seconds);
                 }
-            } else if (Knockout.getPlugin().getConfig().getBoolean("drop-on-hit")) {
-
-                // Drop knocked out player when hit
-                p.getPassengers().stream()
-                        .filter(passenger -> passenger instanceof Player)
-                        .map(passenger -> (Player) passenger)
-                        .filter(NpcManager::npcExists)
-                        .forEach(knockedOutPlayer -> NpcManager.dropPlayer(knockedOutPlayer, p));
+            } else {
+                if (NpcManager.npcExists(p)) {
+                    NpcManager.playDamageAnimation(NpcManager.getNpc(p));
+                }
+                if (Knockout.getPlugin().getConfig().getBoolean("drop-on-hit")) {
+                    // Drop knocked out player when hit
+                    p.getPassengers().stream()
+                            .filter(passenger -> passenger instanceof Player)
+                            .map(passenger -> (Player) passenger)
+                            .filter(NpcManager::npcExists)
+                            .forEach(knockedOutPlayer -> NpcManager.dropPlayer(knockedOutPlayer, p));
+                }
             }
         }
     }

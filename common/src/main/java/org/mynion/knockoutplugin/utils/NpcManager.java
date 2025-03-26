@@ -190,6 +190,9 @@ public class NpcManager {
         // Set player health to max
         versionController.setMaxHealth(p);
 
+        // Prevent xp gain
+        versionController.setXpDelay(p, -1);
+
         p.setWalkSpeed(0);
         if (plugin.getConfig().getBoolean(("move-when-knocked-out"))) {
             p.setWalkSpeed(0.05f);
@@ -280,6 +283,7 @@ public class NpcManager {
         p.removePotionEffect(PotionEffectType.BLINDNESS);
         p.removePotionEffect(PotionEffectType.INVISIBILITY);
         versionController.setAbleToJump(p, true);
+        versionController.setXpDelay(p, 0);
 
         p.setWalkSpeed(0.2f);
         p.setFlySpeed(0.2f);
@@ -493,6 +497,10 @@ public class NpcManager {
 
     }
 
+    public void playDamageAnimation(NpcModel npc) {
+        versionController.broadcastPacket(npc, PacketType.ANIMATE);
+    }
+
     // Damage a knocked out player
     public void damagePlayerByEntity(NpcModel npc, Entity attacker, double value) {
         Player ko = npc.getPlayer();
@@ -501,7 +509,7 @@ public class NpcManager {
         }
 
         // Play damage animation attacked knocked out player
-        versionController.broadcastPacket(getNpc(ko), PacketType.ANIMATE);
+        versionController.broadcastPacket(npc, PacketType.ANIMATE);
 
         if (Knockout.getPlugin().getConfig().getBoolean("damage-on-hit")) {
             ko.damage(value);
