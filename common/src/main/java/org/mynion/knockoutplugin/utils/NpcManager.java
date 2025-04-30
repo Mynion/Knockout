@@ -1,11 +1,10 @@
 package org.mynion.knockoutplugin.utils;
 
 import jline.internal.Nullable;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -458,11 +457,33 @@ public class NpcManager {
     public void revivePlayer(Player knockedOutPlayer, Player revivingPlayer) {
         getNpc(knockedOutPlayer).setBeingRevived(false);
         endKnockout(knockedOutPlayer, false);
+
+        Material reviveItemMaterial = Material.getMaterial(Knockout.getPlugin().getConfig().getString("revive-item"));
+        ItemStack mainHandItem = revivingPlayer.getInventory().getItemInMainHand();
+        if (reviveItemMaterial != null) {
+            // Decrease item amount
+            mainHandItem.setAmount(mainHandItem.getAmount() - 1);
+        }
+        knockedOutPlayer.setHealth(Knockout.getPlugin().getConfig().getDouble("revived-health"));
         MessageUtils.sendMessage(revivingPlayer, "rescuer-revived-message", new HashMap<>(Map.of("%player%", knockedOutPlayer.getDisplayName())));
         MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
         MessageUtils.sendTitle(revivingPlayer, "rescuer-revived-title", "rescuer-revived-subtitle", new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), 10, 20 * 3, 10);
         MessageUtils.sendTitle(knockedOutPlayer, "rescued-revived-title", "rescued-revived-subtitle", new HashMap<>(Map.of("%player%", revivingPlayer.getName())), new HashMap<>(Map.of("%player%", revivingPlayer.getName())), 10, 20 * 3, 10);
         runConfigCommands("console-after-revive-commands", knockedOutPlayer, false);
+    }
+
+
+    public Optional<Player> findNearbyKnockedOutPlayer(Player p) {
+        return p.getNearbyEntities(1, 1, 1).stream()
+                .filter(entity -> entity instanceof Player)
+                .map(entity -> (Player) entity)
+                .filter(this::npcExists)
+                .findFirst();
+    }
+
+    public PlayerInventory  getDownedPlayerInventory (Player downedPlayer)
+    {
+        return downedPlayer.getInventory();
     }
 
     // Refresh all NPCs for a player
@@ -510,6 +531,7 @@ public class NpcManager {
 
         // Play damage animation attacked knocked out player
         versionController.broadcastPacket(npc, PacketType.ANIMATE);
+        ko.getWorld().playSound(ko.getLocation(), Sound.ENTITY_PLAYER_HURT, 1, 1);
 
         if (Knockout.getPlugin().getConfig().getBoolean("damage-on-hit")) {
             ko.damage(value);
