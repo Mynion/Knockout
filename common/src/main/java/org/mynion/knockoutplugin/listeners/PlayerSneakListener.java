@@ -24,11 +24,10 @@ public class PlayerSneakListener implements Listener {
             return;
         }
 
-        Material reviveItemMaterial = Material.getMaterial(Knockout.getPlugin().getConfig().getString("revive-item"));
-
+        String reviveItemMaterial = Knockout.getPlugin().getConfig().getString("revive-item");
         ItemStack mainHandItem = player.getInventory().getItemInMainHand();
 
-        if (reviveItemMaterial != null && mainHandItem.getType() != reviveItemMaterial) {
+        if (reviveItemMaterial != null && mainHandItem.getType().toString().contains(reviveItemMaterial)) {
             MessageUtils.sendMessage(player, "revive-item-missing");
             return;
         }
