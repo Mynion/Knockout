@@ -27,7 +27,7 @@ public class PlayerSneakListener implements Listener {
         String reviveItemMaterial = Knockout.getPlugin().getConfig().getString("revive-item");
         ItemStack mainHandItem = player.getInventory().getItemInMainHand();
 
-        if (reviveItemMaterial != null && mainHandItem.getType().toString().contains(reviveItemMaterial)) {
+        if (reviveItemMaterial != null && reviveItemMaterial.contains(mainHandItem.getType().toString())) {
             MessageUtils.sendMessage(player, "revive-item-missing");
             return;
         }
