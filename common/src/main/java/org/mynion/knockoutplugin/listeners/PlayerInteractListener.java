@@ -32,7 +32,7 @@ public class PlayerInteractListener implements Listener {
                     .findFirst();
 
             // Stop carrying a player
-            knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.dropPlayer(ko, interactor), () -> MessageUtils.sendMessage(interactor, "invalid-drop-message"));
+            knockedOutPlayer.ifPresent(ko -> NpcManager.dropPlayer(ko, interactor));
             return;
         }
 
