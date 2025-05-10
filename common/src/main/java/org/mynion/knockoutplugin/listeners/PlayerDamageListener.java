@@ -36,7 +36,9 @@ public class PlayerDamageListener implements Listener {
 
                             // Damage by attacker
                             NpcManager.getNpc(p).setVulnerableByPlayerWhenCarried(true);
-                            p.damage(e.getFinalDamage(), NpcManager.getKiller(p));
+                            Entity killer = NpcManager.getKiller(p);
+                            NpcManager.endKnockout(p, false);
+                            p.damage(e.getFinalDamage(), killer);
 
                             // p.damage() calls EntityDamageEvent, so we return to prevent ending knockout two times
                             return;
