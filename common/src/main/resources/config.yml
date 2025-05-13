@@ -2,6 +2,8 @@
 # However, there are some placeholders available in the config itself
 # There is also a few custom placeholders for PlaceholderAPI described on the plugin's page
 
+# You can use RGB colors in messages, example: knockout-title: '&#2FD0AAKnockout'
+
 # Time of knockout in seconds
 knockout-time: 60
 
@@ -48,7 +50,7 @@ damage-on-hit: true
 time-decrease-on-hit: 5
 
 # When true: players can be revived by instant health 2 potion
-revive-by-instant-health: true
+revive-by-instant-health: false
 
 # When true: player will respawn in the specific location given below
 # Works only on 1.20.6+ versions
@@ -182,7 +184,7 @@ aliases:
   knockout:
     - ko
 
-# BETA - Use with caution
+# USE WITH CAUTION
 # Commands to run from console.
 # Variable %player% is the knocked out player
 # Use DELAY <ticks> to delay the command execution
