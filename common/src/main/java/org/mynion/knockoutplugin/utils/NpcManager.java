@@ -454,14 +454,23 @@ public class NpcManager {
         }
     }
 
-    // Revive a knocked out player
+    // Revive a knocked out player by another player
     public void revivePlayer(Player knockedOutPlayer, Player revivingPlayer) {
         getNpc(knockedOutPlayer).setBeingRevived(false);
         endKnockout(knockedOutPlayer, false);
         MessageUtils.sendMessage(revivingPlayer, "rescuer-revived-message", new HashMap<>(Map.of("%player%", knockedOutPlayer.getDisplayName())));
-        MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
+        MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-by-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
         MessageUtils.sendTitle(revivingPlayer, "rescuer-revived-title", "rescuer-revived-subtitle", new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), 10, 20 * 3, 10);
-        MessageUtils.sendTitle(knockedOutPlayer, "rescued-revived-title", "rescued-revived-subtitle", new HashMap<>(Map.of("%player%", revivingPlayer.getName())), new HashMap<>(Map.of("%player%", revivingPlayer.getName())), 10, 20 * 3, 10);
+        MessageUtils.sendTitle(knockedOutPlayer, "rescued-revived-by-title", "rescued-revived-by-subtitle", new HashMap<>(Map.of("%player%", revivingPlayer.getName())), new HashMap<>(Map.of("%player%", revivingPlayer.getName())), 10, 20 * 3, 10);
+        runConfigCommands("console-after-revive-commands", knockedOutPlayer, false);
+    }
+
+    // Revive a knocked out player
+    public void revivePlayer(Player knockedOutPlayer) {
+        getNpc(knockedOutPlayer).setBeingRevived(false);
+        endKnockout(knockedOutPlayer, false);
+        MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-message");
+        MessageUtils.sendTitle(knockedOutPlayer, "rescued-revived-title", "rescued-revived-subtitle", new HashMap<>(), new HashMap<>(), 10, 20 * 3, 10);
         runConfigCommands("console-after-revive-commands", knockedOutPlayer, false);
     }
 
