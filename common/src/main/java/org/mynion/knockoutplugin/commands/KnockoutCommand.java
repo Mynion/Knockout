@@ -10,9 +10,7 @@ import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.MessageUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class KnockoutCommand implements TabExecutor {
     @Override

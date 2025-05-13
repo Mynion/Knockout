@@ -2,7 +2,6 @@ package org.mynion.knockoutplugin.utils;
 
 import jline.internal.Nullable;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -49,7 +48,7 @@ public class NpcManager {
         armorStand.setSmall(true);
         String hologramName = plugin.getConfig().getString("knockout-hologram");
         if (hologramName != null) {
-            armorStand.setCustomName(ChatColor.translateAlternateColorCodes('&', hologramName));
+            armorStand.setCustomName(MessageUtils.translateColorCodes(hologramName));
         }
         armorStand.setCustomNameVisible(true);
         armorStand.setInvulnerable(false);
@@ -103,7 +102,7 @@ public class NpcManager {
                     String[] split = task.split(" ");
                     delay += Integer.parseInt(split[1]);
                 } else {
-                    String command = ChatColor.translateAlternateColorCodes('&', task.replace("%player%", knockedOutPlayer.getName()));
+                    String command = MessageUtils.translateColorCodes(task.replace("%player%", knockedOutPlayer.getName()));
                     new BukkitRunnable() {
                         @Override
                         public void run() {
