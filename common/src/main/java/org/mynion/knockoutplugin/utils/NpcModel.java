@@ -1,7 +1,6 @@
 package org.mynion.knockoutplugin.utils;
 
 import jline.internal.Nullable;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -10,6 +9,8 @@ import org.mynion.knockoutplugin.Knockout;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 // NpcModel is a spigot api part of class Npc
 
@@ -83,7 +84,8 @@ public abstract class NpcModel {
                     formattedTime = time.format(DateTimeFormatter.ofPattern("H:mm:ss"));
                 }
 
-                player.sendTitle(ChatColor.translateAlternateColorCodes('&', knockoutTitle), formattedTime, 1, 20 * 3600, 1);
+                MessageUtils.sendTitle(player, "knockout-title", "knockout-subtitle", new HashMap<>(Map.of("%timer%", formattedTime)), new HashMap<>(Map.of("%timer%", formattedTime)), 1, 20 * 3600, 1);
+
             }
         }
     }

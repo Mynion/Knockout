@@ -10,9 +10,7 @@ import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.MessageUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class KnockoutCommand implements TabExecutor {
     @Override
@@ -38,14 +36,12 @@ public class KnockoutCommand implements TabExecutor {
         } else if (args[0].equalsIgnoreCase("revive") && args.length >= 2) {
             Player ko = Bukkit.getPlayer(args[1]);
             if (NpcManager.npcExists(ko)) {
-                NpcManager.endKnockout(ko, false);
                 if (sender instanceof Player playerSender) {
-                    MessageUtils.sendMessage(playerSender, "rescuer-revived-message", new HashMap<>(Map.of("%player%", ko.getName())));
+                    NpcManager.revivePlayer(ko, playerSender);
                 } else {
+                    NpcManager.revivePlayer(ko);
                     sender.sendMessage(ChatColor.GREEN + ko.getName() + " revived.");
                 }
-                MessageUtils.sendMessage(ko, "rescued-revived-message", new HashMap<>(Map.of("%player%", sender.getName())));
-                NpcManager.runConfigCommands("console-after-revive-commands", ko, false);
             } else {
                 sender.sendMessage(ChatColor.RED + "That player is not knocked out!");
             }

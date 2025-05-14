@@ -2,6 +2,9 @@ package org.mynion.knockoutplugin.utils;
 
 import jline.internal.Nullable;
 import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -48,7 +51,7 @@ public class NpcManager {
         armorStand.setSmall(true);
         String hologramName = plugin.getConfig().getString("knockout-hologram");
         if (hologramName != null) {
-            armorStand.setCustomName(ChatColor.translateAlternateColorCodes('&', hologramName));
+            armorStand.setCustomName(MessageUtils.translateColorCodes(hologramName));
         }
         armorStand.setCustomNameVisible(true);
         armorStand.setInvulnerable(false);
@@ -102,7 +105,7 @@ public class NpcManager {
                     String[] split = task.split(" ");
                     delay += Integer.parseInt(split[1]);
                 } else {
-                    String command = ChatColor.translateAlternateColorCodes('&', task.replace("%player%", knockedOutPlayer.getName()));
+                    String command = MessageUtils.translateColorCodes(task.replace("%player%", knockedOutPlayer.getName()));
                     new BukkitRunnable() {
                         @Override
                         public void run() {
@@ -475,15 +478,24 @@ public class NpcManager {
         }
     }
 
-    // Revive a knocked out player
+    // Revive a knocked out player by another player
     public void revivePlayer(Player knockedOutPlayer, Player revivingPlayer) {
         getNpc(knockedOutPlayer).setBeingRevived(false);
         endKnockout(knockedOutPlayer, false);
         knockedOutPlayer.setHealth(Knockout.getPlugin().getConfig().getDouble("revived-health"));
         MessageUtils.sendMessage(revivingPlayer, "rescuer-revived-message", new HashMap<>(Map.of("%player%", knockedOutPlayer.getDisplayName())));
-        MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
+        MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-by-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
         MessageUtils.sendTitle(revivingPlayer, "rescuer-revived-title", "rescuer-revived-subtitle", new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), 10, 20 * 3, 10);
-        MessageUtils.sendTitle(knockedOutPlayer, "rescued-revived-title", "rescued-revived-subtitle", new HashMap<>(Map.of("%player%", revivingPlayer.getName())), new HashMap<>(Map.of("%player%", revivingPlayer.getName())), 10, 20 * 3, 10);
+        MessageUtils.sendTitle(knockedOutPlayer, "rescued-revived-by-title", "rescued-revived-by-subtitle", new HashMap<>(Map.of("%player%", revivingPlayer.getName())), new HashMap<>(Map.of("%player%", revivingPlayer.getName())), 10, 20 * 3, 10);
+        runConfigCommands("console-after-revive-commands", knockedOutPlayer, false);
+    }
+
+    // Revive a knocked out player
+    public void revivePlayer(Player knockedOutPlayer) {
+        getNpc(knockedOutPlayer).setBeingRevived(false);
+        endKnockout(knockedOutPlayer, false);
+        MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-message");
+        MessageUtils.sendTitle(knockedOutPlayer, "rescued-revived-title", "rescued-revived-subtitle", new HashMap<>(), new HashMap<>(), 10, 20 * 3, 10);
         runConfigCommands("console-after-revive-commands", knockedOutPlayer, false);
     }
 
