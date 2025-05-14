@@ -55,12 +55,13 @@ public class EntityInteractListener implements Listener {
         NpcModel npc = npcManager.getNpc((ArmorStand) e.getRightClicked());
         Player clickedPlayer = npc.getPlayer();
 
-        // Проверяем, разрешен ли лутинг в конфиге
+        // Check if looting allowed
         if (!Knockout.getPlugin().getConfig().getBoolean("looting-allowed", false) || clickedPlayer == interactor) {
             return;
         }
 
-        // Если нашли, открываем инвентарь и устанавливаем метаданные
+        // If found, open knocked player's inventory
+        // Can improve: allow taking armor from knocked player
         interactor.openInventory(clickedPlayer.getInventory());
         interactor.setMetadata("KnockoutLooting", new FixedMetadataValue(Knockout.getPlugin(), clickedPlayer.getName()));
     }

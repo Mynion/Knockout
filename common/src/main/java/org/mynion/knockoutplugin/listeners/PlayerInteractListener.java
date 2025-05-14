@@ -18,18 +18,19 @@ public class PlayerInteractListener implements Listener {
         NpcManager NpcManager = Knockout.getNpcManager();
         if ((e.getAction() == Action.LEFT_CLICK_BLOCK || e.getAction() == Action.LEFT_CLICK_AIR) && e.getPlayer().isSneaking()) {
 
-
-            if (!interactor.hasPermission("knockout.drop")) {
-                MessageUtils.sendMessage(interactor, "no-permission-message");
-                return;
-            }
-
             // Get knocked out passenger
             Optional<Player> knockedOutPlayer = interactor.getPassengers().stream()
                     .filter(passenger -> passenger instanceof Player)
                     .map(passenger -> (Player) passenger)
                     .filter(NpcManager::npcExists)
                     .findFirst();
+
+            if (!interactor.hasPermission("knockout.drop")) {
+                // Will fix this later, it spams the message even when not carrying anyone
+                //MessageUtils.sendMessage(interactor, "no-permission-message");
+                return;
+            }
+
 
             // Stop carrying a player
             knockedOutPlayer.ifPresent(ko -> NpcManager.dropPlayer(ko, interactor));

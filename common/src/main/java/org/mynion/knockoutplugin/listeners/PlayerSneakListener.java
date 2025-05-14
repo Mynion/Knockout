@@ -24,12 +24,17 @@ public class PlayerSneakListener implements Listener {
             return;
         }
 
-        String reviveItemMaterial = Knockout.getPlugin().getConfig().getString("revive-item");
-        ItemStack mainHandItem = player.getInventory().getItemInMainHand();
+        Material reviveItemMaterial = Material.getMaterial(Knockout.getPlugin().getConfig().getString("revive-item"));
 
-        if (reviveItemMaterial != null && reviveItemMaterial.contains(mainHandItem.getType().toString())) {
-            MessageUtils.sendMessage(player, "revive-item-missing");
-            return;
+        // Check item conditions
+        if (reviveItemMaterial != null) {
+            if (reviveItemMaterial != player.getInventory().getItemInMainHand().getType()) {
+                // Prevent sending a message twice
+                if (!player.isSneaking()) {
+                    MessageUtils.sendMessage(player, "revive-item-missing-message");
+                }
+                return;
+            }
         }
 
         // Find and revive nearby KO player
