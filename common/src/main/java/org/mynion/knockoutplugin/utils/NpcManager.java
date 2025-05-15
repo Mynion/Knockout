@@ -382,6 +382,20 @@ public class NpcManager {
             return;
         }
 
+        // Revive item check variable
+        Material reviveItemMaterial = Material.getMaterial(Knockout.getPlugin().getConfig().getString("revive-item"));
+
+        // Check item conditions
+        if (reviveItemMaterial != null) {
+            if (reviveItemMaterial != revivingPlayer.getInventory().getItemInMainHand().getType()) {
+                // Prevent sending a message twice
+                if (!revivingPlayer.isSneaking()) {
+                    MessageUtils.sendMessage(revivingPlayer, "revive-item-missing-message");
+                }
+                return;
+            }
+        }
+
         int reviveTime = Knockout.getPlugin().getConfig().getInt("revive-time");
         if (reviveTime <= 0) {
             revivePlayer(knockedOutPlayer, revivingPlayer);
@@ -393,9 +407,6 @@ public class NpcManager {
         int period = 2;
         float expDecrement = (float) requiredLevels / ((float) timeInTicks / period);
         Location reviveLocation = revivingPlayer.getLocation();
-
-        // Revive item check variable
-        Material reviveItemMaterial = Material.getMaterial(Knockout.getPlugin().getConfig().getString("revive-item"));
 
         if (revivingPlayer.getLevel() >= requiredLevels) {
 
@@ -494,6 +505,7 @@ public class NpcManager {
     public void revivePlayer(Player knockedOutPlayer) {
         getNpc(knockedOutPlayer).setBeingRevived(false);
         endKnockout(knockedOutPlayer, false);
+        knockedOutPlayer.setHealth(Knockout.getPlugin().getConfig().getDouble("revived-health"));
         MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-message");
         MessageUtils.sendTitle(knockedOutPlayer, "rescued-revived-title", "rescued-revived-subtitle", new HashMap<>(), new HashMap<>(), 10, 20 * 3, 10);
         runConfigCommands("console-after-revive-commands", knockedOutPlayer, false);
