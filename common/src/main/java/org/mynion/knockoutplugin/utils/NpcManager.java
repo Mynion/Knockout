@@ -389,7 +389,7 @@ public class NpcManager {
         if (reviveItemMaterial != null) {
             if (reviveItemMaterial != revivingPlayer.getInventory().getItemInMainHand().getType()) {
                 // Prevent sending a message twice
-                if (!revivingPlayer.isSneaking()) {
+                if (!revivingPlayer.isSneaking() && !knockedOutPlayer.isInsideVehicle()) {
                     MessageUtils.sendMessage(revivingPlayer, "revive-item-missing-message");
                 }
                 return;
