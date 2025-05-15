@@ -32,11 +32,7 @@ public class CarryCommand implements CommandExecutor {
             }
 
             // Find knocked out player
-            Optional<Player> knockedOutPlayer = p.getNearbyEntities(1, 1, 1).stream()
-                    .filter(entity -> entity instanceof Player)
-                    .map(entity -> (Player) entity)
-                    .filter(NpcManager::npcExists)
-                    .findFirst();
+            Optional<Player> knockedOutPlayer = NpcManager.findNearbyKnockedOutPlayer(p);
 
             // Carry a knocked out player
             knockedOutPlayer.ifPresentOrElse(ko -> NpcManager.carryPlayer(ko, p), () -> MessageUtils.sendMessage(p, "invalid-carry-message"));

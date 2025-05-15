@@ -36,6 +36,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.mynion.knockoutplugin.enums.PacketType;
 import org.mynion.knockoutplugin.enums.PotionType;
+import it.unimi.dsi.fastutil.ints.IntList;
 
 import java.util.List;
 import java.util.Optional;

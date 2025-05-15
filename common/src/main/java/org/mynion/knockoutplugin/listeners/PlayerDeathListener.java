@@ -1,5 +1,6 @@
 package org.mynion.knockoutplugin.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -7,9 +8,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.util.Vector;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.NpcManager;
+
+import java.util.UUID;
 
 public class PlayerDeathListener implements Listener {
 
@@ -18,6 +22,16 @@ public class PlayerDeathListener implements Listener {
     public void onPlayerDeath(PlayerDeathEvent e) {
         NpcManager NpcManager = Knockout.getNpcManager();
         Player p = e.getEntity();
+
+
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+            if (player.hasMetadata("KnockoutLooting") && ((UUID) ((MetadataValue) player.getMetadata("KnockoutLooting").get(0)).value()).equals(p.getUniqueId())) {
+                player.removeMetadata("KnockoutLooting", Knockout.getPlugin());
+                player.closeInventory();
+                break;
+            }
+        }
+
 
         // Check if the player is knocked out
         if (NpcManager.npcExists(p)) {

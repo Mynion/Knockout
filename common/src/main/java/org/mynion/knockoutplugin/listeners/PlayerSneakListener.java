@@ -1,38 +1,30 @@
 package org.mynion.knockoutplugin.listeners;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.inventory.ItemStack;
 import org.mynion.knockoutplugin.Knockout;
+import org.mynion.knockoutplugin.utils.MessageUtils;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class PlayerSneakListener implements Listener {
     @EventHandler
     public void onPlayerToggleSneak(PlayerToggleSneakEvent e) {
-        Player p = e.getPlayer();
-        NpcManager NpcManager = Knockout.getNpcManager();
-        if (NpcManager.npcExists(p)) {
+        Player player = e.getPlayer();
+        NpcManager npcManager = Knockout.getNpcManager();
+
+        if (npcManager.npcExists(player)) {
             e.setCancelled(true);
-
-        } else {
-
-            // Find nearby KO player
-            Optional<Player> knockedOutPlayer = findNearbyKnockedOutPlayer(p);
-
-            // Start reviving if present
-            knockedOutPlayer.ifPresent(ko -> NpcManager.startReviving(p, ko));
+            return;
         }
-    }
 
-    private Optional<Player> findNearbyKnockedOutPlayer(Player p) {
-        NpcManager NpcManager = Knockout.getNpcManager();
-        return p.getNearbyEntities(1, 1, 1).stream()
-                .filter(entity -> entity instanceof Player)
-                .map(entity -> (Player) entity)
-                .filter(NpcManager::npcExists)
-                .findFirst();
+        // Find and revive nearby KO player
+        npcManager.findNearbyKnockedOutPlayer(player).ifPresent(ko -> npcManager.startReviving(player, ko));
     }
 }

@@ -1,10 +1,13 @@
 package org.mynion.knockoutplugin.utils;
 
 import jline.internal.Nullable;
+import org.bukkit.*;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -379,6 +382,20 @@ public class NpcManager {
             return;
         }
 
+        // Revive item check variable
+        Material reviveItemMaterial = Material.getMaterial(Knockout.getPlugin().getConfig().getString("revive-item"));
+
+        // Check item conditions
+        if (reviveItemMaterial != null) {
+            if (reviveItemMaterial != revivingPlayer.getInventory().getItemInMainHand().getType()) {
+                // Prevent sending a message twice
+                if (!revivingPlayer.isSneaking() && !knockedOutPlayer.isInsideVehicle()) {
+                    MessageUtils.sendMessage(revivingPlayer, "revive-item-missing-message");
+                }
+                return;
+            }
+        }
+
         int reviveTime = Knockout.getPlugin().getConfig().getInt("revive-time");
         if (reviveTime <= 0) {
             revivePlayer(knockedOutPlayer, revivingPlayer);
@@ -392,6 +409,7 @@ public class NpcManager {
         Location reviveLocation = revivingPlayer.getLocation();
 
         if (revivingPlayer.getLevel() >= requiredLevels) {
+
             getNpc(knockedOutPlayer).setBeingRevived(true);
             new BukkitRunnable() {
                 int timer = 0;
@@ -400,6 +418,20 @@ public class NpcManager {
 
                 @Override
                 public void run() {
+
+                    // Maybe optimize later
+                    if(reviveItemMaterial != null) {
+                        // We have to check item conditions all the time because player might switch item in main hand
+                        if (reviveItemMaterial != revivingPlayer.getInventory().getItemInMainHand().getType()) {
+                            if (npcExists(knockedOutPlayer)) {
+                                getNpc(knockedOutPlayer).setBeingRevived(false);
+                            }
+                            versionController.setXpDelay(revivingPlayer, 0);
+
+                            this.cancel();
+                        }
+                    }
+
                     if (canBeRevivedBy(revivingPlayer, knockedOutPlayer, reviveLocation)) {
                         versionController.setXpDelay(revivingPlayer, -1);
 
@@ -434,8 +466,12 @@ public class NpcManager {
 
                             // Revive a KO player
                             revivePlayer(knockedOutPlayer, revivingPlayer);
+                            // Decrease item amount in player's hand
+                            revivingPlayer.getInventory().getItemInMainHand().setAmount(revivingPlayer.getInventory().getItemInMainHand().getAmount() - 1);
                             versionController.setXpDelay(revivingPlayer, 0);
                             this.cancel();
+
+
                         }
                     } else {
                         if (npcExists(knockedOutPlayer)) {
@@ -457,6 +493,9 @@ public class NpcManager {
     public void revivePlayer(Player knockedOutPlayer, Player revivingPlayer) {
         getNpc(knockedOutPlayer).setBeingRevived(false);
         endKnockout(knockedOutPlayer, false);
+        double health = Knockout.getPlugin().getConfig().getDouble("revived-health");
+        if(health > 0) knockedOutPlayer.setHealth(health);
+        if(health == -1) knockedOutPlayer.setHealth(knockedOutPlayer.getMaxHealth());
         MessageUtils.sendMessage(revivingPlayer, "rescuer-revived-message", new HashMap<>(Map.of("%player%", knockedOutPlayer.getDisplayName())));
         MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-by-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
         MessageUtils.sendTitle(revivingPlayer, "rescuer-revived-title", "rescuer-revived-subtitle", new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), 10, 20 * 3, 10);
@@ -468,9 +507,25 @@ public class NpcManager {
     public void revivePlayer(Player knockedOutPlayer) {
         getNpc(knockedOutPlayer).setBeingRevived(false);
         endKnockout(knockedOutPlayer, false);
+        double health = Knockout.getPlugin().getConfig().getDouble("revived-health");
+        if(health > 0) knockedOutPlayer.setHealth(health);
+        if(health == -1) knockedOutPlayer.setHealth(knockedOutPlayer.getMaxHealth());
         MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-message");
         MessageUtils.sendTitle(knockedOutPlayer, "rescued-revived-title", "rescued-revived-subtitle", new HashMap<>(), new HashMap<>(), 10, 20 * 3, 10);
         runConfigCommands("console-after-revive-commands", knockedOutPlayer, false);
+    }
+
+
+    public Optional<Player> findNearbyKnockedOutPlayer(Player p) {
+        return p.getNearbyEntities(1, 1, 1).stream()
+                .filter(entity -> entity instanceof Player)
+                .map(entity -> (Player) entity)
+                .filter(this::npcExists)
+                .findFirst();
+    }
+
+    public PlayerInventory getDownedPlayerInventory(Player downedPlayer) {
+        return downedPlayer.getInventory();
     }
 
     // Refresh all NPCs for a player
@@ -518,6 +573,8 @@ public class NpcManager {
 
         // Play damage animation attacked knocked out player
         versionController.broadcastPacket(npc, PacketType.ANIMATE);
+        // Sound added
+        ko.getWorld().playSound(ko.getLocation(), Sound.ENTITY_PLAYER_HURT, 1, 1);
 
         if (Knockout.getPlugin().getConfig().getBoolean("damage-on-hit")) {
             ko.damage(value);

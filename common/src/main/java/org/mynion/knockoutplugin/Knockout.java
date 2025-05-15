@@ -3,6 +3,7 @@ package org.mynion.knockoutplugin;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mynion.knockoutplugin.commands.DieCommand;
@@ -47,6 +48,7 @@ public final class Knockout extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerInteractEntityListener(), this);
         getServer().getPluginManager().registerEvents(new EntityDamageListener(), this);
+        getServer().getPluginManager().registerEvents(new EntityInteractListener(), this);
         getServer().getPluginManager().registerEvents(new RegainHealthListener(), this);
         getServer().getPluginManager().registerEvents(new EntityTargetListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerMoveListener(), this);
@@ -76,6 +78,13 @@ public final class Knockout extends JavaPlugin {
     @Override
     public void onDisable() {
         if (NpcManager != null) NpcManager.endAllKnockouts();
+
+        for(Player player : this.getServer().getOnlinePlayers()) {
+            if (player.hasMetadata("KnockoutLooting")) {
+                player.closeInventory();
+                player.removeMetadata("KnockoutLooting", this);
+            }
+        }
     }
 
     private void loadAliases() {

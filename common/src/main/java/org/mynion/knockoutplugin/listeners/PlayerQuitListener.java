@@ -18,5 +18,9 @@ public class PlayerQuitListener implements Listener {
             NpcManager.endKnockout(p, true);
         }
 
+        if (e.getPlayer().hasMetadata("KnockoutLooting")) {
+            e.getPlayer().removeMetadata("KnockoutLooting", Knockout.getPlugin());
+        }
+
     }
 }
