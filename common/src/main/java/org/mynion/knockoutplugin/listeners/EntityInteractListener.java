@@ -29,6 +29,10 @@ public class EntityInteractListener implements Listener {
 
             NpcManager NpcManager = Knockout.getNpcManager();
 
+            if(!Knockout.getPlugin().getConfig().getBoolean("click-to-carry-drop")){
+                return;
+            }
+
             if (!interactor.hasPermission("knockout.carry")) {
                 MessageUtils.sendMessage(interactor, "no-permission-message");
                 return;

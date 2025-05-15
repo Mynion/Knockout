@@ -18,6 +18,10 @@ public class PlayerInteractListener implements Listener {
         NpcManager NpcManager = Knockout.getNpcManager();
         if ((e.getAction() == Action.LEFT_CLICK_BLOCK || e.getAction() == Action.LEFT_CLICK_AIR) && e.getPlayer().isSneaking()) {
 
+            if(!Knockout.getPlugin().getConfig().getBoolean("click-to-carry-drop")){
+                return;
+            }
+
             // Get knocked out passenger
             Optional<Player> knockedOutPlayer = interactor.getPassengers().stream()
                     .filter(passenger -> passenger instanceof Player)
