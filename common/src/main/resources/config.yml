@@ -53,10 +53,12 @@ knockout-vulnerable: true
 damage-on-hit: true
 
 # Health of revived player after revival
-revived-health: 2.0
+# Set to -1 to set the maximum health of the player
+# Set to 0 to not change the health
+revived-health: 0.0
 
 # Allow looting a knocked out player
-looting-allowed: true
+looting-allowed: false
 
 # If damage-on-hit is false, it is amount of knockout time to be decreased on hit
 time-decrease-on-hit: 5

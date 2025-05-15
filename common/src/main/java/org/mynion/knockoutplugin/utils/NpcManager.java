@@ -493,7 +493,9 @@ public class NpcManager {
     public void revivePlayer(Player knockedOutPlayer, Player revivingPlayer) {
         getNpc(knockedOutPlayer).setBeingRevived(false);
         endKnockout(knockedOutPlayer, false);
-        knockedOutPlayer.setHealth(Knockout.getPlugin().getConfig().getDouble("revived-health"));
+        double health = Knockout.getPlugin().getConfig().getDouble("revived-health");
+        if(health > 0) knockedOutPlayer.setHealth(health);
+        if(health == -1) knockedOutPlayer.setHealth(knockedOutPlayer.getMaxHealth());
         MessageUtils.sendMessage(revivingPlayer, "rescuer-revived-message", new HashMap<>(Map.of("%player%", knockedOutPlayer.getDisplayName())));
         MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-by-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
         MessageUtils.sendTitle(revivingPlayer, "rescuer-revived-title", "rescuer-revived-subtitle", new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), 10, 20 * 3, 10);
@@ -505,7 +507,9 @@ public class NpcManager {
     public void revivePlayer(Player knockedOutPlayer) {
         getNpc(knockedOutPlayer).setBeingRevived(false);
         endKnockout(knockedOutPlayer, false);
-        knockedOutPlayer.setHealth(Knockout.getPlugin().getConfig().getDouble("revived-health"));
+        double health = Knockout.getPlugin().getConfig().getDouble("revived-health");
+        if(health > 0) knockedOutPlayer.setHealth(health);
+        if(health == -1) knockedOutPlayer.setHealth(knockedOutPlayer.getMaxHealth());
         MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-message");
         MessageUtils.sendTitle(knockedOutPlayer, "rescued-revived-title", "rescued-revived-subtitle", new HashMap<>(), new HashMap<>(), 10, 20 * 3, 10);
         runConfigCommands("console-after-revive-commands", knockedOutPlayer, false);
