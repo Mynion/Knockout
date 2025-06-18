@@ -13,8 +13,8 @@ revive-levels: 5
 # Time in seconds to revive a player
 revive-time: 10
 
-# Item required in main hand of a rescuer to revive a player. Set to '' to disable
-revive-item: 'GOLDEN_APPLE'
+# Item required in main hand of a rescuer to revive a player, eq. 'GOLDEN_APPLE'. Set to '' to disable
+revive-item: ''
 
 # Send message to player after attempt to revive a player with an item missing in main hand
 revive-item-missing-message: '&cYou need a golden apple in your main hand!'
@@ -57,7 +57,7 @@ damage-on-hit: true
 # Set to 0 to not change the health
 revived-health: 0.0
 
-# Allow looting a knocked out player
+# Allow looting a knocked out player by clicking RightClick on him
 looting-allowed: false
 
 # If damage-on-hit is false, it is amount of knockout time to be decreased on hit
