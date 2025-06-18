@@ -3,6 +3,7 @@ package org.mynion.knockoutplugin.utils;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.logging.LogUtils;
 import jline.internal.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
@@ -13,19 +14,21 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.*;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.ChatVisiblity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.Team;
 import org.bukkit.GameMode;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R5.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_21_R5.entity.CraftPlayer;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -41,7 +44,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class VersionController_v1_21_5 implements VersionController {
+public class VersionController_v1_21_6 implements VersionController {
     @Override
     public void setMaxHealth(Player p) {
         AttributeInstance maxHealthAttribute = getServerPlayer(p).getAttribute(Attributes.MAX_HEALTH);
@@ -141,7 +144,8 @@ public class VersionController_v1_21_5 implements VersionController {
 
         if (parrot.isEmpty()) return;
 
-        Optional<net.minecraft.world.entity.Entity> left = EntityType.create(parrot, sp.level(), EntitySpawnReason.NATURAL);
+        ProblemReporter.ScopedCollector problemreporter_j = new ProblemReporter.ScopedCollector(sp.problemPath(), LogUtils.getLogger());
+        Optional<net.minecraft.world.entity.Entity> left = EntityType.create(TagValueInput.create(problemreporter_j.forChild(() -> ".shoulder"), sp.level().registryAccess(), parrot), sp.level(), EntitySpawnReason.NATURAL);
 
         if (left.isEmpty()) return;
 
@@ -150,7 +154,7 @@ public class VersionController_v1_21_5 implements VersionController {
             tamableAnimal.setOwner(sp);
         }
         entity.setPos(sp.getX(), sp.getY() + 0.699999988079071, sp.getZ());
-        ((ServerLevel) sp.level()).addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
+        sp.level().addWithUUID(entity, CreatureSpawnEvent.SpawnReason.SHOULDER_ENTITY);
 
         if (rightShoulder) {
             sp.setShoulderEntityRight(new CompoundTag());
@@ -171,7 +175,7 @@ public class VersionController_v1_21_5 implements VersionController {
     private Packet<?> createPacket(Npc npc, PacketType packetType) {
         ServerPlayer sp = getServerPlayer(npc.getPlayer());
         ServerPlayer mannequin = npc.getMannequin();
-        ServerLevel level = sp.serverLevel();
+        ServerLevel level = sp.level();
         double yDiff = -0.2;
         if (npc.getPlayer().isInsideVehicle()) {
             yDiff = 0.6;
@@ -215,7 +219,7 @@ public class VersionController_v1_21_5 implements VersionController {
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
         MinecraftServer server = sp.getServer();
-        ServerLevel level = sp.serverLevel();
+        ServerLevel level = sp.level();
 
         UUID mannequinUUID = UUID.randomUUID();
         String mannequinName = p.getName();
