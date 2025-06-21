@@ -55,6 +55,7 @@ damage-on-hit: true
 # Health of revived player after revival
 # Set to -1 to set the maximum health of the player
 # Set to 0 to not change the health
+# Or set to a specific value to set the health of the revived player
 revived-health: 0.0
 
 # Allow looting a knocked out player by clicking RightClick on him
