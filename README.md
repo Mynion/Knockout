@@ -15,7 +15,7 @@
 
 ## 🛠️ Installation
 
-1. Download the latest `.jar` release.
+1. Download the latest `.jar` release from [spigotmc.org](https://www.spigotmc.org/resources/knockout.119934/).
 2. Place it into your server's `plugins/` directory.
 3. Restart or reload the server.
 4. Modify `config.yml` if needed.
