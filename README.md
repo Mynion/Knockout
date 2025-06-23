@@ -24,6 +24,11 @@
 
 Join our [Discord server](https://discord.com/invite/ynwDP8H2DY) for support, feature requests, and updates!
 
+## 🤝 Contributing
+
+Contributions are welcome!  
+If you'd like to help improve this plugin, please read the [Contributing Guidelines](CONTRIBUTING.md) before submitting a pull request.
+
 ---
 
 <details>
