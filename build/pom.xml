@@ -139,7 +139,7 @@
                                     <include>org.mynion:*</include>
                                 </includes>
                             </artifactSet>
-                            <outputFile>${plugin.output.directory}${output.version}/plugins/${project.parent.artifactId}-${project.parent.version}.jar</outputFile>
+                            <outputFile>${plugin.output.directory}/${project.parent.artifactId}-${project.parent.version}.jar</outputFile>
                         </configuration>
                     </execution>
                 </executions>
