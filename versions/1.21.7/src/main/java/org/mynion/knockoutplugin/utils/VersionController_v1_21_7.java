@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class VersionController_v1_21_6 implements VersionController {
+public class VersionController_v1_21_7 implements VersionController {
     @Override
     public void setMaxHealth(Player p) {
         AttributeInstance maxHealthAttribute = getServerPlayer(p).getAttribute(Attributes.MAX_HEALTH);
