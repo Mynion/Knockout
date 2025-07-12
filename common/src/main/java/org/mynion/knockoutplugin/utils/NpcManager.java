@@ -465,9 +465,17 @@ public class NpcManager {
                         if (percent == 100) {
 
                             // Revive a KO player
-                            revivePlayer(knockedOutPlayer, revivingPlayer);
-                            // Decrease item amount in player's hand
-                            revivingPlayer.getInventory().getItemInMainHand().setAmount(revivingPlayer.getInventory().getItemInMainHand().getAmount() - 1);
+                            if (reviveItemMaterial != null){
+                                if(reviveItemMaterial == revivingPlayer.getInventory().getItemInMainHand().getType()){
+                                    // Decrease item amount in player's hand
+                                    revivingPlayer.getInventory().getItemInMainHand().setAmount(revivingPlayer.getInventory().getItemInMainHand().getAmount() - 1);
+                                    revivePlayer(knockedOutPlayer, revivingPlayer);
+                                }else{
+                                    this.cancel();
+                                }
+                            } else {
+                                revivePlayer(knockedOutPlayer, revivingPlayer);
+                            }
                             versionController.setXpDelay(revivingPlayer, 0);
                             this.cancel();
 
