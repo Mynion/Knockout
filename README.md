@@ -120,6 +120,19 @@ custom-location:
   y: 100
   z: 0
 
+# When true: players will get knocked out only in the worlds listed in world-whitelist
+enable-world-whitelist: false
+
+# Knockouts will work only in the worlds listed below if enable-world-whitelist is true.
+world-whitelist:
+  -
+
+# Knockouts will not work in the worlds listed below. Players will die instead.
+world-blacklist:
+  -
+
+# Note that "/ko knockout" command will work in all worlds regardless of the whitelist/blacklist
+
 # Message for the player when knocked out
 knockout-message: '&cYou have been knocked out! Ask someone to revive you or use /die to die at once.'
 
