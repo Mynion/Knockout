@@ -49,6 +49,12 @@ public class PlayerDamageListener implements Listener {
                     NpcManager.endKnockout(p, false);
                 } else {
 
+                    // Check world white/black list
+                    if(Knockout.getPlugin().getConfig().getList("world-blacklist").contains(p.getWorld().getName())) return;
+                    if(Knockout.getPlugin().getConfig().getBoolean("enable-world-whitelist")){
+                        if(!Knockout.getPlugin().getConfig().getList("world-whitelist").contains(p.getWorld().getName())) return;
+                    }
+
                     e.setCancelled(true);
                     Entity damager = null;
                     if (e instanceof EntityDamageByEntityEvent ebyEntity) {
