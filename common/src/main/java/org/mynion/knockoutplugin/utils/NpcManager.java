@@ -382,6 +382,10 @@ public class NpcManager {
             return;
         }
 
+        if(revivingPlayer.getGameMode().equals(GameMode.SPECTATOR)){
+            return;
+        }
+
         // Revive item check variable
         Material reviveItemMaterial = Material.getMaterial(Knockout.getPlugin().getConfig().getString("revive-item"));
 
