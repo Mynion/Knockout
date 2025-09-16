@@ -56,6 +56,11 @@ public class EntityInteractListener implements Listener {
         }
 
         NpcManager npcManager = Knockout.getNpcManager();
+
+        if(!npcManager.npcExists((ArmorStand) e.getRightClicked())){
+            return;
+        }
+
         NpcModel npc = npcManager.getNpc((ArmorStand) e.getRightClicked());
         Player clickedPlayer = npc.getPlayer();
 
