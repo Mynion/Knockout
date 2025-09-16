@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.NpcManager;
 
@@ -37,7 +38,16 @@ public class PlayerDamageListener implements Listener {
                             // Damage by attacker
                             NpcManager.getNpc(p).setVulnerableByPlayerWhenCarried(true);
                             Entity killer = NpcManager.getKiller(p);
-                            p.damage(e.getFinalDamage(), killer);
+                            if(Knockout.getPlugin().getServer().getName().equals("Purpur")){
+                                new BukkitRunnable(){
+                                    @Override
+                                    public void run() {
+                                        p.damage(e.getFinalDamage(), killer);
+                                    }
+                                }.runTaskLater(Knockout.getPlugin(), 0);
+                            }else{
+                                p.damage(e.getFinalDamage(), killer);
+                            }
 
                             // p.damage() calls EntityDamageEvent, so we return to prevent ending knockout two times
                             return;
