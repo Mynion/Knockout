@@ -382,7 +382,7 @@ public class NpcManager {
             return;
         }
 
-        if(revivingPlayer.getGameMode().equals(GameMode.SPECTATOR)){
+        if (revivingPlayer.getGameMode().equals(GameMode.SPECTATOR)) {
             return;
         }
 
@@ -424,7 +424,7 @@ public class NpcManager {
                 public void run() {
 
                     // Maybe optimize later
-                    if(reviveItemMaterial != null) {
+                    if (reviveItemMaterial != null) {
                         // We have to check item conditions all the time because player might switch item in main hand
                         if (reviveItemMaterial != revivingPlayer.getInventory().getItemInMainHand().getType()) {
                             if (npcExists(knockedOutPlayer)) {
@@ -469,12 +469,12 @@ public class NpcManager {
                         if (percent == 100) {
 
                             // Revive a KO player
-                            if (reviveItemMaterial != null){
-                                if(reviveItemMaterial == revivingPlayer.getInventory().getItemInMainHand().getType()){
+                            if (reviveItemMaterial != null) {
+                                if (reviveItemMaterial == revivingPlayer.getInventory().getItemInMainHand().getType()) {
                                     // Decrease item amount in player's hand
                                     revivingPlayer.getInventory().getItemInMainHand().setAmount(revivingPlayer.getInventory().getItemInMainHand().getAmount() - 1);
                                     revivePlayer(knockedOutPlayer, revivingPlayer);
-                                }else{
+                                } else {
                                     this.cancel();
                                 }
                             } else {
@@ -505,9 +505,7 @@ public class NpcManager {
     public void revivePlayer(Player knockedOutPlayer, Player revivingPlayer) {
         getNpc(knockedOutPlayer).setBeingRevived(false);
         endKnockout(knockedOutPlayer, false);
-        double health = Knockout.getPlugin().getConfig().getDouble("revived-health");
-        if(health > 0) knockedOutPlayer.setHealth(health);
-        if(health == -1) knockedOutPlayer.setHealth(knockedOutPlayer.getMaxHealth());
+        resetPlayerHealth(knockedOutPlayer);
         MessageUtils.sendMessage(revivingPlayer, "rescuer-revived-message", new HashMap<>(Map.of("%player%", knockedOutPlayer.getDisplayName())));
         MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-by-message", new HashMap<>(Map.of("%player%", revivingPlayer.getDisplayName())));
         MessageUtils.sendTitle(revivingPlayer, "rescuer-revived-title", "rescuer-revived-subtitle", new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), new HashMap<>(Map.of("%player%", knockedOutPlayer.getName())), 10, 20 * 3, 10);
@@ -519,14 +517,17 @@ public class NpcManager {
     public void revivePlayer(Player knockedOutPlayer) {
         getNpc(knockedOutPlayer).setBeingRevived(false);
         endKnockout(knockedOutPlayer, false);
-        double health = Knockout.getPlugin().getConfig().getDouble("revived-health");
-        if(health > 0) knockedOutPlayer.setHealth(health);
-        if(health == -1) knockedOutPlayer.setHealth(knockedOutPlayer.getMaxHealth());
+        resetPlayerHealth(knockedOutPlayer);
         MessageUtils.sendMessage(knockedOutPlayer, "rescued-revived-message");
         MessageUtils.sendTitle(knockedOutPlayer, "rescued-revived-title", "rescued-revived-subtitle", new HashMap<>(), new HashMap<>(), 10, 20 * 3, 10);
         runConfigCommands("console-after-revive-commands", knockedOutPlayer, false);
     }
 
+    private void resetPlayerHealth(Player p) {
+        double health = Knockout.getPlugin().getConfig().getDouble("revived-health");
+        if (health > 0) p.setHealth(health);
+        if (health == -1) p.setHealth(p.getMaxHealth());
+    }
 
     public Optional<Player> findNearbyKnockedOutPlayer(Player p) {
         return p.getNearbyEntities(1, 1, 1).stream()
@@ -565,8 +566,16 @@ public class NpcManager {
 
         getNPCs().forEach(npc -> {
             Player p = npc.getPlayer();
-
-            endKO(p, plugin.getConfig().getBoolean("death-on-end"));
+            if (plugin.getConfig().getBoolean("death-on-end")) {
+                endKO(p, true);
+            } else {
+                getNpc(p).setBeingRevived(false);
+                endKO(p, false);
+                resetPlayerHealth(p);
+                MessageUtils.sendMessage(p, "rescued-revived-message");
+                MessageUtils.sendTitle(p, "rescued-revived-title", "rescued-revived-subtitle", new HashMap<>(), new HashMap<>(), 10, 20 * 3, 10);
+                runConfigCommands("console-after-revive-commands", p, false);
+            }
 
         });
 

@@ -67,7 +67,11 @@ public abstract class NpcModel {
     public void setKnockoutCooldown(int knockoutCooldown) {
         this.knockoutCooldown = knockoutCooldown;
         if (knockoutCooldown <= 0) {
-            Knockout.getNpcManager().endKnockout(player, Knockout.getPlugin().getConfig().getBoolean("death-on-end"));
+            if (Knockout.getPlugin().getConfig().getBoolean("death-on-end")) {
+                Knockout.getNpcManager().endKnockout(player, true);
+            } else {
+                Knockout.getNpcManager().revivePlayer(player);
+            }
 
         } else {
             String knockoutTitle = Knockout.getPlugin().getConfig().getString("knockout-title");
@@ -101,6 +105,7 @@ public abstract class NpcModel {
     public boolean isVulnerableByPlayerWhenCarried() {
         return isVulnerableByPlayerWhenCarried;
     }
+
     public void setVulnerableByPlayerWhenCarried(boolean vulnerableByPlayerWhenCarried) {
         isVulnerableByPlayerWhenCarried = vulnerableByPlayerWhenCarried;
     }
