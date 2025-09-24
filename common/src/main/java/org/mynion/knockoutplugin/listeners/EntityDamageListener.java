@@ -35,9 +35,22 @@ public class EntityDamageListener implements Listener {
                 return;
             }
 
-            if(armorStand.getNoDamageTicks() > 0) return;
+            if (armorStand.getNoDamageTicks() > 0) return;
 
-            NpcManager.damagePlayerByEntity(npc, e.getDamager(), e.getFinalDamage());
+            Player p = npc.getPlayer();
+
+            // Prevent hurting ko player by yourself
+            if (p.equals(e.getDamager())) return;
+
+            if (NpcManager.useDamageSource()) {
+                if (NpcManager.wouldDie(p, e)) {
+                    NpcManager.damagePlayerWithDamageSource(npc, e.getDamageSource(), e.getFinalDamage());
+                } else {
+                    NpcManager.damagePlayerWithoutKB(npc, e.getDamager(), e.getFinalDamage());
+                }
+            } else {
+                NpcManager.damagePlayerWithoutKB(npc, e.getDamager(), e.getFinalDamage());
+            }
 
             armorStand.setNoDamageTicks(10);
 

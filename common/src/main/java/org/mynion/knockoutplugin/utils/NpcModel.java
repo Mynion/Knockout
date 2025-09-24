@@ -2,6 +2,7 @@ package org.mynion.knockoutplugin.utils;
 
 import jline.internal.Nullable;
 import org.bukkit.GameMode;
+import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -24,12 +25,16 @@ public abstract class NpcModel {
     private Entity killer;
     private boolean isVulnerableByPlayerWhenCarried;
 
+    private DamageSource knockoutDamageSource;
+    private DamageSource lastDamageSource;
+
     public NpcModel(Player player, ArmorStand armorStand, GameMode previousGameMode, @Nullable Entity killer) {
         this.player = player;
         this.armorStand = armorStand;
         this.previousGameMode = previousGameMode;
         isBeingRevived = false;
         this.killer = killer;
+        isVulnerableByPlayerWhenCarried = true;
     }
 
     public Player getPlayer() {
@@ -108,5 +113,21 @@ public abstract class NpcModel {
 
     public void setVulnerableByPlayerWhenCarried(boolean vulnerableByPlayerWhenCarried) {
         isVulnerableByPlayerWhenCarried = vulnerableByPlayerWhenCarried;
+    }
+
+    public DamageSource getKnockoutDamageSource() {
+        return knockoutDamageSource;
+    }
+
+    public void setKnockoutDamageSource(DamageSource knockoutDamageSource) {
+        this.knockoutDamageSource = knockoutDamageSource;
+    }
+
+    public DamageSource getLastDamageSource() {
+        return lastDamageSource;
+    }
+
+    public void setLastDamageSource(DamageSource lastDamageSource) {
+        this.lastDamageSource = lastDamageSource;
     }
 }

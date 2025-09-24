@@ -5,8 +5,11 @@ import org.bukkit.*;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.*;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -586,7 +589,7 @@ public class NpcManager {
     }
 
     // Damage a knocked out player
-    public void damagePlayerByEntity(NpcModel npc, Entity attacker, double value) {
+    public void damagePlayerWithoutKB(NpcModel npc, Entity attacker, double value) {
         Player ko = npc.getPlayer();
         if (attacker instanceof Player p) {
             if (ko.equals(p)) return;
@@ -605,6 +608,64 @@ public class NpcManager {
             npc.setKnockoutCooldown(npc.getKnockoutCooldown() - timeDecrease);
 
         }
+    }
+
+    // Damage a knocked out player
+    public void damagePlayerWithDamageSource(NpcModel npc, DamageSource source, double value) {
+        Player ko = npc.getPlayer();
+        if (source.getCausingEntity() instanceof Player p) {
+            if (ko.equals(p)) return;
+        }
+
+        // Play damage animation attacked knocked out player
+        versionController.broadcastPacket(npc, PacketType.ANIMATE);
+        // Sound added
+        ko.getWorld().playSound(ko.getLocation(), Sound.ENTITY_PLAYER_HURT, 1, 1);
+
+        if (Knockout.getPlugin().getConfig().getBoolean("damage-on-hit")) {
+            ko.damage(value, source);
+
+        } else {
+            int timeDecrease = Knockout.getPlugin().getConfig().getInt("time-decrease-on-hit");
+            npc.setKnockoutCooldown(npc.getKnockoutCooldown() - timeDecrease);
+
+        }
+    }
+
+    private boolean hasDamageCooldown(Player p, EntityDamageEvent e) {
+        EntityDamageEvent.DamageCause CAUSE = e.getCause();
+        if (e instanceof EntityDamageByEntityEvent ebyEntity && p.getLastDamageCause() instanceof EntityDamageByEntityEvent lastEbyEntity) {
+            if (!ebyEntity.getDamager().equals(lastEbyEntity.getDamager())) {
+                return false;
+            }
+        }
+        if (p.getLastDamageCause() != null) {
+            if (p.getLastDamageCause().getCause() != CAUSE) {
+                return false;
+            }
+        }
+        return p.getNoDamageTicks() > 10;
+    }
+
+    // Check if the player has totem of undying in either of his hands
+    private boolean hasTotemOfUndying(Player p) {
+        return p.getInventory().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING)
+                || p.getInventory().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING);
+    }
+
+    public boolean wouldDie(Player p, EntityDamageEvent e){
+        return e.getFinalDamage() >= p.getHealth() && !hasDamageCooldown(p, e) && !hasTotemOfUndying(p);
+    }
+
+    public boolean useDamageSource(){
+//        try{
+//            DamageSource.builder(DamageType.GENERIC).build();
+//            return true;
+//        }catch (Exception e){
+//            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");
+//            return false;
+//        }
+        return Knockout.getVersion().startsWith("1.20.4") || Knockout.getVersion().startsWith("1.20.5") || Knockout.getVersion().startsWith("1.20.6") || Knockout.getVersion().startsWith("1.21");
     }
 
     private boolean canBeRevivedBy(Player revivingPlayer, Player knockedOutPlayer, Location reviveLocation) {

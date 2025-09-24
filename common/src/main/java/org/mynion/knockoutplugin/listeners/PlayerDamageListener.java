@@ -1,6 +1,6 @@
 package org.mynion.knockoutplugin.listeners;
 
-import org.bukkit.Material;
+import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,42 +26,79 @@ public class PlayerDamageListener implements Listener {
 
 
             // Check if the player would die
-            if (e.getFinalDamage() >= p.getHealth() && !hasDamageCooldown(p, e) && !hasTotemOfUndying(p)) {
+            if (NpcManager.wouldDie(p, e)) {
                 // Check if the player is knocked out
                 if (NpcManager.npcExists(p)) {
 
-                    // Replace normal damage event with attacker damage event
-                    if (!(e instanceof EntityDamageByEntityEvent ebyEntity && ebyEntity.getDamager().equals(NpcManager.getKiller(p)))) {
-                        if (NpcManager.getKiller(p) != null) {
+                    if (NpcManager.useDamageSource()) {
+                        if (!Knockout.getPlugin().getConfig().getBoolean("remember-death-cause")) {
+                            NpcManager.endKnockout(p, false);
+                            return;
+                        }
+
+                        DamageSource damageSource;
+                        if (Knockout.getPlugin().getConfig().getBoolean("remember-death-cause")) {
+                            damageSource = NpcManager.getNpc(p).getKnockoutDamageSource();
+                        } else {
+                            damageSource = NpcManager.getNpc(p).getLastDamageSource();
+                        }
+
+                        if (damageSource.getDamageType() != e.getDamageSource().getDamageType() || damageSource.getCausingEntity() != e.getDamageSource().getCausingEntity()) {
+                            // Replace normal damage event with attacker damage event
                             e.setCancelled(true);
 
                             // Damage by attacker
                             NpcManager.getNpc(p).setVulnerableByPlayerWhenCarried(true);
-                            Entity killer = NpcManager.getKiller(p);
-                            if(Knockout.getPlugin().getServer().getName().equals("Purpur")){
-                                new BukkitRunnable(){
+                            if (Knockout.getPlugin().getServer().getName().equals("Purpur")) {
+                                new BukkitRunnable() {
                                     @Override
                                     public void run() {
-                                        p.damage(e.getFinalDamage(), killer);
+                                        p.damage(e.getFinalDamage(), damageSource);
                                     }
                                 }.runTaskLater(Knockout.getPlugin(), 0);
-                            }else{
-                                p.damage(e.getFinalDamage(), killer);
+                            } else {
+                                p.damage(e.getFinalDamage(), damageSource);
                             }
-
-                            // p.damage() calls EntityDamageEvent, so we return to prevent ending knockout two times
-                            return;
+                        } else {
+                            // End knockout
+                            NpcManager.endKnockout(p, false);
                         }
-                    }
+                    } else {
+                        // Replace normal damage event with attacker damage event
+                        if (!(e instanceof EntityDamageByEntityEvent ebyEntity && ebyEntity.getDamager().equals(NpcManager.getKiller(p)))) {
+                            if (NpcManager.getKiller(p) != null) {
+                                e.setCancelled(true);
 
-                    // End knockout
-                    NpcManager.endKnockout(p, false);
+                                // Damage by attacker
+                                NpcManager.getNpc(p).setVulnerableByPlayerWhenCarried(true);
+                                Entity killer = NpcManager.getKiller(p);
+                                if (Knockout.getPlugin().getServer().getName().equals("Purpur")) {
+                                    new BukkitRunnable() {
+                                        @Override
+                                        public void run() {
+                                            p.damage(e.getFinalDamage(), killer);
+                                        }
+                                    }.runTaskLater(Knockout.getPlugin(), 0);
+                                } else {
+                                    p.damage(e.getFinalDamage(), killer);
+                                }
+
+                                // p.damage() calls EntityDamageEvent, so we return to prevent ending knockout two times
+                                return;
+                            }
+                        }
+
+                        // End knockout
+                        NpcManager.endKnockout(p, false);
+                    }
                 } else {
 
                     // Check world white/black list
-                    if(Knockout.getPlugin().getConfig().getList("world-blacklist").contains(p.getWorld().getName())) return;
-                    if(Knockout.getPlugin().getConfig().getBoolean("enable-world-whitelist")){
-                        if(!Knockout.getPlugin().getConfig().getList("world-whitelist").contains(p.getWorld().getName())) return;
+                    if (Knockout.getPlugin().getConfig().getList("world-blacklist").contains(p.getWorld().getName()))
+                        return;
+                    if (Knockout.getPlugin().getConfig().getBoolean("enable-world-whitelist")) {
+                        if (!Knockout.getPlugin().getConfig().getList("world-whitelist").contains(p.getWorld().getName()))
+                            return;
                     }
 
                     e.setCancelled(true);
@@ -76,6 +113,7 @@ public class PlayerDamageListener implements Listener {
                         seconds = 60;
                     }
                     NpcManager.knockoutPlayer(p, damager, seconds);
+                    if (NpcManager.useDamageSource()) NpcManager.getNpc(p).setKnockoutDamageSource(e.getDamageSource());
                 }
             } else {
                 if (NpcManager.npcExists(p)) {
@@ -91,27 +129,5 @@ public class PlayerDamageListener implements Listener {
                 }
             }
         }
-    }
-
-    // Check if the player has damage cooldown to prevent false event calls
-    private boolean hasDamageCooldown(Player p, EntityDamageEvent e) {
-        EntityDamageEvent.DamageCause CAUSE = e.getCause();
-        if (e instanceof EntityDamageByEntityEvent ebyEntity && p.getLastDamageCause() instanceof EntityDamageByEntityEvent lastEbyEntity) {
-            if (!ebyEntity.getDamager().equals(lastEbyEntity.getDamager())) {
-                return false;
-            }
-        }
-        if (p.getLastDamageCause() != null) {
-            if (p.getLastDamageCause().getCause() != CAUSE) {
-                return false;
-            }
-        }
-        return p.getNoDamageTicks() > 10;
-    }
-
-    // Check if the player has totem of undying in either of his hands
-    private boolean hasTotemOfUndying(Player p) {
-        return p.getInventory().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING)
-                || p.getInventory().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING);
     }
 }

@@ -5,6 +5,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Player;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.utils.MessageUtils;
@@ -68,6 +70,8 @@ public class KnockoutCommand implements TabExecutor {
                     }
                 }
                 NpcManager.knockoutPlayer(ko, null, time);
+                if (NpcManager.useDamageSource())
+                    NpcManager.getNpc(ko).setKnockoutDamageSource(DamageSource.builder(DamageType.GENERIC).build());
                 sender.sendMessage(ChatColor.GREEN + "Player knocked out for " + time + " seconds.");
             } else {
                 sender.sendMessage(ChatColor.RED + "Player not found.");
