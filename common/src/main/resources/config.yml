@@ -70,6 +70,9 @@ revive-by-instant-health: false
 # When true: players can be carried by Shift+RightClick and dropped by Shift+LeftClick
 click-to-carry-drop: true
 
+# When true: if a knocked out player lefts the server, knockout will end
+end-knockout-on-quit: true
+
 # When true: replaces the death cause with knockout cause
 # Works only on 1.20.4+ versions
 remember-death-cause: true

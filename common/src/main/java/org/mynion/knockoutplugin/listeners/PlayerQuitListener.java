@@ -13,9 +13,13 @@ public class PlayerQuitListener implements Listener {
         NpcManager NpcManager = Knockout.getNpcManager();
         Player p = e.getPlayer();
 
-        // Kill the player if knocked out
+        // End knockout or end temporary and knockout again when player rejoins
         if (NpcManager.npcExists(p)) {
-            NpcManager.endKnockout(p, true);
+            if(Knockout.getPlugin().getConfig().getBoolean("end-knockout-on-quit")){
+                NpcManager.endKnockout(p, Knockout.getPlugin().getConfig().getBoolean("death-on-end"));
+            } else {
+                NpcManager.endKnockoutTemporary(p, false);
+            }
         }
 
         if (e.getPlayer().hasMetadata("KnockoutLooting")) {

@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.damage.DamageSource;
-import org.bukkit.damage.DamageType;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -134,14 +133,14 @@ public class NpcManager {
     public void endKnockout(Player p, boolean killPlayer) {
         NpcModel npc = getNpc(p);
 
-        endKO(p, killPlayer);
+        endKnockoutTemporary(p, killPlayer);
 
         // Remove npc from npc list
         NPCs.remove(npc);
 
     }
 
-    private void endKO(Player p, boolean killPlayer) {
+    public void endKnockoutTemporary(Player p, boolean killPlayer) {
         NpcModel npc = getNpc(p);
         GameMode previousGameMode = npc.getPreviousGameMode();
 
@@ -547,21 +546,36 @@ public class NpcManager {
     // Refresh all NPCs for a player
     public void refreshNPCsForPlayer(Player p) {
 
-        // Perform actions for a new player
         getNPCs().forEach(npc -> {
 
-            // Show bodies for a new player
+            // Show bodies for a player
             versionController.sendPacket(p, npc, PacketType.INFO_UPDATE);
             versionController.sendPacket(p, npc, PacketType.ADD_ENTITY);
             versionController.sendPacket(p, npc, PacketType.SET_ENTITY_DATA);
 
-            // Set no collisions for bodies and a new player
+            // Set no collisions for bodies and a player
             versionController.setCollisions(p, false);
 
-            // Hide knocked out players for a new player
+            // Hide knocked out players for a player
             p.hidePlayer(Knockout.getPlugin(), npc.getPlayer());
 
         });
+    }
+
+    // Refresh an NPC for a player
+    public void refreshNPCForPlayer(Player p, NpcModel npc) {
+
+        // Show bodies for a player
+        versionController.sendPacket(p, npc, PacketType.INFO_UPDATE);
+        versionController.sendPacket(p, npc, PacketType.ADD_ENTITY);
+        versionController.sendPacket(p, npc, PacketType.SET_ENTITY_DATA);
+
+        // Set no collisions for bodies and a player
+        versionController.setCollisions(p, false);
+
+        // Hide knocked out players for a player
+        p.hidePlayer(Knockout.getPlugin(), npc.getPlayer());
+
     }
 
     // Remove all NPCs
@@ -570,10 +584,10 @@ public class NpcManager {
         getNPCs().forEach(npc -> {
             Player p = npc.getPlayer();
             if (plugin.getConfig().getBoolean("death-on-end")) {
-                endKO(p, true);
+                endKnockoutTemporary(p, true);
             } else {
                 getNpc(p).setBeingRevived(false);
-                endKO(p, false);
+                endKnockoutTemporary(p, false);
                 resetPlayerHealth(p);
                 MessageUtils.sendMessage(p, "rescued-revived-message");
                 MessageUtils.sendTitle(p, "rescued-revived-title", "rescued-revived-subtitle", new HashMap<>(), new HashMap<>(), 10, 20 * 3, 10);
@@ -658,13 +672,6 @@ public class NpcManager {
     }
 
     public boolean useDamageSource(){
-//        try{
-//            DamageSource.builder(DamageType.GENERIC).build();
-//            return true;
-//        }catch (Exception e){
-//            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++");
-//            return false;
-//        }
         return Knockout.getVersion().startsWith("1.20.4") || Knockout.getVersion().startsWith("1.20.5") || Knockout.getVersion().startsWith("1.20.6") || Knockout.getVersion().startsWith("1.21");
     }
 
@@ -681,6 +688,11 @@ public class NpcManager {
         return matchingNpc.isPresent();
     }
 
+    public boolean npcExists(UUID uuid) {
+        Optional<NpcModel> matchingNpc = NPCs.stream().filter(npc -> npc.getPlayer().getUniqueId().equals(uuid)).findFirst();
+        return matchingNpc.isPresent();
+    }
+
     public boolean npcExists(ArmorStand armorStand) {
         Optional<NpcModel> matchingNpc = NPCs.stream().filter(npc -> npc.getArmorStand().equals(armorStand)).findFirst();
         return matchingNpc.isPresent();
@@ -688,6 +700,11 @@ public class NpcManager {
 
     public NpcModel getNpc(Player player) {
         Optional<NpcModel> matchingNpc = NPCs.stream().filter(npc -> npc.getPlayer().equals(player)).findFirst();
+        return matchingNpc.orElse(null);
+    }
+
+    public NpcModel getNpc(UUID uuid) {
+        Optional<NpcModel> matchingNpc = NPCs.stream().filter(npc -> npc.getPlayer().getUniqueId().equals(uuid)).findFirst();
         return matchingNpc.orElse(null);
     }
 

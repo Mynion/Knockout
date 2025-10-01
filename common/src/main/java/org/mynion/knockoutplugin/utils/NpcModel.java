@@ -1,6 +1,7 @@
 package org.mynion.knockoutplugin.utils;
 
 import jline.internal.Nullable;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.ArmorStand;
@@ -24,9 +25,9 @@ public abstract class NpcModel {
     private int knockoutCooldown;
     private Entity killer;
     private boolean isVulnerableByPlayerWhenCarried;
-
     private DamageSource knockoutDamageSource;
     private DamageSource lastDamageSource;
+    private boolean isDead;
 
     public NpcModel(Player player, ArmorStand armorStand, GameMode previousGameMode, @Nullable Entity killer) {
         this.player = player;
@@ -35,6 +36,7 @@ public abstract class NpcModel {
         isBeingRevived = false;
         this.killer = killer;
         isVulnerableByPlayerWhenCarried = true;
+        isDead = false;
     }
 
     public Player getPlayer() {
@@ -73,7 +75,11 @@ public abstract class NpcModel {
         this.knockoutCooldown = knockoutCooldown;
         if (knockoutCooldown <= 0) {
             if (Knockout.getPlugin().getConfig().getBoolean("death-on-end")) {
-                Knockout.getNpcManager().endKnockout(player, true);
+                if (Bukkit.getServer().getOnlinePlayers().contains(player)) {
+                    if (!isDead) Knockout.getNpcManager().endKnockout(player, true);
+                } else {
+                    isDead = true;
+                }
             } else {
                 Knockout.getNpcManager().revivePlayer(player);
             }
@@ -129,5 +135,13 @@ public abstract class NpcModel {
 
     public void setLastDamageSource(DamageSource lastDamageSource) {
         this.lastDamageSource = lastDamageSource;
+    }
+
+    public boolean isDead() {
+        return isDead;
+    }
+
+    public void setDead(boolean dead) {
+        isDead = dead;
     }
 }
