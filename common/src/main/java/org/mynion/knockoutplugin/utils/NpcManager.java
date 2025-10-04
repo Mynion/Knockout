@@ -262,7 +262,7 @@ public class NpcManager {
             @Override
             public void run() {
 
-                if (!npcExists(p)) {
+                if (!npcExists(p) || !getNpc(p).equals(npc)) {
                     this.cancel();
                     return;
                 }
@@ -667,11 +667,11 @@ public class NpcManager {
                 || p.getInventory().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING);
     }
 
-    public boolean wouldDie(Player p, EntityDamageEvent e){
+    public boolean wouldDie(Player p, EntityDamageEvent e) {
         return e.getFinalDamage() >= p.getHealth() && !hasDamageCooldown(p, e) && !hasTotemOfUndying(p);
     }
 
-    public boolean useDamageSource(){
+    public boolean useDamageSource() {
         return Knockout.getVersion().startsWith("1.20.4") || Knockout.getVersion().startsWith("1.20.5") || Knockout.getVersion().startsWith("1.20.6") || Knockout.getVersion().startsWith("1.21");
     }
 
