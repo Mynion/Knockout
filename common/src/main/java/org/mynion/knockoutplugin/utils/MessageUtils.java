@@ -27,6 +27,18 @@ public class MessageUtils {
         }
     }
 
+    public static String createMessage(Player recipient, String configPath, HashMap<String, String> replacements){
+        String message = Knockout.getPlugin().getConfig().getString(configPath);
+        if (message != null && !message.isEmpty()) {
+            for (String key : replacements.keySet()) {
+                message = message.replace(key, replacements.get(key));
+            }
+            message = PapiAdapter.setPlaceholders(recipient, message);
+            message = translateColorCodes(message);
+        }
+        return message;
+    }
+
     public static void sendTitle(Player p, String titleConfigPath, String subtitleConfigPath, HashMap<String, String> titleReplacements, HashMap<String, String> subtitleReplacements, int fadeIn, int stay, int fadeOut) {
         String title = Knockout.getPlugin().getConfig().getString(titleConfigPath);
         String subtitle = Knockout.getPlugin().getConfig().getString(subtitleConfigPath);

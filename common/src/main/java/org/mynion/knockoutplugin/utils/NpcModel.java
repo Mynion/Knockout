@@ -3,10 +3,12 @@ package org.mynion.knockoutplugin.utils;
 import jline.internal.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.NamespacedKey;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import org.mynion.knockoutplugin.Knockout;
 
 import java.time.LocalTime;
@@ -35,6 +37,8 @@ public abstract class NpcModel {
         this.previousGameMode = previousGameMode;
         isBeingRevived = false;
         this.killer = killer;
+        if (killer != null)
+            player.getPersistentDataContainer().set(new NamespacedKey(Knockout.getPlugin(), "killer"), PersistentDataType.STRING, killer.getName());
         isVulnerableByPlayerWhenCarried = true;
         isDead = false;
     }
@@ -111,6 +115,7 @@ public abstract class NpcModel {
 
     public void setKiller(Entity killer) {
         this.killer = killer;
+        player.getPersistentDataContainer().set(new NamespacedKey(Knockout.getPlugin(), "killer"), PersistentDataType.STRING, killer.getName());
     }
 
     public boolean isVulnerableByPlayerWhenCarried() {

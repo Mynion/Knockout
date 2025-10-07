@@ -103,6 +103,15 @@ world-blacklist:
 
 # Note that "/ko knockout" command will work in all worlds regardless of the whitelist/blacklist
 
+# When true: replaces the original death message with new-death-message. Set remember-death-cause to false for this to work correctly
+replace-death-message: false
+
+# Replaces the original death message, if replace-death-message is set to true and %entity% exists. Set remember-death-cause to false for this to work correctly
+# Use variable %player% to show the knocked out player name
+# Use variable %entity% to show the name of the entity causing knockout
+# Use variable %death_message% to show the original death message
+new-death-message: "%player% was knocked out by %entity%, then %death_message%"
+
 # Message for the player when knocked out
 knockout-message: '&cYou have been knocked out! Ask someone to revive you or use /die to die at once.'
 
