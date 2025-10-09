@@ -71,6 +71,12 @@
                 </dependency>
                 <dependency>
                     <groupId>org.mynion</groupId>
+                    <artifactId>1.21.10</artifactId>
+                    <version>${project.version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.mynion</groupId>
                     <artifactId>1.19</artifactId>
                     <version>${project.version}</version>
                     <scope>compile</scope>
