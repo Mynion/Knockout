@@ -1,7 +1,7 @@
 package org.mynion.knockoutplugin.utils;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
 import jline.internal.Nullable;
@@ -183,13 +183,13 @@ public class VersionController_v1_21_10 implements VersionController {
         return switch (packetType) {
             case ANIMATE -> new ClientboundHurtAnimationPacket(mannequin.getId(), 0);
             case ADD_ENTITY ->
-                    new ClientboundAddEntityPacket(mannequin, new ServerEntity(level, mannequin, 20, false, null, null, null));
+                    new ClientboundAddEntityPacket(mannequin, new ServerEntity(level, mannequin, 20, false, null, null));
             case INFO_UPDATE ->
                     new ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, mannequin);
             case SET_ENTITY_DATA ->
                     new ClientboundSetEntityDataPacket(mannequin.getId(), mannequin.getEntityData().getNonDefaultValues());
             case SET_EQUIPMENT -> new ClientboundSetEquipmentPacket(mannequin.getId(), getItems(sp));
-            case INFO_REMOVE -> new ClientboundPlayerInfoRemovePacket(List.of(mannequin.getGameProfile().getId()));
+            case INFO_REMOVE -> new ClientboundPlayerInfoRemovePacket(List.of(mannequin.getGameProfile().id()));
             case REMOVE_ENTITY -> new ClientboundRemoveEntitiesPacket(mannequin.getId());
             case TELEPORT ->
                     new ClientboundTeleportEntityPacket(mannequin.getId(), new PositionMoveRotation(new Vec3(sp.getX() - mannequin.getX(), sp.getY() + yDiff - mannequin.getY(), sp.getZ() - mannequin.getZ()), new Vec3(0, 0, 0), 0, 0), Relative.ALL, mannequin.onGround());
@@ -218,12 +218,12 @@ public class VersionController_v1_21_10 implements VersionController {
 
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
-        MinecraftServer server = sp.getServer();
+        MinecraftServer server = sp.server;
         ServerLevel level = sp.level();
 
         UUID mannequinUUID = UUID.randomUUID();
         String mannequinName = p.getName();
-        GameProfile mannequinProfile = new GameProfile(mannequinUUID, mannequinName);
+        GameProfile mannequinProfile = new GameProfile(mannequinUUID, mannequinName, new PropertyMap(sp.getGameProfile().properties()));
 
         ServerPlayer mannequin = new ServerPlayer(server, level, mannequinProfile, new ClientInformation("en_us", 10, ChatVisiblity.FULL, true, sp.clientInformation().modelCustomisation(), net.minecraft.world.entity.player.Player.DEFAULT_MAIN_HAND, false, false, ParticleStatus.ALL));
 
@@ -234,15 +234,6 @@ public class VersionController_v1_21_10 implements VersionController {
         mannequin.setPose(Pose.SWIMMING);
         mannequin.setUUID(mannequinUUID);
         mannequin.setGameMode(GameType.SURVIVAL);
-
-        // Set mannequin skin
-        try {
-            Property skin = (Property) sp.getGameProfile().getProperties().get("textures").toArray()[0];
-            String textures = skin.value();
-            String signature = skin.signature();
-            mannequin.getGameProfile().getProperties().put("textures", new Property("textures", textures, signature));
-        } catch (ArrayIndexOutOfBoundsException ignored) {
-        }
 
         // Create mannequin server connection
         new ServerGamePacketListenerImpl(server, new Connection(PacketFlow.CLIENTBOUND), mannequin, CommonListenerCookie.createInitial(mannequin.getGameProfile(), false));
