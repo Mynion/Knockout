@@ -6,7 +6,7 @@
 
     <groupId>org.mynion</groupId>
     <artifactId>Knockout</artifactId>
-    <version>1.5.3</version>
+    <version>1.6.0</version>
     <packaging>pom</packaging>
 
     <name>Knockout</name>
