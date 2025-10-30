@@ -40,6 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import org.mynion.knockoutplugin.enums.PacketType;
 import org.mynion.knockoutplugin.enums.PotionType;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -218,7 +219,19 @@ public class VersionController_v1_21_10 implements VersionController {
 
         CraftPlayer cp = (CraftPlayer) p;
         ServerPlayer sp = cp.getHandle();
-        MinecraftServer server = sp.server;
+        MinecraftServer server = null;
+        // Solves a problem with private "server" attribute on experimental paper 1.21.10
+        try{
+            Field field = ServerPlayer.class.getDeclaredField("server");
+            if(field.canAccess(sp)){
+                server = sp.server;
+            } else {
+                field.setAccessible(true);
+                server = (MinecraftServer) field.get(sp);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         ServerLevel level = sp.level();
 
         UUID mannequinUUID = UUID.randomUUID();
