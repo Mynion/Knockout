@@ -166,11 +166,6 @@ public class VersionController_v1_21_10 implements VersionController {
     }
 
     @Override
-    public UUID getMannequinUUID(NpcModel npc) {
-        return ((Npc) npc).getMannequin().getGameProfile().id();
-    }
-
-    @Override
     public void broadcastPacket(NpcModel npc, PacketType packetType) {
         Packet<?> packet = createPacket((Npc) npc, packetType);
         MinecraftServer server = MinecraftServer.getServer();
@@ -263,5 +258,10 @@ public class VersionController_v1_21_10 implements VersionController {
 
     private ServerPlayer getServerPlayer(Player p) {
         return ((CraftPlayer) p).getHandle();
+    }
+
+    @Override
+    public UUID getMannequinUUID(NpcModel npc) {
+        return ((Npc) npc).getMannequin().getGameProfile().id();
     }
 }

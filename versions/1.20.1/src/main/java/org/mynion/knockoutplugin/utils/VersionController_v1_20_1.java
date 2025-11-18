@@ -246,4 +246,9 @@ public class VersionController_v1_20_1 implements VersionController {
     private ServerPlayer getServerPlayer(Player p) {
         return ((CraftPlayer) p).getHandle();
     }
+
+    @Override
+    public UUID getMannequinUUID(NpcModel npc) {
+        return ((Npc) npc).getMannequin().getGameProfile().getId();
+    }
 }
