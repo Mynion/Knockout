@@ -166,6 +166,11 @@ public class VersionController_v1_21_10 implements VersionController {
     }
 
     @Override
+    public UUID getMannequinUUID(NpcModel npc) {
+        return ((Npc) npc).getMannequin().getGameProfile().id();
+    }
+
+    @Override
     public void broadcastPacket(NpcModel npc, PacketType packetType) {
         Packet<?> packet = createPacket((Npc) npc, packetType);
         MinecraftServer server = MinecraftServer.getServer();
@@ -221,16 +226,18 @@ public class VersionController_v1_21_10 implements VersionController {
         ServerPlayer sp = cp.getHandle();
         MinecraftServer server = null;
         // Solves a problem with private "server" attribute on experimental paper 1.21.10
-        try{
+        try {
             Field field = ServerPlayer.class.getDeclaredField("server");
-            if(field.canAccess(sp)){
+            if (field.canAccess(sp)) {
                 server = sp.server;
             } else {
                 field.setAccessible(true);
                 server = (MinecraftServer) field.get(sp);
             }
-        } catch (Exception e){
-            e.printStackTrace();
+        } catch (NoSuchFieldException e1) {
+            server = sp.server;
+        } catch (Exception e2) {
+            e2.printStackTrace();
         }
         ServerLevel level = sp.level();
 

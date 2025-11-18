@@ -37,4 +37,4 @@ permissions:
     description: Permission to use admin /knockout commands
     default: op
 
-softdepend: [TAB, PlaceholderAPI]
+softdepend: [TAB, PlaceholderAPI, WorldGuard]

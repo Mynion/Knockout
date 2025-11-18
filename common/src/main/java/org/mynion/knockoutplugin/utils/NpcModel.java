@@ -3,6 +3,7 @@ package org.mynion.knockoutplugin.utils;
 import jline.internal.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.ArmorStand;
@@ -30,6 +31,7 @@ public abstract class NpcModel {
     private DamageSource knockoutDamageSource;
     private DamageSource lastDamageSource;
     private boolean isDead;
+    private Location lastLocation;
 
     public NpcModel(Player player, ArmorStand armorStand, GameMode previousGameMode, @Nullable Entity killer) {
         this.player = player;
@@ -41,6 +43,7 @@ public abstract class NpcModel {
             player.getPersistentDataContainer().set(new NamespacedKey(Knockout.getPlugin(), "killer"), PersistentDataType.STRING, killer.getName());
         isVulnerableByPlayerWhenCarried = true;
         isDead = false;
+        lastLocation = player.getLocation();
     }
 
     public Player getPlayer() {
@@ -148,5 +151,13 @@ public abstract class NpcModel {
 
     public void setDead(boolean dead) {
         isDead = dead;
+    }
+
+    public Location getLastLocation() {
+        return lastLocation;
+    }
+
+    public void setLastLocation(Location lastLocation) {
+        this.lastLocation = lastLocation;
     }
 }

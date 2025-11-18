@@ -16,6 +16,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.mynion.knockoutplugin.Knockout;
 import org.mynion.knockoutplugin.compatibility.TabAdapter;
+import org.mynion.knockoutplugin.compatibility.WorldGuardAdapter;
 import org.mynion.knockoutplugin.enums.PacketType;
 import org.mynion.knockoutplugin.enums.PotionType;
 
@@ -172,6 +173,10 @@ public class NpcManager {
         // Set previous gamemode
         p.setGameMode(previousGameMode);
 
+        if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
+            WorldGuardAdapter.removeMannequinFromRegions(npc);
+        }
+
     }
 
     private void applyKnockoutEffects(Player p) {
@@ -315,6 +320,14 @@ public class NpcManager {
                     this.cancel();
                     return;
                 }
+                if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
+                    if (!WorldGuardAdapter.canEnterRegion(p)) {
+                        return;
+                    }
+                }
+
+                npc.setLastLocation(p.getLocation());
+
                 versionController.broadcastPacket(npc, PacketType.TELEPORT);
                 if (p.isInsideVehicle()) {
                     versionController.teleportMannequin(npc, p.getLocation().getX(), p.getLocation().getY() + 0.6, p.getLocation().getZ());
@@ -715,5 +728,9 @@ public class NpcManager {
 
     public Entity getKiller(Player p) {
         return getNpc(p).getKiller();
+    }
+
+    public VersionController getVersionController() {
+        return versionController;
     }
 }
