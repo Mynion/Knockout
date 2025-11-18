@@ -31,14 +31,15 @@ public class WorldGuardAdapter {
 
         UUID mannequinUUID = npcManager.getVersionController().getMannequinUUID(npc);
 
-        query.getApplicableRegions(loc).getRegions().stream()
+        // Prevent teleporting mannequin bug when dropped a knocked out player on WorldGuard cuboid from above
+        query.getApplicableRegions(loc.setY(loc.getY() - 1)).getRegions().stream()
                 .filter(r -> !r.getMembers().contains(mannequinUUID))
                 .forEach(r -> r.getMembers().addPlayer(mannequinUUID));
 
         SessionManager sessionManager = WorldGuard.getInstance().getPlatform().getSessionManager();
 
         LocalPlayer localVehicle = null;
-        if(npc.getVehicle() != null){
+        if (npc.getVehicle() != null) {
             localVehicle = WorldGuardPlugin.inst().wrapPlayer(npc.getVehicle());
         }
 
@@ -47,6 +48,11 @@ public class WorldGuardAdapter {
             npcManager.dropPlayer(p, npc.getVehicle());
             p.teleport(npc.getLastLocation());
             return false;
+        } else {
+            // Add mannequin to region so it can enter it
+            query.getApplicableRegions(loc).getRegions().stream()
+                    .filter(r -> !r.getMembers().contains(mannequinUUID))
+                    .forEach(r -> r.getMembers().addPlayer(mannequinUUID));
         }
 
         return true;
