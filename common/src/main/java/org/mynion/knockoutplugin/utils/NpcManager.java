@@ -343,6 +343,12 @@ public class NpcManager {
 
     // Start carrying a knocked out player
     public void carryPlayer(Player knockedOutPlayer, Player vehicle) {
+        if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
+            if (!WorldGuardAdapter.canCarryPlayer(vehicle, knockedOutPlayer)) {
+                return;
+            }
+        }
+
         getNpc(knockedOutPlayer).setVehicle(vehicle);
 
         // Checking if knocked out player is riding a vehicle

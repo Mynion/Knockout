@@ -69,4 +69,16 @@ public class WorldGuardAdapter {
         manager.getRegions().forEach((s, r) -> r.getMembers().removePlayer(mannequinUUID));
 
     }
+
+    public static boolean canCarryPlayer(Player vehicle, Player knockedOutPlayer) {
+        LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(knockedOutPlayer);
+        Location loc = new Location(localPlayer.getWorld(), vehicle.getLocation().getX(), vehicle.getLocation().getY(), vehicle.getLocation().getZ());
+        RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
+        RegionQuery query = container.createQuery();
+
+        SessionManager sessionManager = WorldGuard.getInstance().getPlatform().getSessionManager();
+
+        // Can entry region?
+        return query.testState(loc, localPlayer, Flags.ENTRY) || sessionManager.hasBypass(localPlayer, localPlayer.getWorld());
+    }
 }
