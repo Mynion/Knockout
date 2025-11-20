@@ -107,6 +107,13 @@ revive-by-instant-health: false
 # When true: players can be carried by Shift+RightClick and dropped by Shift+LeftClick
 click-to-carry-drop: true
 
+# When true: if a knocked out player lefts the server, knockout will end
+end-knockout-on-quit: true
+
+# When true: replaces the death cause with knockout cause
+# Works only on 1.20.4+ versions
+remember-death-cause: true
+
 # When true: player will respawn in the specific location given below
 # Works only on 1.20.6+ versions
 # WARNING: If true, the player will respawn in this specific location even if it is not safe! Make sure to set it to a safe location!
@@ -132,6 +139,15 @@ world-blacklist:
   -
 
 # Note that "/ko knockout" command will work in all worlds regardless of the whitelist/blacklist
+
+# When true: replaces the original death message with new-death-message. Set remember-death-cause to false for this to work correctly
+replace-death-message: false
+
+# Replaces the original death message, if replace-death-message is set to true and %entity% exists. Set remember-death-cause to false for this to work correctly
+# Use variable %player% to show the knocked out player name
+# Use variable %entity% to show the name of the entity causing knockout
+# Use variable %death_message% to show the original death message
+new-death-message: "%player% was knocked out by %entity%, then %death_message%"
 
 # Message for the player when knocked out
 knockout-message: '&cYou have been knocked out! Ask someone to revive you or use /die to die at once.'
