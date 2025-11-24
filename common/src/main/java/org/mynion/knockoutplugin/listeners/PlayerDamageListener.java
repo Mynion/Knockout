@@ -1,5 +1,6 @@
 package org.mynion.knockoutplugin.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -91,7 +92,7 @@ public class PlayerDamageListener implements Listener {
                         // End knockout
                         NpcManager.endKnockout(p, false);
                     }
-                } else {
+                } else if (e.getCause() != EntityDamageEvent.DamageCause.KILL) {
 
                     // Check world white/black list
                     if (Knockout.getPlugin().getConfig().getList("world-blacklist").contains(p.getWorld().getName()))
