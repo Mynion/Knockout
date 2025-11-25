@@ -58,6 +58,7 @@ public class VersionController_v1_21_5 implements VersionController {
     public void setCollisions(Player p, boolean on) {
         ServerPlayer sp = getServerPlayer(p);
         PlayerTeam team = new PlayerTeam(new Scoreboard(), "mannequin");
+        if (sp.getTeam() != null && sp.getTeam().getName().startsWith("PVP-")) team = sp.getTeam();
         if (on) {
             if (sp.getTeam() != null) {
                 team.setCollisionRule(sp.getTeam().getCollisionRule());

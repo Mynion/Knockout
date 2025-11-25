@@ -10,6 +10,7 @@ import org.mynion.knockoutplugin.commands.DieCommand;
 import org.mynion.knockoutplugin.commands.CarryCommand;
 import org.mynion.knockoutplugin.commands.DropCommand;
 import org.mynion.knockoutplugin.commands.KnockoutCommand;
+import org.mynion.knockoutplugin.compatibility.PVPManagerListener;
 import org.mynion.knockoutplugin.compatibility.PapiExpansion;
 import org.mynion.knockoutplugin.listeners.*;
 import org.mynion.knockoutplugin.listeners.cancelled.*;
@@ -65,6 +66,8 @@ public final class Knockout extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerWorldListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerPortalListener(), this);
         getServer().getPluginManager().registerEvents(new PotionSplashListener(), this);
+        if (Bukkit.getPluginManager().isPluginEnabled("PvPManager"))
+            getServer().getPluginManager().registerEvents(new PVPManagerListener(), this);
         getCommand("carry").setExecutor(new CarryCommand());
         getCommand("drop").setExecutor(new DropCommand());
         getCommand("die").setExecutor(new DieCommand());
@@ -79,7 +82,7 @@ public final class Knockout extends JavaPlugin {
     public void onDisable() {
         if (NpcManager != null) NpcManager.endAllKnockouts();
 
-        for(Player player : this.getServer().getOnlinePlayers()) {
+        for (Player player : this.getServer().getOnlinePlayers()) {
             if (player.hasMetadata("KnockoutLooting")) {
                 player.closeInventory();
                 player.removeMetadata("KnockoutLooting", this);
