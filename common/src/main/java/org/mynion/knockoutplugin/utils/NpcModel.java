@@ -44,6 +44,9 @@ public abstract class NpcModel {
         isVulnerableByPlayerWhenCarried = true;
         isDead = false;
         lastLocation = player.getLocation();
+        if(Knockout.getNpcManager().useDamageSource()){
+            lastDamageSource = player.getLastDamageCause().getDamageSource();
+        }
     }
 
     public Player getPlayer() {

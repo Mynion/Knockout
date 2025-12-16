@@ -152,8 +152,20 @@ public class NpcManager {
 
         // Kill player if needed
         if (killPlayer) {
+            if (useDamageSource()) {
+                getNpc(p).setVulnerableByPlayerWhenCarried(true);
+                DamageSource damageSource;
+                if (Knockout.getPlugin().getConfig().getBoolean("remember-death-cause")) {
+                    damageSource = npc.getKnockoutDamageSource();
+                    Bukkit.getServer().broadcastMessage("1");
+                } else {
+                    damageSource = npc.getLastDamageSource();
+                    Bukkit.getServer().broadcastMessage("2");
+                }
+                p.damage(p.getHealth(), damageSource);
+            }
             // Sets a player killer
-            if (getKiller(p) != null) {
+            else if (getKiller(p) != null) {
                 getNpc(p).setVulnerableByPlayerWhenCarried(true);
                 p.damage(p.getHealth(), getKiller(p));
             }
