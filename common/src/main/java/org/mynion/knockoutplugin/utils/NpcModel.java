@@ -6,6 +6,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -44,8 +45,9 @@ public abstract class NpcModel {
         isVulnerableByPlayerWhenCarried = true;
         isDead = false;
         lastLocation = player.getLocation();
-        if(Knockout.getNpcManager().useDamageSource()){
-            lastDamageSource = player.getLastDamageCause().getDamageSource();
+        if (Knockout.getNpcManager().useDamageSource()) {
+            lastDamageSource = DamageSource.builder(DamageType.GENERIC).build();
+            if (player.getLastDamageCause() != null) lastDamageSource = player.getLastDamageCause().getDamageSource();
         }
     }
 
