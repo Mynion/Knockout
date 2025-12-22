@@ -133,17 +133,20 @@ public class NpcManager {
     // End knockout for a player
     public void endKnockout(Player p, boolean killPlayer) {
         NpcModel npc = getNpc(p);
+        GameMode previousGameMode = npc.getPreviousGameMode();
 
         endKnockoutTemporary(p, killPlayer);
 
         // Remove npc from npc list
         NPCs.remove(npc);
 
+        // Set previous gamemode
+        p.setGameMode(previousGameMode);
+
     }
 
     public void endKnockoutTemporary(Player p, boolean killPlayer) {
         NpcModel npc = getNpc(p);
-        GameMode previousGameMode = npc.getPreviousGameMode();
 
         // Leave vehicle
         if (p.isInsideVehicle()) {
@@ -157,10 +160,8 @@ public class NpcManager {
                 DamageSource damageSource;
                 if (Knockout.getPlugin().getConfig().getBoolean("remember-death-cause")) {
                     damageSource = npc.getKnockoutDamageSource();
-                    Bukkit.getServer().broadcastMessage("1");
                 } else {
                     damageSource = npc.getLastDamageSource();
-                    Bukkit.getServer().broadcastMessage("2");
                 }
                 p.damage(p.getHealth(), damageSource);
             }
@@ -181,9 +182,6 @@ public class NpcManager {
 
         // Remove hologram
         npc.getArmorStand().remove();
-
-        // Set previous gamemode
-        p.setGameMode(previousGameMode);
 
         if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
             WorldGuardAdapter.removeMannequinFromRegions(npc);

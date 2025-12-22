@@ -14,7 +14,6 @@ public class GameModeListener implements Listener {
         if (NpcManager.npcExists(e.getPlayer())) {
             e.setCancelled(true);
             MessageUtils.sendMessage(e.getPlayer(), "not-allowed-message");
-
         }
     }
 }
