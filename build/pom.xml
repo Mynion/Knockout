@@ -15,7 +15,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <output.version>1.21.10</output.version>
+        <output.version>1.21.11</output.version>
     </properties>
 
     <profiles>
@@ -72,6 +72,12 @@
                 <dependency>
                     <groupId>org.mynion</groupId>
                     <artifactId>1.21.10</artifactId>
+                    <version>${project.version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.mynion</groupId>
+                    <artifactId>1.21.11</artifactId>
                     <version>${project.version}</version>
                     <scope>compile</scope>
                 </dependency>
